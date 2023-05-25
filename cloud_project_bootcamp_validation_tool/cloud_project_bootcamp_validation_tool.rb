@@ -17,7 +17,7 @@ end
 
 class Cpbvt::Aws2023
   def self.run
-    base_attrs = {
+    attrs = {
       project_scope: "aws-bootcamp-2023",
       user_uuid: 'da124fec-133b-45c5-8423-04b768c886c2',
       region: 'ca-central-1',
