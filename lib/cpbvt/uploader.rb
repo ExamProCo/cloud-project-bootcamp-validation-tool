@@ -6,12 +6,12 @@ require 'aws-sdk-s3'
 class Cpbvt::Uploader
   # file_path - the path to the json file to be uploaded
   # object_key - the s3 object key that the file will use in the bucket
-  def self.run file_path:, 
+  def self.run(file_path:, 
                object_key:,
                aws_region:,
                aws_access_key_id:,
                aws_secret_access_key:,
-               payloads_bucket:
+               payloads_bucket:)
     Aws.config.update({
       region: aws_region,
       credentials: Aws::Credentials.new(
@@ -44,7 +44,7 @@ class Cpbvt::Uploader
   end # self.run
 
   # create the key to where the json file will be uploaded into the bucket
-  def self.output_key user_uuid:,
+  def self.object_key user_uuid:,
                       project_scope:,
                       region:, 
                       filename:

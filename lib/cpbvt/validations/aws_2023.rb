@@ -1,6 +1,6 @@
 require "openai"
 
-class Cpbvt::Validations::Aws:2023
+class Cpbvt::Validations::Aws2023
   def self.run
     client = OpenAI::Client.new
 

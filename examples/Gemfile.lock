@@ -33,6 +33,8 @@ GEM
     faraday-net_http (3.0.2)
     jmespath (1.6.2)
     multipart-post (2.3.0)
+    ox (2.14.16)
+    rake (13.0.6)
     ruby-openai (4.1.0)
       faraday (>= 1)
       faraday-multipart (>= 1)
@@ -44,6 +46,8 @@ PLATFORMS
 DEPENDENCIES
   cloud_project_bootcamp_validation_tool!
   dotenv
+  ox
+  rake
 
 BUNDLED WITH
    2.4.9

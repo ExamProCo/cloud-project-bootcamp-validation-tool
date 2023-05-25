@@ -2,6 +2,7 @@
 
 source "https://rubygems.org"
 
-# gem "aws-sdk-ec2"
 gem 'cloud_project_bootcamp_validation_tool', path: "/workspace/cloud-project-bootcamp-validation-tool"
 gem 'dotenv', groups: [:development, :test]
+gem 'rake'
+gem 'ox'
