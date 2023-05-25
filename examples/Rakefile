@@ -8,7 +8,7 @@ namespace :run do
       project_scope: "aws-bootcamp-2023",
       user_uuid: ENV['USER_UUID'],
       region: ENV['USER_AWS_REGION'],
-      output_path: ENV['OUTPUT_PATH']
+      output_path: ENV['OUTPUT_PATH'],
       aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
       aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
       payloads_bucket: ENV['PAYLOADS_BUCKET']

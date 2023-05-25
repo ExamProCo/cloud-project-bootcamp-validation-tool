@@ -1,10 +1,7 @@
-require_relative 'lib/uploader'
-require_relative 'lib/payloads/aws'
-require_relative 'lib/validations/aws_2023'
-
-# load our .env file into the environment variables
-require 'dotenv'
-Dotenv.load
+require_relative 'cpbvt/version'
+require_relative 'cpbvt/uploader'
+require_relative 'cpbvt/payloads/aws'
+require_relative 'cpbvt/validations/aws_2023'
 
 # Define all our modules so we don't have nest modules
 # names in our files

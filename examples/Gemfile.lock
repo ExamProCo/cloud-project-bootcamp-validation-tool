@@ -1,5 +1,5 @@
 PATH
-  remote: .
+  remote: /workspace/cloud-project-bootcamp-validation-tool
   specs:
     cloud_project_bootcamp_validation_tool (0.1.0)
       aws-sdk-s3
@@ -24,6 +24,7 @@ GEM
       aws-sigv4 (~> 1.4)
     aws-sigv4 (1.5.2)
       aws-eventstream (~> 1, >= 1.0.2)
+    dotenv (2.8.1)
     faraday (2.7.5)
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
@@ -42,6 +43,7 @@ PLATFORMS
 
 DEPENDENCIES
   cloud_project_bootcamp_validation_tool!
+  dotenv
 
 BUNDLED WITH
    2.4.9
