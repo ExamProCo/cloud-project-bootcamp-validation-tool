@@ -1,4 +1,4 @@
-require 'cpbvt'
+require_relative '../lib/cpbvt'
 require 'dotenv'
 
 Dotenv.load
