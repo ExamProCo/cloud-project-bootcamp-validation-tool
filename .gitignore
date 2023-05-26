@@ -12,7 +12,7 @@
 
 .env
 
-output/*
+output/**/*
 # Used by dotenv library to load environment variables.
 # .env
 
