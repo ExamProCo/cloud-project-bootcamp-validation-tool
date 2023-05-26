@@ -1,13 +1,17 @@
 require_relative '../lib/cpbvt'
 require 'dotenv'
+require 'securerandom'
 
 Dotenv.load
 
 namespace :run do
   task :aws_2023 do
     puts "aws_2023 =="
+
+    run_uuid =
     Cpbvt::Aws2023.run(
       project_scope: "aws-bootcamp-2023",
+      run_uuid: SecureRandom.uuid,
       user_uuid: ENV['USER_UUID'],
       user_region: ENV['USER_AWS_REGION'],
       output_path: ENV['OUTPUT_PATH'],

@@ -46,18 +46,19 @@ class Cpbvt::Uploader
   # create the key to where the json file will be uploaded into the bucket
   def self.object_key user_uuid:,
                       project_scope:,
+                      run_uuid:,
                       region:, 
                       filename:
     value = File.join(
       project_scope, 
-      user_uuid, 
+      "user-#{user_uuid}",
+      "run-#{run_uuid}",
       region, 
       filename
     )
 
     # print the desination of the outputed json
-    puts "[Output Key]"
-    puts value
+    puts "[Output Key] #{value}"
 
     return value
   end

@@ -1,10 +1,14 @@
 require 'fileutils'
 require 'ostruct'
+require 'time'
+
 
 module Cpbvt::Payloads::Aws::Runner
   def self.run command, attrs
+    starts_at = Time.now.to_i
     attrs = OpenStruct.new attrs
     output_file = Cpbvt::Payloads::Aws::Runner::output_file(
+      run_uuid: attrs.run_uuid,
       user_uuid: attrs.user_uuid,
       project_scope: attrs.project_scope,
       region: attrs.user_region, 
@@ -14,6 +18,7 @@ module Cpbvt::Payloads::Aws::Runner
 
     object_key = Cpbvt::Uploader::object_key(
       user_uuid: attrs.user_uuid,
+      run_uuid: attrs.run_uuid,
       project_scope: attrs.project_scope,
       region: attrs.user_region, 
       filename: attrs.filename
@@ -22,7 +27,7 @@ module Cpbvt::Payloads::Aws::Runner
     command = Cpbvt::Payloads::Aws::Commands.send(
       command,
       output_file: output_file,
-      region: attrs.region
+      region: attrs.user_region
     )
 
     Cpbvt::Payloads::Aws::Runner.execute command
@@ -35,10 +40,22 @@ module Cpbvt::Payloads::Aws::Runner
       aws_secret_access_key: attrs.aws_secret_access_key,
       payloads_bucket: attrs.payloads_bucket
     )
+
+    ends_at = Time.now.to_i
+    {
+      benchmark: {
+        starts_at: starts_at,
+        ends_at:  ends_at,
+        duration_in_seconds: ends_at - starts_at
+      },
+      command: command,
+      object_key: object_key
+    }
   end
 
   # create the path to where the json file will be downloaded
   def self.output_file(user_uuid:, 
+                       run_uuid:,
                        project_scope:,
                        region:,
                        output_path:,
@@ -46,7 +63,8 @@ module Cpbvt::Payloads::Aws::Runner
     value = File.join(
       output_path, 
       project_scope, 
-      user_uuid, 
+      "user-#{user_uuid}",
+      "run-#{run_uuid}",
       region, 
       filename
     )
@@ -55,38 +73,15 @@ module Cpbvt::Payloads::Aws::Runner
     FileUtils.mkdir_p File.dirname(value)
 
     # print the desination of the outputed json
-    puts "[Output File]"
-    puts value
+    puts "[Output File] #{value}"
 
     return value
   end
 
   def self.execute command
     # print the command so we know what is running
-    puts "[Executing...]"
-    puts command
+    puts "[Executing] #{command}"
     # run the command which will download the json
     system command
-  end
-end
-
-class Cpbvt::Payloads::Aws::Commands
-  def self.ec2_describe_vpcs(region:, output_file:)
-    # format the AWS CLI command to be a single line
-    command = <<~COMMAND.strip.gsub("\n", " ")
-aws ec2 describe-vpcs \
---region #{region} \
---output json \
-> #{output_file}
-  COMMAND
-  end
-
-  # We can't use s3 ls because it won't return json
-  def self.s3api_list_buckets(region:, output_file:)
-    command = <<~COMMAND.strip.gsub("\n", " ")
-aws s3api list-buckets  \
---output json \
-> #{output_file}
-    COMMAND
   end
 end
