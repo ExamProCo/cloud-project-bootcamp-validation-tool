@@ -48,6 +48,18 @@ aws s3api list-buckets  \
     COMMAND
   end
 
+  def ec2_describe_vpc_gateway_attachments(region:, output_file:)
+    command = <<~COMMAND.strip.gsub("\n", " ")
+      aws ec2 describe-vpc-attachments \
+      --region #{region} \
+      --output json \
+      > #{output_file}
+    COMMAND
+  
+    # Run the command using the system call or execute it with a shell
+    # based on your preferred method.
+  end
+
   # listing security groups
   def self.ec2_describe_security_groups(region:, output_file:)
     command = <<~COMMAND.strip.gsub("\n", " ")
@@ -109,4 +121,17 @@ aws s3api list-buckets  \
     > #{output_file}
     COMMAND
   end
+
+  def ec2_describe_route_tables(region:, output_file:)
+    command = <<~COMMAND.strip.gsub("\n", " ")
+      aws ec2 describe-route-tables \
+      --region #{region} \
+      --output json \
+      > #{output_file}
+    COMMAND
+  
+    # Run the command using the system call or execute it with a shell
+    # based on your preferred method.
+  end
+
 end
