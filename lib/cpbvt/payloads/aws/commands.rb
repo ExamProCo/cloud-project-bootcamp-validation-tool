@@ -14,4 +14,5 @@ class Cpbvt::Payloads::Aws::Commands
   include Cpbvt::Payloads::Aws::Commands::Rds
   include Cpbvt::Payloads::Aws::Commands::Rout53
   include Cpbvt::Payloads::Aws::Commands::S3api
+  include Cpbvt::Payloads::Aws::Commands::Servicediscovery
 end

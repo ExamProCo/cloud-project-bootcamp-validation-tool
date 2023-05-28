@@ -24,11 +24,19 @@ module Cpbvt::Payloads::Aws::Runner
       filename: attrs.filename
     )
 
-    command = Cpbvt::Payloads::Aws::Commands.send(
-      command,
-      output_file: output_file,
-      region: attrs.user_region
-    )
+    # only pass the region if it's not global
+    if attrs.user_region == 'global'
+      command = Cpbvt::Payloads::Aws::Commands.send(
+        command,
+        output_file: output_file
+      )
+    else
+      command = Cpbvt::Payloads::Aws::Commands.send(
+        command,
+        output_file: output_file,
+        region: attrs.user_region
+      )
+    end
 
     Cpbvt::Payloads::Aws::Runner.execute command
     # upload json file to s3

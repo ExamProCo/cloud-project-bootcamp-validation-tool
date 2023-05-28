@@ -3,7 +3,7 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 
 # apigatewayv2 get-authorizers
-def apigatewayv2_get_authorizers(region:, output_file:, api_id)
+def apigatewayv2_get_authorizers(region:, output_file:, api_id:)
   command = <<~COMMAND.strip.gsub("\n", " ")
 aws apigatewayv2 get-authorizers \
 --api-id #{api_id} \
@@ -12,7 +12,7 @@ COMMAND
 end
 
 # apigatewayv2 get-integerations
-def apigatewayv2_get_integrations(region:, output_file:, api_id)
+def apigatewayv2_get_integrations(region:, output_file:, api_id:)
 command = <<~COMMAND.strip.gsub("\n", " ")
 aws apigatewayv2 get-integrations \
 --api-id #{api_id} \

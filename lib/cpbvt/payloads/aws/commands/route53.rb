@@ -13,7 +13,7 @@ end
 def route53_get_hosted_zone(region:, output_file: hosted_zone_id:)
   command = <<~COMMAND.strip.gsub("\n", " ")
 aws route53 get-hosted-zone \
---id #{hosted_zone_id} 
+--id #{hosted_zone_id} \
 --region #{region} --output json > #{output_file}
 COMMAND
 end
@@ -21,7 +21,7 @@ end
 def route53_list_resource_record_sets(region:, output_file:,hosted_zone_id:)
   command = <<~COMMAND.strip.gsub("\n", " ")
 aws route53 list-resource-record-sets \
---hosted-zone-id #{hosted_zone_id}
+--hosted-zone-id #{hosted_zone_id} \
 --region #{region} --output json > #{output_file}
 COMMAND
 
