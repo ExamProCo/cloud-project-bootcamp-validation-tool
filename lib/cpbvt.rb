@@ -4,6 +4,7 @@ require_relative 'cpbvt/uploader'
 require_relative 'cpbvt/manifest'
 require_relative 'cpbvt/payloads/aws/runner'
 require_relative 'cpbvt/payloads/aws/commands'
+require_relative 'cpbvt/payloads/aws/commands/ec2'
 require_relative 'cpbvt/payloads/aws/policies'
 require_relative 'cpbvt/validations/aws_2023'
 
