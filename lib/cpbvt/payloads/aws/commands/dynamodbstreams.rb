@@ -10,5 +10,12 @@ aws dynamodbstreams list-streams \
 COMMAND
 end
 
+def dynamodbstreams_describe_stream(region:, output_file:, stream_arn:) 
+  command = <<~COMMAND.strip.gsub("\n", " ")
+aws dynamodbstreams describe-stream \
+--stream-arn #{stream_arn} \
+--region #{region} --output json > #{output_file}
+end
+
 # ------
 end; end

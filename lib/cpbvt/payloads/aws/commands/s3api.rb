@@ -34,12 +34,65 @@ get-bucket-notification-configuration \
 COMMAND
 end
 
-def s3api_get_bucket_policy( output_file:, bucket:)
-command = <<~COMMAND.strip.gsub("\n", " ")
+def s3api_get_bucket_policy(region:, output_file:, bucket:)
+  command = <<~COMMAND.strip.gsub("\n", " ")
 aws s3api get-bucket-policy \
 --bucket #{bucket} \
 --output json > #{output_file}
 COMMAND
 end
+
+def s3api_get_bucket_cors(region:, output_file:, bucket:)
+  command = <<~COMMAND.strip.gsub("\n", " ")
+aws s3api get-bucket-cors \
+--bucket #{bucket} \
+--output json > #{output_file}
+COMMAND
+end
+
+def s3api_get_bucket_website(region:, output_file:, bucket:)
+   command = <<~COMMAND.strip.gsub("\n", " ") 
+aws s3api get-bucket-website \
+--bucket #{bucket} \
+--output json > #{output_file}
+COMMAND
+end
+
+def s3api_get_object_header(region:, output_file:, bucket:, key:) 
+  command = <<~COMMAND.strip.gsub("\n", " ")
+aws s3api get-object-metadata \
+--bucket #{bucket} \
+--key #{key} \
+--output json > #{output_file}
+COMMAND
+end
+
+# special since we are downloading a file
+def s3api_get_object(region:, output_file:, bucket:, key:)
+   command = <<~COMMAND.strip.gsub("\n", " ")
+aws s3api get-object \
+--bucket #{bucket} \
+--key #{key} \
+--output json > #{output_file}
+COMMAND
+end
+
+def s3api_get_public_access_block(region:, output_file:, bucket:) 
+  command = <<~COMMAND.strip.gsub("\n", " ")
+aws s3api get-public-access-block \
+--bucket #{bucket} \
+--output json > #{output_file}
+COMMAND
+end
+
+def s3api_list_objects_v2(region:, output_file:, bucket:, prefix:)
+   command = <<~COMMAND.strip.gsub("\n", " ")
+   aws s3api list-objects-v2 \
+   --bucket #{bucket} \
+   --prefix #{prefix} \
+   --output json > #{output_file}
+   COMMAND
+end
+
 # ------
 end; end

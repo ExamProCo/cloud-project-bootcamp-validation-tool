@@ -35,22 +35,3 @@ AWS Architecture:
 Please provide a single codeblock of AWS CLI commands for the provided AWS Architecture following the provided Codeblock Criteria
 
 --- output
-
-aws ecs describe-clusters --cluster my-cluster
-aws ecs describe-services --cluster my-cluster --service backend-service
-aws ecr describe-repositories --repository-names backend-flask-app
-aws codebuild describe-projects --names backend-flask-build
-aws rds describe-db-instances --db-instance-identifier my-db-instance
-aws dynamodb describe-table --table-name my-table
-aws cognito-idp describe-user-pool --user-pool-id my-user-pool-id
-aws s3api head-bucket --bucket my-static-website-bucket
-aws cloudfront get-distribution --id my-distribution-id
-aws apigateway get-rest-api --rest-api-id my-api-id
-aws lambda get-function --function-name my-lambda
-aws s3api get-bucket-notification-configuration --bucket my-assets-bucket
-aws route53 get-hosted-zone --id my-hosted-zone-id
-aws acm describe-certificate --certificate-arn my-certificate-arn
-aws apigateway get-domain-name --domain-name api.my-domain.com
-aws s3api get-bucket-policy --bucket my-static-website-bucket
-aws cloudfront get-distribution --id my-assets-distribution-id
-aws route53 list-resource-record-sets --hosted-zone-id my-hosted-zone-id

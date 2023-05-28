@@ -26,5 +26,6 @@ aws lambda list-layers \
 --region #{region} --output json > #{output_file}
 COMMAND
 end
+
 # ------
 end; end
