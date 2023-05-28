@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::Commands::Rds
+module Cpbvt::Payloads::Aws::CommandsModules::Rds
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
@@ -7,13 +7,6 @@ module ClassMethods
 def rds_describe_db_instances(region:, output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
 aws rds describe-db-instances \
---region #{region} --output json > #{output_file}
-COMMAND
-end
-
-def rds_describe_db_security_groups(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws rds describe-db-security-groups \
 --region #{region} --output json > #{output_file}
 COMMAND
 end

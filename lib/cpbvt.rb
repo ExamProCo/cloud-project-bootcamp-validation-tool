@@ -2,9 +2,12 @@ require_relative 'cpbvt/module_defs'
 require_relative 'cpbvt/version'
 require_relative 'cpbvt/uploader'
 require_relative 'cpbvt/manifest'
+# --- require cpbvt/payloads/aws/commands/*
+aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','aws','commands_modules','*.rb')
+Dir.glob(aws_commands_path,&method(:require))
+# ---
 require_relative 'cpbvt/payloads/aws/runner'
-require_relative 'cpbvt/payloads/aws/commands'
-require_relative 'cpbvt/payloads/aws/commands/ec2'
+require_relative 'cpbvt/payloads/aws/commands.rb'
 require_relative 'cpbvt/payloads/aws/policies'
 require_relative 'cpbvt/validations/aws_2023'
 
@@ -51,23 +54,16 @@ class Cpbvt::Aws2023
       ec2_describe_subnets
       ec2_describe_route_tables
       ec2_describe_internet_gateways
-      ec2_describe_vpc_gateway_attachments
       ec2_describe_security_groups
       ec2_describe_route_tables
       ecr_describe_repositories
-      ecr_describe_images
       ecs_describe_clusters
       ecs_list_task_definitions
       elbv2_describe_load_balancers
-      elbv2_describe_listeners
-      elbv2_describe_load_balancer_attributes
-      elbv2_describe_rules
       elbv2_describe_target_groups
-      elbv2_describe_target_group_attributes
       lambda_list_functions
       lambda_list_layers
       rds_describe_db_instances
-      rds_describe_db_security_groups
       rds_describe_db_subnet_groups
       rds_describe_db_snapshots
       route53_list_hosted_zones
@@ -122,6 +118,10 @@ class Cpbvt::Aws2023
     # - ecs_describe_services
     # - ecs_describe_tasks
     # - ecs_list_tasks
+    # - ecr_describe_images
+    # - elbv2_describe_target_group_attributes
+    # - elbv2_describe_load_balancer_attributes
+    # - elbv2_describe_listeners
     # - lambda_get_function
     # - route53_get_hosted_zone
     # - route53_list_resource_record_sets
@@ -134,6 +134,7 @@ class Cpbvt::Aws2023
     # - s3api_get_object
     # - s3api_get_public_access_block
     # - s3api_list_objects_v2
+    # - elbv2_describe_rules
 
     manifest.write_file
     Cpbvt::Uploader.run(

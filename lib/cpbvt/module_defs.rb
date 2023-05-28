@@ -3,6 +3,8 @@
 module Cpbvt
   module Validations; end
   module Payloads
-    module Aws; end
+    module Aws
+      module CommandsModules; end
+    end
   end
 end

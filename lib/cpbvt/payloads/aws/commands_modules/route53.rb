@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::Commands::S3api
+module Cpbvt::Payloads::Aws::CommandsModules::Route53
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
@@ -10,7 +10,7 @@ aws route53 list-hosted-zones \
 COMMAND
 end
 
-def route53_get_hosted_zone(region:, output_file: hosted_zone_id:)
+def route53_get_hosted_zone(region:, output_file:, hosted_zone_id:)
   command = <<~COMMAND.strip.gsub("\n", " ")
 aws route53 get-hosted-zone \
 --id #{hosted_zone_id} \
@@ -18,12 +18,13 @@ aws route53 get-hosted-zone \
 COMMAND
 end
 
-def route53_list_resource_record_sets(region:, output_file:,hosted_zone_id:)
+def route53_list_resource_record_sets(region:, output_file:, hosted_zone_id:)
   command = <<~COMMAND.strip.gsub("\n", " ")
 aws route53 list-resource-record-sets \
 --hosted-zone-id #{hosted_zone_id} \
 --region #{region} --output json > #{output_file}
 COMMAND
+end
 
 # ------
 end; end

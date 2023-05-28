@@ -1,19 +1,19 @@
-module Cpbvt::Payloads::Aws::Commands::Ec2
+module Cpbvt::Payloads::Aws::CommandsModules::Dynamodbstreams
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def codepipeline_list_pipelines(region:, output_file:)
+def dynamodbstreams_list_streams(region:, output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws codepipeline list-pipelines \
+aws dynamodbstreams list-streams \
 --region #{region} --output json > #{output_file}
 COMMAND
 end
 
-def codepipeline_get_pipeline(region::, output_file:, pipeline_name:)
+def dynamodbstreams_describe_stream(region:, output_file:, stream_arn:) 
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws codepipeline get-pipeline \
---name #{pipeline_name} \
+aws dynamodbstreams describe-stream \
+--stream-arn #{stream_arn} \
 --region #{region} --output json > #{output_file}
 COMMAND
 end

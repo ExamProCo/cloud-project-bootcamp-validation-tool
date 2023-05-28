@@ -1,9 +1,9 @@
-module Cpbvt::Payloads::Aws::Commands::Ecs
+module Cpbvt::Payloads::Aws::CommandsModules::Ecs
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
   
-def ecs_describe_clusters(region: output_file:)
+def ecs_describe_clusters(region:, output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
 aws ecs describe-clusters \
 --region #{region} --output json > #{output_file}
@@ -11,7 +11,7 @@ COMMAND
 end
 
 # services is required - a list of services to describe
-def ecs_describe_services(region:, output_file:, :services)
+def ecs_describe_services(region:, output_file:, services:)
   command = <<~COMMAND.strip.gsub("\n", " ")
 aws ecs describe-services \
 --services #{services} \
@@ -42,5 +42,6 @@ def ecs_list_task_definitions(region:, output_file:)
 aws ecs list-task-definitions \
 --region #{region} --output json > #{output_file}
 COMMAND
+end
 # ------
 end; end

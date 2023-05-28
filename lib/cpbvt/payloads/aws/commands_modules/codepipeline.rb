@@ -1,19 +1,22 @@
-module Cpbvt::Payloads::Aws::Commands::Servicediscovery
+module Cpbvt::Payloads::Aws::CommandsModules::Codepipeline
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
-def servicediscovery_list_services(region:, output_file:)
+
+def codepipeline_list_pipelines(region:, output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws servicediscovery list-services \
+aws codepipeline list-pipelines \
 --region #{region} --output json > #{output_file}
 COMMAND
 end
 
-def servicediscovery_list_namespaces(region:, output_file:)
+def codepipeline_get_pipeline(region:, output_file:, pipeline_name:)
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws servicediscovery list-namespaces \
+aws codepipeline get-pipeline \
+--name #{pipeline_name} \
 --region #{region} --output json > #{output_file}
 COMMAND
 end
+
 # ------
 end; end

@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::Commands::S3api
+module Cpbvt::Payloads::Aws::CommandsModules::S3api
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
@@ -8,7 +8,7 @@ module ClassMethods
 # We can't use s2 ls because it won't return json
 def s3api_list_buckets(output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws s2api list-buckets  \
+aws s3api list-buckets  \
 --output json > #{output_file}
 COMMAND
 end

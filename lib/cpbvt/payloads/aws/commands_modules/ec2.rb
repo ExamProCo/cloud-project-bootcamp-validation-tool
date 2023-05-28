@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::Commands::Ec2
+module Cpbvt::Payloads::Aws::CommandsModules::Ec2
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
@@ -31,13 +31,6 @@ end
 def ec2_describe_internet_gateways(region:, output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
 aws ec2 describe-internet-gateways \
---region #{region} --output json > #{output_file}
-COMMAND
-end
-
-def ec2_describe_vpc_gateway_attachments(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws ec2 describe-vpc-attachments \
 --region #{region} --output json > #{output_file}
 COMMAND
 end

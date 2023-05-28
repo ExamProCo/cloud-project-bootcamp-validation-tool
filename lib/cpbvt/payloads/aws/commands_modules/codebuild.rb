@@ -1,19 +1,19 @@
-module Cpbvt::Payloads::Aws::Commands::Ecr
+module Cpbvt::Payloads::Aws::CommandsModules::Codebuild
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-# listing ecr repos
-def ecr_describe_repositories(region:, output_file:)
+def codebuild_list_projects(region:, output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws ecr describe-repositories \
+aws codebuild list-projects \ 
 --region #{region} --output json > #{output_file}
 COMMAND
 end
 
-def ecr_describe_images(region:, output_file:)
+# codebuild_list Builds
+def codebuild_list_builds(region:, output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws ecr describe-images \
+aws codebuild list-builds \
 --region #{region} --output json > #{output_file}
 COMMAND
 end

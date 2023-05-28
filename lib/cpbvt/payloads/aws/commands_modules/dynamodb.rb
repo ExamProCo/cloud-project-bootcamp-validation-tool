@@ -1,19 +1,21 @@
-module Cpbvt::Payloads::Aws::Commands::Codebuild
+module Cpbvt::Payloads::Aws::CommandsModules::Dynamodb
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
-
-def codebuild_list_projects(region:, output_file:)
+  
+# list dynamodb tables
+def dynamodb_list_tables(region:, output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws codebuild list-projects \ 
+aws dynamodb list-tables \
 --region #{region} --output json > #{output_file}
 COMMAND
 end
 
-# codebuild_list Builds
-def codebuild_list_builds(region:, output_file:)
+def dynamodb_describe_table(region:, output_file:, table_name:)
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws codebuild list-builds \
+aws dynamodb \
+describe-table \
+--table-name #{table_name} \
 --region #{region} --output json > #{output_file}
 COMMAND
 end

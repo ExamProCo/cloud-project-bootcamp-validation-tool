@@ -11,7 +11,6 @@ class Cpbvt::Manifest
 
   def initialize(user_uuid:, run_uuid:, output_path:, project_scope:, payloads_bucket:)
     @starts_at = Time.now.to_i
-    @ends_at = Time.now.to_i
     @user_uuid = user_uuid
     @run_uuid = run_uuid
     @project_scope = project_scope
@@ -44,6 +43,7 @@ class Cpbvt::Manifest
 
   # write content to a file
   def write_file
+    @ends_at = Time.now.to_i
     File.open(self.output_file, 'w') do |f|
       f.write(JSON.pretty_generate(self.contents))
     end

@@ -1,21 +1,19 @@
-module Cpbvt::Payloads::Aws::Commands::Dynamodbstreams
+module Cpbvt::Payloads::Aws::CommandsModules::Servicediscovery
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
-
-def dynamodbstreams_list_streams(region:, output_file:)
+def servicediscovery_list_services(region:, output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws dynamodbstreams list-streams \
+aws servicediscovery list-services \
 --region #{region} --output json > #{output_file}
 COMMAND
 end
 
-def dynamodbstreams_describe_stream(region:, output_file:, stream_arn:) 
+def servicediscovery_list_namespaces(region:, output_file:)
   command = <<~COMMAND.strip.gsub("\n", " ")
-aws dynamodbstreams describe-stream \
---stream-arn #{stream_arn} \
+aws servicediscovery list-namespaces \
 --region #{region} --output json > #{output_file}
+COMMAND
 end
-
 # ------
 end; end
