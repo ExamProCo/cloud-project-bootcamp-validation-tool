@@ -2,13 +2,15 @@ require_relative '../lib/cpbvt'
 require 'dotenv'
 require 'securerandom'
 
+#require 'json'
+#require 'openai'
+
 Dotenv.load
 
 namespace :run do
   task :aws_2023 do
     puts "aws_2023 =="
 
-    run_uuid =
     Cpbvt::Aws2023.run(
       project_scope: "aws-bootcamp-2023",
       run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
@@ -22,3 +24,30 @@ namespace :run do
     )
   end
 end
+
+#task :chat do 
+#  path = "/workspace/cloud-project-bootcamp-validation-tool/examples/output/aws-bootcamp-2023/user-da124fec-133b-45c5-8423-04b768c886c2/run-1685322793-80559fe1-534d-408c-b1c3-1628e3485d12/ca-central-1/ec2-describe-subnets.json"
+#  data = File.read(path)
+#  hash = JSON.parse(data)
+#  json_data = JSON.generate(hash)
+#
+#  prompt = [
+#    "Return the 'project_id' given the following JSON data:",
+#    json_data
+#  ].join("\n")
+#
+#  OpenAI.configure do |config|
+#    config.access_token = ENV.fetch("OPENAI_ACCESS_TOKEN")
+#    config.organization_id = ENV.fetch("OPENAI_ORGANIZATION_ID")
+#  end
+#  
+#  client = OpenAI::Client.new
+#  response = client.completions(
+#    parameters: {
+#      model: 'text-babbage-001',
+#      prompt: prompt,
+#      max_tokens: 64
+#    }
+#  )
+#  puts response
+#end

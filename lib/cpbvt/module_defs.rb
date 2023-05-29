@@ -5,6 +5,7 @@ module Cpbvt
   module Payloads
     module Aws
       module CommandsModules; end
+      module Extractors; end
     end
   end
 end

@@ -6,3 +6,4 @@ gem 'cloud_project_bootcamp_validation_tool', path: "/workspace/cloud-project-bo
 gem 'dotenv', groups: [:development, :test]
 gem 'rake'
 gem 'ox'
+#gem 'ruby-openai'

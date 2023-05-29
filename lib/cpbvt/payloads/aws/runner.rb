@@ -4,7 +4,7 @@ require 'time'
 
 
 module Cpbvt::Payloads::Aws::Runner
-  def self.run command, attrs
+  def self.run command, attrs, params={}
     starts_at = Time.now.to_i
     attrs = OpenStruct.new attrs
     output_file = Cpbvt::Payloads::Aws::Runner::output_file(
@@ -24,19 +24,12 @@ module Cpbvt::Payloads::Aws::Runner
       filename: attrs.filename
     )
 
-    # only pass the region if it's not global
-    if attrs.user_region == 'global'
-      command = Cpbvt::Payloads::Aws::Commands.send(
-        command,
-        output_file: output_file
-      )
-    else
-      command = Cpbvt::Payloads::Aws::Commands.send(
-        command,
-        output_file: output_file,
-        region: attrs.user_region
-      )
-    end
+    params[:output_file] = output_file
+    params[:region] = attrs.user_region unless attrs.user_region == 'global'
+
+    puts "p---------"
+    puts params
+    command = Cpbvt::Payloads::Aws::Commands.send(command, **params)
 
     Cpbvt::Payloads::Aws::Runner.execute command
     # upload json file to s3
@@ -50,15 +43,39 @@ module Cpbvt::Payloads::Aws::Runner
     )
 
     ends_at = Time.now.to_i
-    {
+    return {
       benchmark: {
         starts_at: starts_at,
         ends_at:  ends_at,
         duration_in_seconds: ends_at - starts_at
       },
       command: command,
-      object_key: object_key
+      object_key: object_key,
+      output_file: output_file
     }
+  end # run
+
+  # data_key - eg. acm_list_certificates
+  # formatter - the name of the function that will format the loaded data
+  def self.iter_run! manifest:, command:, data_key:, extractor:, params:
+    results = []
+
+    data = manifest.get_output data_key.to_s
+    iter_data = Cpbvt::Payloads::Aws::Extractor.send(
+      extractor,
+      data
+    )
+    iter_data.each do |extractor_attrs|
+      iter_id = extractor_attrs.delete(:iter_id)
+      params[:filename] = params[:filename].sub(".json","__#{iter_id}.json")
+      result = Cpbvt::Payloads::Aws::Runner.run command, params, extractor_attrs
+      payload_key = params[:filename].sub(".json","")
+      results.push [payload_key, result]
+    end
+
+    results.each do |t|
+      manifest.add_payload t[0], t[1]
+    end
   end
 
   # create the path to where the json file will be downloaded

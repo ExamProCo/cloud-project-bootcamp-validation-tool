@@ -1,6 +1,7 @@
 class Cpbvt::Payloads::Aws::Commands
   include Cpbvt::Payloads::Aws::CommandsModules::Acm
   include Cpbvt::Payloads::Aws::CommandsModules::Apigatewayv2
+  include Cpbvt::Payloads::Aws::CommandsModules::Cloudformation
   include Cpbvt::Payloads::Aws::CommandsModules::Cloudfront
   include Cpbvt::Payloads::Aws::CommandsModules::Codebuild
   include Cpbvt::Payloads::Aws::CommandsModules::Codepipeline

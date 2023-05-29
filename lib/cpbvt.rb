@@ -2,6 +2,11 @@ require_relative 'cpbvt/module_defs'
 require_relative 'cpbvt/version'
 require_relative 'cpbvt/uploader'
 require_relative 'cpbvt/manifest'
+# --- require cpbvt/payloads/aws/extractors/*
+aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','aws','extractors','*.rb')
+Dir.glob(aws_commands_path,&method(:require))
+# ---
+require_relative 'cpbvt/payloads/aws/extractor'
 # --- require cpbvt/payloads/aws/commands/*
 aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','aws','commands_modules','*.rb')
 Dir.glob(aws_commands_path,&method(:require))
@@ -41,9 +46,10 @@ class Cpbvt::Aws2023
     }
 
     # Primary Region-Specific Commands
-    %w{
+    primary_region_commands = %w{
       acm_list_certificates
       apigatewayv2_get_apis
+      cloudformation_list_stacks
       codebuild_list_projects
       codebuild_list_builds
       codepipeline_list_pipelines
@@ -69,7 +75,9 @@ class Cpbvt::Aws2023
       route53_list_hosted_zones
       servicediscovery_list_services
       servicediscovery_list_namespaces
-    }.each do |command|
+    }
+    primary_region_commands = ['acm_list_certificates'] # override
+    primary_region_commands.each do |command|
       result = Cpbvt::Payloads::Aws::Runner.run command, attrs.merge({
         filename: "#{command.gsub('_','-')}.json"
       })
@@ -78,9 +86,11 @@ class Cpbvt::Aws2023
 
     # Alternate Region-Specific Commands
     # - acm_list_certificates for CloudFront since it has to use one in us-east-1
-    %w{
+    alt_region_commands = %w{
       acm_list_certificates
-    }.each do |command|
+    }
+    alt_region_commands = [] # override
+    alt_region_commands.each do |command|
       result = Cpbvt::Payloads::Aws::Runner.run command, attrs.merge({
         user_region: 'us-east-1',
         filename: "#{command.gsub('_','-')}.json"
@@ -89,11 +99,13 @@ class Cpbvt::Aws2023
     end
 
     # Global Commands
-    %w{
+    global_commands = %w{
       cloudfront_list_distributions
       cloudfront_list_cloud_front_origin_access_identities
       s3api_list_buckets
-    }.each do |command|
+    }
+    global_commands = [] # override
+    global_commands.each do |command|
       result = Cpbvt::Payloads::Aws::Runner.run command, attrs.merge({
         user_region: 'global',
         filename: "#{command.gsub('_','-')}.json"
@@ -103,8 +115,32 @@ class Cpbvt::Aws2023
 
     # Specific AWS Resources
     # - acm_describe_certificate
+    specific_aws_resources = [
+      {
+        command: 'acm_describe_certificate',
+        data_key: 'acm_list_certificates',
+        extractor: 'acm_list_certificates_from_extract_certificate_arns'
+      }
+    ]
+    specific_aws_resources.each do |specific_attrs|
+      Cpbvt::Payloads::Aws::Runner.iter_run!(
+        manifest: manifest,
+        command: specific_attrs[:command], 
+        data_key: specific_attrs[:data_key], 
+        extractor: specific_attrs[:extractor], 
+        params: attrs.merge({
+          filename: "#{specific_attrs[:command].gsub('_','-')}.json"
+        })
+      )
+
+    end
+    
+
+
+
     # - apigatewayv2_get_authorizers
     # - apigatewayv2_get_integrations
+    # - cloudformation_list_stack_resources
     # - cloudfront_get_distribution
     # - cloudfront_list_invalidations
     # - cloudfront_get_cloud_front_origin_access_identity
@@ -145,6 +181,5 @@ class Cpbvt::Aws2023
       aws_secret_access_key: aws_secret_access_key,
       payloads_bucket: payloads_bucket
     )
-
   end # def self.run
 end # class AwsBootcamp2023

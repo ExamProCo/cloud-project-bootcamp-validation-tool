@@ -1,4 +1,5 @@
 require 'time'
+require 'json'
 
 class Cpbvt::Manifest
   attr_accessor :payloads, # store all the payloads data structures
@@ -39,6 +40,13 @@ class Cpbvt::Manifest
 
   def add_payload key, data
     @payloads[key] = data
+  end
+
+  def get_output key
+    output_file = @payloads[key][:output_file]
+    json_data = File.read(output_file)
+    hash = JSON.parse(json_data)
+    return hash
   end
 
   # write content to a file
