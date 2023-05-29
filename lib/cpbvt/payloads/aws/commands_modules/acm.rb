@@ -3,19 +3,18 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def acm_describe_certificate(region:, output_file:, certificate_arn:)
-command = <<~COMMAND.strip.gsub("\n", " ")
-  aws acm describe-certificate  \
-  --certificate-arn #{certificate_arn} \
-  --region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/acm/describe-certificate.html
+def acm_describe_certificate(certificate_arn:)
+<<~COMMAND
+aws acm describe-certificate  \
+--certificate-arn #{certificate_arn}
 COMMAND
 end
 
-
-def acm_list_certificates(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-    aws acm list-certificates \
-    --region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/acm/list-certificates.html
+def acm_list_certificates
+<<~COMMAND
+aws acm list-certificates
 COMMAND
 end
 # ------

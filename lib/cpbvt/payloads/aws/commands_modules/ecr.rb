@@ -3,19 +3,18 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-# listing ecr repos
-def ecr_describe_repositories(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws ecr describe-repositories \
---region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecr/describe-repositories.html
+def ecr_describe_repositories
+<<~COMMAND
+aws ecr describe-repositories
 COMMAND
 end
 
-def ecr_describe_images(region:, output_file:, repository_name:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecr/describe-images.html
+def ecr_describe_images(repository_name:)
+<<~COMMAND
 aws ecr describe-images \
 --repository-name #{repository_name} 
---region #{region} --output json > #{output_file}
 COMMAND
 end
 

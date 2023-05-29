@@ -3,18 +3,18 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def codepipeline_list_pipelines(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws codepipeline list-pipelines \
---region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/codepipeline/list-pipelines.html
+def codepipeline_list_pipelines
+<<~COMMAND
+aws codepipeline list-pipelines
 COMMAND
 end
 
-def codepipeline_get_pipeline(region:, output_file:, pipeline_name:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/codepipeline/get-pipeline.html
+def codepipeline_get_pipeline(pipeline_name:)
+<<~COMMAND
 aws codepipeline get-pipeline \
---name #{pipeline_name} \
---region #{region} --output json > #{output_file}
+--name #{pipeline_name}
 COMMAND
 end
 

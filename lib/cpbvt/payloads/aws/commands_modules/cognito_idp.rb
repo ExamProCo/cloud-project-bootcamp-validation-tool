@@ -2,46 +2,46 @@ module Cpbvt::Payloads::Aws::CommandsModules::CognitoIdp
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
-  
-def cognito_describe_user_pool(region:, output_file:, user_pool_id:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/describe-user-pool.html
+def cognito_idp_describe_user_pool(user_pool_id:)
+<<~COMMAND
 aws cognito-idp describe-user-pool \
---user-pool-id #{user_pool_id} \
---region #{region} --output json > #{output_file}
+--user-pool-id #{user_pool_id}
 COMMAND
 end
 
 # we manually set max results to 10, we shouldn't really see that many
-def cognito_list_user_pools(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/list-user-pools.html
+def cognito_idp_list_user_pools
+<<~COMMAND
 aws cognito-idp list-user-pools  \
---max-results 10 \
---region #{region} --output json > #{output_file}
+--max-results 10
 COMMAND
 end
 
-def cognito_list_user_pool_clients(region:, output_file:, user_pool_id:)  
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/list-user-pool-clients.html
+def cognito_idp_list_user_pool_clients(user_pool_id:)  
+<<~COMMAND
 aws cognito-idp list-user-pool-clients \
---user-pool-id #{user_pool_id} \
---region #{region} --output json > #{output_file}
+--user-pool-id #{user_pool_id}
 COMMAND
 end
 
-def cognito_list_users(region:, output_file:, user_pool_id:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/list-users.html
+def cognito_list_users(user_pool_id:)
+<<~COMMAND
 aws cognito-idp list-users \
---user-pool-id #{user_pool_id} \
---region #{region} --output json > #{output_file}
+--user-pool-id #{user_pool_id}
 COMMAND
 end
 
-def cognito_describe_user_pool_client(region:, output_file:, user_pool_id:, client_id:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/describe-user-pool-client.html
+def cognito_describe_user_pool_client(user_pool_id:, client_id:)
+<<~COMMAND
 aws cognito-idp describe-user-pool-client \
 --user-pool-id #{user_pool_id} \
---client-id #{client_id} \
---region #{region} --output json > #{output_file}
+--client-id #{client_id}
 COMMAND
 end
   

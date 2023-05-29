@@ -2,29 +2,26 @@ module Cpbvt::Payloads::Aws::CommandsModules::Apigatewayv2
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 
-# apigatewayv2 get-authorizers
-def apigatewayv2_get_authorizers(region:, output_file:, api_id:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://docs.aws.amazon.com/cli/latest/reference/apigatewayv2/get-authorizers.html
+def apigatewayv2_get_authorizers(api_id:)
+<<~COMMAND
 aws apigatewayv2 get-authorizers \
---api-id #{api_id} \
---region #{region} --output json > #{output_file}
+--api-id #{api_id}
 COMMAND
 end
 
-# apigatewayv2 get-integerations
-def apigatewayv2_get_integrations(region:, output_file:, api_id:)
-command = <<~COMMAND.strip.gsub("\n", " ")
+# https://docs.aws.amazon.com/cli/latest/reference/apigatewayv2/get-integrations.html
+def apigatewayv2_get_integrations(api_id:)
+<<~COMMAND
 aws apigatewayv2 get-integrations \
---api-id #{api_id} \
---region #{region} --output json > #{output_file}
+--api-id #{api_id}
 COMMAND
 end
 
-# apigatewayv2 get-apis
-def apigatewayv2_get_apis(region:, output_file:)
-command = <<~COMMAND.strip.gsub("\n", " ")
-aws apigatewayv2 get-apis \
---region #{region} --output json > #{output_file}
+# https://docs.aws.amazon.com/cli/latest/reference/apigatewayv2/get-apis.html
+def apigatewayv2_get_apis
+<<~COMMAND
+aws apigatewayv2 get-apis
 COMMAND
 end
 

@@ -3,18 +3,18 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def dynamodbstreams_list_streams(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws dynamodbstreams list-streams \
---region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/dynamodbstreams/list-streams.html
+def dynamodbstreams_list_streams
+<<~COMMAND
+aws dynamodbstreams list-streams
 COMMAND
 end
 
-def dynamodbstreams_describe_stream(region:, output_file:, stream_arn:) 
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/dynamodbstreams/describe-stream.html
+def dynamodbstreams_describe_stream(stream_arn:) 
+<<~COMMAND
 aws dynamodbstreams describe-stream \
---stream-arn #{stream_arn} \
---region #{region} --output json > #{output_file}
+--stream-arn #{stream_arn}
 COMMAND
 end
 

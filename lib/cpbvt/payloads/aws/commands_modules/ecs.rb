@@ -2,46 +2,47 @@ module Cpbvt::Payloads::Aws::CommandsModules::Ecs
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
-  
-def ecs_describe_clusters(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws ecs describe-clusters \
---region #{region} --output json > #{output_file}
+
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-clusters.html
+def ecs_describe_clusters
+<<~COMMAND
+aws ecs describe-clusters
 COMMAND
 end
 
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-services.html
 # services is required - a list of services to describe
-def ecs_describe_services(region:, output_file:, services:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+def ecs_describe_services(services:)
+<<~COMMAND
 aws ecs describe-services \
---services #{services} \
---region #{region} --output json > #{output_file}
+--services #{services}
 COMMAND
 end
 
-def ecs_describe_tasks(region:, output_file:, cluster:, tasks:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-tasks.html
+def ecs_describe_tasks(cluster:, tasks:)
+<<~COMMAND
 aws ecs describe-tasks \
 --tasks #{tasks} \
---cluster #{cluster} \
---region #{region} --output json > #{output_file}
+--cluster #{cluster}
 COMMAND
 end
 
-def ecs_list_tasks(region:, output_file:, cluster:, family:)
-    command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/list-tasks.html
+def ecs_list_tasks(cluster:, family:)
+<<~COMMAND
 aws ecs list-tasks \
 --cluster #{cluster} \
---family #{family} \
---region #{region} --output json > #{output_file}
+--family #{family}
 COMMAND
 end
 
-def ecs_list_task_definitions(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws ecs list-task-definitions \
---region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/list-task-definitions.html
+def ecs_list_task_definitions
+<<~COMMAND
+aws ecs list-task-definitions
 COMMAND
 end
+
 # ------
 end; end

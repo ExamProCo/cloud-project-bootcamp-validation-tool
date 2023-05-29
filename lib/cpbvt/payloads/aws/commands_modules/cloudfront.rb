@@ -3,50 +3,49 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def cloudfront_list_distributions(output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws cloudfront list-distributions \
---output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/list-distributions.html
+def cloudfront_list_distributions
+<<~COMMAND
+aws cloudfront list-distributions
 COMMAND
 end
 
-def cloudfront_get_distribution(output_file:, distribution_id:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/get-distribution.html
+def cloudfront_get_distribution(distribution_id:)
+<<~COMMAND
 aws cloudfront get-distribution \
---id #{distribution_id} \
---output json > #{output_file}
+--id #{distribution_id}
 COMMAND
 end
-
-def cloudfront_list_invalidations(output_file:, distribution_id:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+j
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/list-invalidations.html
+def cloudfront_list_invalidations(distribution_id:)
+ <<~COMMAND
 aws cloudfront list-invalidations  \
---id #{distribution_id} \
---output json > #{output_file}
+--id #{distribution_id}
 COMMAND
 end
 
-def cloudfront_list_cloud_front_origin_access_identities(output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws cloudfront list-cloud-front-origin-access-identities \
---output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/list-cloud-front-origin-access-identities.html
+def cloudfront_list_cloud_front_origin_access_identities
+<<~COMMAND
+aws cloudfront list-cloud-front-origin-access-identities
 COMMAND
 end
-# get-cloud-front-origin-access-identity
-def cloudfront_get_cloud_front_origin_access_identity(output_file:, identity_id:) 
-  command = <<~COMMAND.strip.gsub("\n", " ")
+
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/get-cloud-front-origin-access-identity.html
+def cloudfront_get_cloud_front_origin_access_identity(identity_id:) 
+<<~COMMAND
 aws cloudfront get-cloud-front-origin-access-identity \
---id #{identity_id} \
---output json > #{output_file}
+--id #{identity_id}
 COMMAND
 end
 
-# get-cloud-front-origin-access-identity-config
-def cloudfront_get_cloud_front_origin_access_identity_config(output_file:, identity_id:)
-   command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/get-cloud-front-origin-access-identity-config.html
+def cloudfront_get_cloud_front_origin_access_identity_config(identity_id:)
+<<~COMMAND
 aws cloudfront get-cloud-front-origin-access-identity-config \
---id #{identity_id} \
---output json > #{output_file}
+--id #{identity_id}
 COMMAND
 end
   

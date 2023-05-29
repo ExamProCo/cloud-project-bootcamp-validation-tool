@@ -3,20 +3,19 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
   
-# list dynamodb tables
-def dynamodb_list_tables(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws dynamodb list-tables \
---region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/dynamodb/list-tables.html
+def dynamodb_list_tables
+<<~COMMAND
+aws dynamodb list-tables
 COMMAND
 end
 
-def dynamodb_describe_table(region:, output_file:, table_name:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/dynamodb/describe-table.html
+def dynamodb_describe_table(table_name:)
+<<~COMMAND
 aws dynamodb \
 describe-table \
---table-name #{table_name} \
---region #{region} --output json > #{output_file}
+--table-name #{table_name}
 COMMAND
 end
 

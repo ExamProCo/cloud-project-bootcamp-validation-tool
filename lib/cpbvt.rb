@@ -132,11 +132,7 @@ class Cpbvt::Aws2023
           filename: "#{specific_attrs[:command].gsub('_','-')}.json"
         })
       )
-
     end
-    
-
-
 
     # - apigatewayv2_get_authorizers
     # - apigatewayv2_get_integrations
@@ -145,10 +141,10 @@ class Cpbvt::Aws2023
     # - cloudfront_list_invalidations
     # - cloudfront_get_cloud_front_origin_access_identity
     # - codepipeline_get_pipeline
-    # - cognito_describe_user_pool
-    # - cognito_list_user_pool_clients
-    # - cognito_list_users
-    # - cognito_describe_user_pool_client
+    # - cognito_idp_describe_user_pool
+    # - cognito_idp_list_user_pool_clients
+    # - cognito_idp_list_users
+    # - cognito_idp_describe_user_pool_client
     # - dynamodb_describe_table
     # - dynamodbstreams_describe_stream
     # - ecs_describe_services
@@ -158,6 +154,7 @@ class Cpbvt::Aws2023
     # - elbv2_describe_target_group_attributes
     # - elbv2_describe_load_balancer_attributes
     # - elbv2_describe_listeners
+    # - elbv2_describe_rules
     # - lambda_get_function
     # - route53_get_hosted_zone
     # - route53_list_resource_record_sets
@@ -170,7 +167,6 @@ class Cpbvt::Aws2023
     # - s3api_get_object
     # - s3api_get_public_access_block
     # - s3api_list_objects_v2
-    # - elbv2_describe_rules
 
     manifest.write_file
     Cpbvt::Uploader.run(

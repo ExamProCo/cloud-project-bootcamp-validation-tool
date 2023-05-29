@@ -4,15 +4,14 @@ module ClassMethods
 # ------
 
 # listing ALBs
-def elbv2_describe_load_balancers(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws elbv2 describe-load-balancers \
---region #{region} --output json > #{output_file}
+def elbv2_describe_load_balancers
+<<~COMMAND
+aws elbv2 describe-load-balancers
 COMMAND
 end
 
-def elbv2_describe_listeners(region:, output_file:, load_balancer_arn:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+def elbv2_describe_listeners(load_balancer_arn:)
+<<~COMMAND
 aws elbv2 describe-listeners \
 --load-balancer-arn #{load_balancer_arn} \
 --region #{region} --output json > #{output_file}

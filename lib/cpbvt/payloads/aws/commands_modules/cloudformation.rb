@@ -3,18 +3,18 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def cloudformation_list_stacks(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws cloudformation list-stacks \
---region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudformation/list-stacks.html
+def cloudformation_list_stacks
+<<~COMMAND
+aws cloudformation list-stacks
 COMMAND
 end
 
-def cloudformation_list_stack_resources(region:, output_file:, stack_name:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudformation/list-stack-resources.html
+def cloudformation_list_stack_resources(stack_name:)
+<<~COMMAND
 aws cloudformation list-stack-resources \
---stack-name #{stack_name} \
---region #{region} --output json > #{output_file}
+--stack-name #{stack_name}
 COMMAND
 end
 
