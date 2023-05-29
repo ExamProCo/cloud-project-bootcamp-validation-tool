@@ -6,92 +6,90 @@ module ClassMethods
 # has no region but we just pass it in anyway to make 
 # our code my dry elsewhere
 # We can't use s2 ls because it won't return json
-def s3api_list_buckets(output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws s3api list-buckets  \
---output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/list-buckets.html
+def s3api_list_buckets
+<<~COMMAND
+aws s3api list-buckets
 COMMAND
 end
 
 #This action is useful to determine if a bucket exists and you have
 #permission to access it. The action returns a 200 OK if the bucket
 #exists and you have permission to access it.
-def s3api_head_bucket(output_file:, bucket:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/head-bucket.html
+def s3api_head_bucket(bucket:)
+<<~COMMAND
 aws s3api \ 
-head-bucket --bucket #{bucket} \
---output json > #{output_file}
+head-bucket --bucket #{bucket}
 COMMAND
   end
 
-#aws s3api get-bucket-notification-configuration
-def s3api_get_bucket_notification_configuration(output_file:,  bucket:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws s3api \
-get-bucket-notification-configuration \
---bucket #{bucket} \
---output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-bucket-notification-configuration.html
+def s3api_get_bucket_notification_configuration(bucket:)
+<<~COMMAND
+aws s3api get-bucket-notification-configuration \
+--bucket #{bucket}
 COMMAND
 end
 
-def s3api_get_bucket_policy(output_file:, bucket:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-bucket-policy.html
+def s3api_get_bucket_policy(bucket:)
+<<~COMMAND
 aws s3api get-bucket-policy \
---bucket #{bucket} \
---output json > #{output_file}
+--bucket #{bucket}
 COMMAND
 end
 
-def s3api_get_bucket_cors(output_file:, bucket:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-bucket-cors.html
+def s3api_get_bucket_cors(bucket:)
+<<~COMMAND
 aws s3api get-bucket-cors \
---bucket #{bucket} \
---output json > #{output_file}
+--bucket #{bucket}
 COMMAND
 end
 
-def s3api_get_bucket_website(output_file:, bucket:)
-   command = <<~COMMAND.strip.gsub("\n", " ") 
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-bucket-website.html
+def s3api_get_bucket_website(bucket:)
+<<~COMMAND
 aws s3api get-bucket-website \
---bucket #{bucket} \
---output json > #{output_file}
+--bucket #{bucket}
 COMMAND
 end
 
-def s3api_get_object_header(output_file:, bucket:, key:) 
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws s3api get-object-metadata \
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/head-object.html
+def s3api_get_head_object(bucket:, key:) 
+<<~COMMAND
+aws s3api head-object \
 --bucket #{bucket} \
---key #{key} \
---output json > #{output_file}
+--key #{key}
 COMMAND
 end
 
 # special since we are downloading a file
-def s3api_get_object(output_file:, bucket:, key:)
-   command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-object.html
+def s3api_get_object(bucket:, key:)
+<<~COMMAND
 aws s3api get-object \
 --bucket #{bucket} \
---key #{key} \
---output json > #{output_file}
+--key #{key}
 COMMAND
 end
 
-def s3api_get_public_access_block(output_file:, bucket:) 
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-public-access-block.html
+def s3api_get_public_access_block(bucket:) 
+<<~COMMAND
 aws s3api get-public-access-block \
---bucket #{bucket} \
---output json > #{output_file}
+--bucket #{bucket}
 COMMAND
 end
 
-def s3api_list_objects_v2(output_file:, bucket:, prefix:)
-   command = <<~COMMAND.strip.gsub("\n", " ")
-   aws s3api list-objects-v2 \
-   --bucket #{bucket} \
-   --prefix #{prefix} \
-   --output json > #{output_file}
-   COMMAND
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/list-objects-v2.html
+def s3api_list_objects_v2(bucket:, prefix:)
+<<~COMMAND
+aws s3api list-objects-v2 \
+--bucket #{bucket} \
+--prefix #{prefix}
+COMMAND
 end
 
 # ------

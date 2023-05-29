@@ -3,26 +3,26 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def route53_list_hosted_zones(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws route53 list-hosted-zones \
---region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/route53/list-hosted-zones.html
+def route53_list_hosted_zones
+<<~COMMAND
+aws route53 list-hosted-zones
 COMMAND
 end
 
-def route53_get_hosted_zone(region:, output_file:, hosted_zone_id:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/route53/get-hosted-zone.html
+def route53_get_hosted_zone(hosted_zone_id:)
+<<~COMMAND
 aws route53 get-hosted-zone \
---id #{hosted_zone_id} \
---region #{region} --output json > #{output_file}
+--id #{hosted_zone_id}
 COMMAND
 end
 
-def route53_list_resource_record_sets(region:, output_file:, hosted_zone_id:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/route53/list-resource-record-sets.html
+def route53_list_resource_record_sets(hosted_zone_id:)
+<<~COMMAND
 aws route53 list-resource-record-sets \
---hosted-zone-id #{hosted_zone_id} \
---region #{region} --output json > #{output_file}
+--hosted-zone-id #{hosted_zone_id}
 COMMAND
 end
 

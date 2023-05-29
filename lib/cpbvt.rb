@@ -163,7 +163,7 @@ class Cpbvt::Aws2023
     # - s3api_get_bucket_policy
     # - s3api_get_bucket_cors
     # - s3api_get_bucket_website
-    # - s3api_get_object_header
+    # - s3api_get_head_object
     # - s3api_get_object
     # - s3api_get_public_access_block
     # - s3api_list_objects_v2

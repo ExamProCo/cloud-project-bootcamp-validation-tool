@@ -3,27 +3,25 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def lambda_get_function(region:, output_file:, function_name:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/get-function.html
+def lambda_get_function(function_name:)
+<<~COMMAND
 aws lambda get-function \
---function-name #{function_name} \
---region #{region} --output json > #{output_file}
+--function-name #{function_name}
 COMMAND
 end
 
-# lambda list functions
-def lambda_list_functions(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")
-aws lambda list-functions \
---region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/list-functions.html
+def lambda_list_functions
+<<~COMMAND
+aws lambda list-functions
 COMMAND
 end
 
-# lambda list layers
-def lambda_list_layers(region:, output_file:)
-  command = <<~COMMAND.strip.gsub("\n", " ")  
-aws lambda list-layers \
---region #{region} --output json > #{output_file}
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/list-layers.html
+def lambda_list_layers
+<<~COMMAND
+aws lambda list-layers
 COMMAND
 end
 
