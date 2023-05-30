@@ -27,8 +27,7 @@ module Cpbvt::Payloads::Aws::Runner
     command = Cpbvt::Payloads::Aws::Commands.send(command, **params)
     command = command.strip.gsub("\n", " ")
     command = "#{command} --region #{attrs.user_region}" unless attrs.user_region == 'global'
-    command = "#{command} --output-file #{output_file}"
-
+    command = "#{command} --output json > #{output_file}"
     Cpbvt::Payloads::Aws::Runner.execute command
     # upload json file to s3
     Cpbvt::Uploader.run(
@@ -65,9 +64,9 @@ module Cpbvt::Payloads::Aws::Runner
     )
     iter_data.each do |extractor_attrs|
       iter_id = extractor_attrs.delete(:iter_id)
-      params[:filename] = params[:filename].sub(".json","__#{iter_id}.json")
-      result = Cpbvt::Payloads::Aws::Runner.run command, params, extractor_attrs
-      payload_key = params[:filename].sub(".json","")
+      filename = params[:filename].sub(".json","__#{iter_id}.json")
+      result = Cpbvt::Payloads::Aws::Runner.run command, params.merge({filename: filename}), extractor_attrs
+      payload_key = filename.sub(".json","")
       results.push [payload_key, result]
     end
 
@@ -96,7 +95,7 @@ module Cpbvt::Payloads::Aws::Runner
     FileUtils.mkdir_p File.dirname(value)
 
     # print the desination of the outputed json
-    puts "[Output File] #{value}"
+    #puts "[Output File] #{value}"
 
     return value
   end

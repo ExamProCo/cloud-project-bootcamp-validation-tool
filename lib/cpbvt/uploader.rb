@@ -58,7 +58,7 @@ class Cpbvt::Uploader
     )
 
     # print the desination of the outputed json
-    puts "[Output Key] #{value}"
+    #puts "[Output Key] #{value}"
 
     return value
   end

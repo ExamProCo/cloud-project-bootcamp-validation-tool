@@ -4,9 +4,12 @@ module ClassMethods
 # ------
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudformation/list-stacks.html
+# If we don't specify a stack status filter, the output includes all stacks.
+# We really only want to see currently deployed stacks.
 def cloudformation_list_stacks
 <<~COMMAND
-aws cloudformation list-stacks
+aws cloudformation list-stacks \
+--stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE 
 COMMAND
 end
 
