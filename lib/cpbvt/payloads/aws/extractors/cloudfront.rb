@@ -3,7 +3,7 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def cloudfront_list_distributions_extract_distribution_ids(data)
+def cloudfront_list_distributions__distribution_id(data)
   data['DistributionList']['Items'].map do |d|
     {
       iter_id: d['Id'],

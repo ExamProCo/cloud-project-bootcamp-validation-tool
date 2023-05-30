@@ -3,7 +3,7 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def cloudformation_list_stacks_extract_stack_names(data)
+def cloudformation_list_stacks__stack_name(data)
   data['StackSummaries'].map do |x| 
     arn     = x['StackId'] 
     iter_id = arn.split("/").last

@@ -101,7 +101,6 @@ class Cpbvt::Aws2023
     # Global Commands
     global_commands = %w{
       cloudfront_list_distributions
-      cloudfront_list_cloud_front_origin_access_identities
       s3api_list_buckets
     }
     global_commands = [] #override
@@ -117,43 +116,57 @@ class Cpbvt::Aws2023
     specific_aws_resources = [
       {
         command: 'acm_describe_certificate',
-        data_key: 'acm_list_certificates',
-        extractor: 'acm_list_certificates_extract_certificate_arns'
+        params: {certificate_arn: 'acm_list_certificates'}
       },
       {
         command: 'apigatewayv2_get_authorizers',
-        data_key: 'apigatewayv2_get_apis',
-        extractor: 'apigatewayv2_get_apis_extract_app_ids'
+        params: {app_id: 'apigatewayv2_get_apis'}
       },
       {
         command: 'apigatewayv2_get_integrations',
-        data_key: 'apigatewayv2_get_apis',
-        extractor: 'apigatewayv2_get_apis_extract_app_ids'
+        params: {app_id: 'apigatewayv2_get_apis'}
       },
       {
         command: 'cloudformation_list_stack_resources',
-        data_key: 'cloudformation_list_stacks',
-        extractor: 'cloudformation_list_stacks_extract_stack_names'
+        params: {stack_name: 'cloudformation_list_stacks'}
+      },
+      {
+        command: 'codepipeline_get_pipeline',
+        params: {pipeline_name: 'codepipeline_list_pipelines'}
       }
     ]
-    specific_aws_resources = []
+    specific_aws_resources = [
+      {
+        command: 'cognito_idp_describe_user_pool',
+        params: {user_pool_id: 'cognito_idp_list_user_pools'}
+      },
+      {
+        command: 'cognito_idp_list_user_pool_clients',
+        params: {user_pool_id: 'cognito_idp_list_user_pools'}
+      },
+      {
+        command: 'cognito_idp_list_users',
+        params: {user_pool_id: 'cognito_idp_list_user_pools'}
+      },
+      {
+        command: 'cognito_idp_describe_user_pool_client',
+        params: {
+          user_pool_id: 'cognito_idp_list_user_pools'
+          client_id:    'cognito_idp_list_user_pool_clients'
+        }
+      }
+    ]
+    # - cognito_idp_describe_user_pool_client
     specific_aws_resources.each do |specific_attrs|
       Cpbvt::Payloads::Aws::Runner.iter_run!(
         manifest: manifest,
         command: specific_attrs[:command], 
-        data_key: specific_attrs[:data_key], 
-        extractor: specific_attrs[:extractor], 
-        params: attrs.merge({
+        specific_params: specific_attrs[:params], 
+        general_params: attrs.merge({
           filename: "#{specific_attrs[:command].gsub('_','-')}.json"
         })
       )
     end
-    # - cloudfront_get_cloud_front_origin_access_identity
-    # - codepipeline_get_pipeline
-    # - cognito_idp_describe_user_pool
-    # - cognito_idp_list_user_pool_clients
-    # - cognito_idp_list_users
-    # - cognito_idp_describe_user_pool_client
     # - dynamodb_describe_table
     # - dynamodbstreams_describe_stream
     # - ecs_describe_services
@@ -173,21 +186,21 @@ class Cpbvt::Aws2023
     specific_global_aws_resources = [
       {
         command: 'cloudfront_get_distribution',
-        data_key: 'cloudfront_list_distributions',
+        data_keys: 'cloudfront_list_distributions',
         extractor: 'cloudfront_list_distributions_extract_distribution_ids'
       },
       {
         command: 'cloudfront_list_invalidations',
-        data_key: 'cloudfront_list_distributions',
+        data_keys: 'cloudfront_list_distributions',
         extractor: 'cloudfront_list_distributions_extract_distribution_ids'
       }
     ]
-
+    specific_global_aws_resources = []
     specific_global_aws_resources.each do |specific_attrs|
       Cpbvt::Payloads::Aws::Runner.iter_run!(
         manifest: manifest,
         command: specific_attrs[:command], 
-        data_key: specific_attrs[:data_key], 
+        data_keys: specific_attrs[:data_keys], 
         extractor: specific_attrs[:extractor], 
         params: attrs.merge({
           user_region: 'global',
