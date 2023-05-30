@@ -151,8 +151,8 @@ class Cpbvt::Aws2023
       {
         command: 'cognito_idp_describe_user_pool_client',
         params: {
-          user_pool_id: 'cognito_idp_list_user_pools'
-          client_id:    'cognito_idp_list_user_pool_clients'
+          user_pool_id: 'cognito_idp_list_user_pools',
+          client_id: 'cognito_idp_list_user_pool_clients'
         }
       }
     ]
