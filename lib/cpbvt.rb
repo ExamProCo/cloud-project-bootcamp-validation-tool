@@ -47,6 +47,9 @@ class Cpbvt::Aws2023
 
     # Primary Region-Specific Commands
     primary_region_commands = %w{
+      acm_list_certificates
+      apigatewayv2_get_apis
+      cloudformation_list_stacks
       codebuild_list_projects
       codebuild_list_builds
       codepipeline_list_pipelines
@@ -73,11 +76,7 @@ class Cpbvt::Aws2023
       servicediscovery_list_services
       servicediscovery_list_namespaces
     }
-    primary_region_commands = %w{
-      acm_list_certificates
-      apigatewayv2_get_apis
-      cloudformation_list_stacks
-    }
+    primary_region_commands = [] #override
     primary_region_commands.each do |command|
       result = Cpbvt::Payloads::Aws::Runner.run command, attrs.merge({
         filename: "#{command.gsub('_','-')}.json"
@@ -105,7 +104,7 @@ class Cpbvt::Aws2023
       cloudfront_list_cloud_front_origin_access_identities
       s3api_list_buckets
     }
-    global_commands = [] # override
+    global_commands = [] #override
     global_commands.each do |command|
       result = Cpbvt::Payloads::Aws::Runner.run command, attrs.merge({
         user_region: 'global',
@@ -114,8 +113,7 @@ class Cpbvt::Aws2023
       manifest.add_payload command, result
     end
 
-    # Specific AWS Resources
-    # - acm_describe_certificate
+    # Specific Regional AWS Resources Commands
     specific_aws_resources = [
       {
         command: 'acm_describe_certificate',
@@ -138,6 +136,7 @@ class Cpbvt::Aws2023
         extractor: 'cloudformation_list_stacks_extract_stack_names'
       }
     ]
+    specific_aws_resources = []
     specific_aws_resources.each do |specific_attrs|
       Cpbvt::Payloads::Aws::Runner.iter_run!(
         manifest: manifest,
@@ -149,10 +148,6 @@ class Cpbvt::Aws2023
         })
       )
     end
-
-    # - cloudformation_list_stack_resources
-    # - cloudfront_get_distribution
-    # - cloudfront_list_invalidations
     # - cloudfront_get_cloud_front_origin_access_identity
     # - codepipeline_get_pipeline
     # - cognito_idp_describe_user_pool
@@ -172,6 +167,34 @@ class Cpbvt::Aws2023
     # - lambda_get_function
     # - route53_get_hosted_zone
     # - route53_list_resource_record_sets
+
+
+    # Specific Regional AWS Resources Commands
+    specific_global_aws_resources = [
+      {
+        command: 'cloudfront_get_distribution',
+        data_key: 'cloudfront_list_distributions',
+        extractor: 'cloudfront_list_distributions_extract_distribution_ids'
+      },
+      {
+        command: 'cloudfront_list_invalidations',
+        data_key: 'cloudfront_list_distributions',
+        extractor: 'cloudfront_list_distributions_extract_distribution_ids'
+      }
+    ]
+
+    specific_global_aws_resources.each do |specific_attrs|
+      Cpbvt::Payloads::Aws::Runner.iter_run!(
+        manifest: manifest,
+        command: specific_attrs[:command], 
+        data_key: specific_attrs[:data_key], 
+        extractor: specific_attrs[:extractor], 
+        params: attrs.merge({
+          user_region: 'global',
+          filename: "#{specific_attrs[:command].gsub('_','-')}.json"
+        })
+      )
+    end
     # - s3api_head_bucket
     # - s3api_get_bucket_notification_configuration
     # - s3api_get_bucket_policy
@@ -181,6 +204,8 @@ class Cpbvt::Aws2023
     # - s3api_get_object
     # - s3api_get_public_access_block
     # - s3api_list_objects_v2
+
+
 
     manifest.write_file
     Cpbvt::Uploader.run(

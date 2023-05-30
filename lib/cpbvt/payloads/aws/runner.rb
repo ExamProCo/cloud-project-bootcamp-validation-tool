@@ -57,6 +57,12 @@ module Cpbvt::Payloads::Aws::Runner
   def self.iter_run! manifest:, command:, data_key:, extractor:, params:
     results = []
 
+    # automatically pull the other required data if it is not already loaded
+    unless manifest.has_payload?(data_key.to_s)
+      filename = "#{data_key.gsub('_','-')}.json"
+      result = Cpbvt::Payloads::Aws::Runner.run data_key, params.merge({filename: filename})
+      manifest.add_payload data_key, result
+    end
     data = manifest.get_output data_key.to_s
     iter_data = Cpbvt::Payloads::Aws::Extractor.send(
       extractor,

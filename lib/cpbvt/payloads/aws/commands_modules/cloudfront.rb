@@ -17,12 +17,12 @@ aws cloudfront get-distribution \
 --id #{distribution_id}
 COMMAND
 end
-j
+
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/list-invalidations.html
 def cloudfront_list_invalidations(distribution_id:)
  <<~COMMAND
-aws cloudfront list-invalidations  \
---id #{distribution_id}
+aws cloudfront list-invalidations \
+--distribution-id #{distribution_id}
 COMMAND
 end
 

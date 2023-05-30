@@ -42,6 +42,10 @@ class Cpbvt::Manifest
     @payloads[key] = data
   end
 
+  def has_payload? key
+    @payloads.has_key? key
+  end
+
   def get_output key
     output_file = @payloads[key][:output_file]
     json_data = File.read(output_file)
