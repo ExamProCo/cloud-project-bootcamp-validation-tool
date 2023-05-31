@@ -53,48 +53,63 @@ module Cpbvt::Payloads::Aws::Runner
     }
   end # run
 
-  def self.iter_params manifest:, command:, specific_params:, general_params:
-    results = []
-    keys = specific_params.keys
+  # This was a failed attmpt for pulling for a more complex
+  # API call that requires two parameters to fetch the data.
+  # Since most API calls only require one, it didn't makes sense
+  # to implement this yet until I saw more emergin edge cases.
+  #{
+  #  command: 'cognito_idp_describe_user_pool_client',
+  #  params: {
+  #    user_pool_id: 'cognito_idp_list_user_pools',
+  #    client_id: 'cognito_idp_list_user_pool_clients'
+  #  }
+  #def self.iter_params(
+  #    manifest:, 
+  #    command:, 
+  #    specific_params:, 
+  #    general_params:
+  #  )
+  #  results = []
+  #  keys = specific_params.keys
 
-    specific_params.each_with_index do |param, data_key|
+  #  specific_params.each_with_index do |param, data_key|
 
-      prev_param = nil
+  #    prev_param = nil
 
-      # how many params are there
-      len = keys.index(param)
+  #    # how many params are there
+  #    len = keys.index(param)
 
-      unless keys.index(param).zero?
-        prev_param = keys[keys.index(param)-1]
-      end
+  #    unless keys.index(param).zero?
+  #      prev_param = keys[keys.index(param)-1]
+  #    end
 
-      if 
-      results = Cpbvt::Payloads::Aws::Runner.iter_run!(
-        manifest: manifest,
-        command: data_key,
-        param: param,
-        general_params: general_params
-      )
-      results.each do |t|
-        # appending the results to our results
-        results = results + Cpbvt::Payloads::Aws::Runner.iter_run!(
-          manifest: manifest,
-          command: data_key,
-          param: param,
-          general_params: general_params
-        )
-      end # results.each
+  #    results = Cpbvt::Payloads::Aws::Runner.iter_run!(
+  #      manifest: manifest,
+  #      command: data_key,
+  #      param: param,
+  #      general_params: general_params
+  #    )
 
-    end
+  #    results.each do |t|
+  #      # appending the results to our results
+  #      results = results + Cpbvt::Payloads::Aws::Runner.iter_run!(
+  #        manifest: manifest,
+  #        command: data_key,
+  #        param: param,
+  #        general_params: general_params
+  #      )
+  #    end # results.each
 
-    results.each do |t|
-      manifest.add_payload t[0], t[1]
-    end # results.each
-  end
+  #  end
+
+  #  results.each do |t|
+  #    manifest.add_payload t[0], t[1]
+  #  end # results.each
+  #end
 
   # When we have an AWS API Call that needs a specific value from a list of resources.
   # eg. in order to get describe_user_pool we have to extract the user_pool_ids from list_user_pools
-  def self.iter_run! manifest:, command:, general_params:, param:, auto_params: {}
+  def self.iter_run! manifest:, command:, :param, general_params:
     # all the results from the command being run
     results = []
 
@@ -104,7 +119,6 @@ module Cpbvt::Payloads::Aws::Runner
       result = Cpbvt::Payloads::Aws::Runner.run(
         data_key,
         general_params.merge({filename: filename}),
-        auto_params
       )
       manifest.add_payload data_key, result
     end

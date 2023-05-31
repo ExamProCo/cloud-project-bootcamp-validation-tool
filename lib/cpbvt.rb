@@ -17,7 +17,7 @@ require_relative 'cpbvt/payloads/aws/policies'
 require_relative 'cpbvt/validations/aws_2023'
 
 class Cpbvt::Aws2023
-  def self.run project_scope:,
+  def self.run(project_scope:,
                user_uuid:,
                run_uuid:,
                region:,
@@ -26,6 +26,8 @@ class Cpbvt::Aws2023
                aws_access_key_id:,
                aws_secret_access_key:,
                payloads_bucket:
+              )
+
     manifest = Cpbvt::Manifest.new(
       user_uuid: user_uuid, 
       run_uuid: run_uuid, 
@@ -33,7 +35,8 @@ class Cpbvt::Aws2023
       output_path: output_path,
       payloads_bucket: payloads_bucket
     )
-    attrs = {
+
+    general_params = {
       project_scope: project_scope,
       run_uuid: run_uuid,
       user_uuid: user_uuid,
@@ -45,6 +48,49 @@ class Cpbvt::Aws2023
       payloads_bucket: payloads_bucket
     }
 
+    Cpbvt::Aws2023.pull_primary_region_aws_resources(
+      manifest: manifest,
+      general_params: general_params
+    )
+    Cpbvt::Aws2023.pull_alternate_specific_aws_resources(
+      manifest: manifest,
+      general_params: general_params
+    )
+    Cpbvt::Aws2023.pull_global_resources(
+      manifest: manifest,
+      general_params: general_params
+    )
+    Cpbvt::Aws2023.pull_specific_aws_resources(
+      manifest: manifest,
+      general_params: general_params
+    )
+    Cpbvt::Aws2023.pull_specific_global_aws_resources(
+      manifest: manifest,
+      general_params: general_params
+    )
+
+    # Complex usecase
+    #{
+    #
+    #  command: 'cognito_idp_describe_user_pool_client',
+    #  params: {
+    #    user_pool_id: 'cognito_idp_list_user_pools',
+    #    client_id: 'cognito_idp_list_user_pool_clients'
+    #  }
+    #}
+
+    manifest.write_file
+    Cpbvt::Uploader.run(
+      file_path: manifest.output_file, 
+      object_key: manifest.object_key,
+      aws_region: region,
+      aws_access_key_id: aws_access_key_id,
+      aws_secret_access_key: aws_secret_access_key,
+      payloads_bucket: payloads_bucket
+    )
+  end # def self.run
+
+  def self.pull_primary_region_aws_resources(manifest:, general_params:)
     # Primary Region-Specific Commands
     primary_region_commands = %w{
       acm_list_certificates
@@ -83,7 +129,9 @@ class Cpbvt::Aws2023
       })
       manifest.add_payload command, result
     end
+  end
 
+  def self.pull_alternate_specific_aws_resources(manifest:, general_params:)
     # Alternate Region-Specific Commands
     # - acm_list_certificates for CloudFront since it has to use one in us-east-1
     alt_region_commands = %w{
@@ -97,8 +145,10 @@ class Cpbvt::Aws2023
       })
       manifest.add_payload command, result
     end
+  end
 
-    # Global Commands
+  # Global Commands
+  def self.pull_global_resources(manifest: general_params:)
     global_commands = %w{
       cloudfront_list_distributions
       s3api_list_buckets
@@ -111,7 +161,9 @@ class Cpbvt::Aws2023
       })
       manifest.add_payload command, result
     end
+  end
 
+  def self.pull_specific_aws_resources(manifest:, general_params:)
     # Specific Regional AWS Resources Commands
     specific_aws_resources = [
       {
@@ -147,13 +199,6 @@ class Cpbvt::Aws2023
       {
         command: 'cognito_idp_list_users',
         params: {user_pool_id: 'cognito_idp_list_user_pools'}
-      },
-      {
-        command: 'cognito_idp_describe_user_pool_client',
-        params: {
-          user_pool_id: 'cognito_idp_list_user_pools',
-          client_id: 'cognito_idp_list_user_pool_clients'
-        }
       }
     ]
     # - cognito_idp_describe_user_pool_client
@@ -180,19 +225,18 @@ class Cpbvt::Aws2023
     # - lambda_get_function
     # - route53_get_hosted_zone
     # - route53_list_resource_record_sets
+  end
 
-
-    # Specific Regional AWS Resources Commands
+  # Specific Regional AWS Resources Commands
+  def self.pull_specific_global_aws_resources(manifest:, general_params:)
     specific_global_aws_resources = [
       {
         command: 'cloudfront_get_distribution',
-        data_keys: 'cloudfront_list_distributions',
-        extractor: 'cloudfront_list_distributions_extract_distribution_ids'
+        params: {distribution_id: 'cloudfront_list_distributions'}
       },
       {
         command: 'cloudfront_list_invalidations',
-        data_keys: 'cloudfront_list_distributions',
-        extractor: 'cloudfront_list_distributions_extract_distribution_ids'
+        params: {distribution_id: 'cloudfront_list_distributions'}
       }
     ]
     specific_global_aws_resources = []
@@ -202,7 +246,7 @@ class Cpbvt::Aws2023
         command: specific_attrs[:command], 
         data_keys: specific_attrs[:data_keys], 
         extractor: specific_attrs[:extractor], 
-        params: attrs.merge({
+        params: general_params.merge({
           user_region: 'global',
           filename: "#{specific_attrs[:command].gsub('_','-')}.json"
         })
@@ -217,17 +261,5 @@ class Cpbvt::Aws2023
     # - s3api_get_object
     # - s3api_get_public_access_block
     # - s3api_list_objects_v2
-
-
-
-    manifest.write_file
-    Cpbvt::Uploader.run(
-      file_path: manifest.output_file, 
-      object_key: manifest.object_key,
-      aws_region: region,
-      aws_access_key_id: aws_access_key_id,
-      aws_secret_access_key: aws_secret_access_key,
-      payloads_bucket: payloads_bucket
-    )
-  end # def self.run
+  end
 end # class AwsBootcamp2023
