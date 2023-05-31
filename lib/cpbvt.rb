@@ -92,7 +92,7 @@ class Cpbvt::Aws2023
 
   def self.pull_primary_region_aws_resources(manifest:, general_params:)
     # Primary Region-Specific Commands
-    primary_region_commands = %w{
+    commands = %w{
       acm_list_certificates
       apigatewayv2_get_apis
       cloudformation_list_stacks
@@ -122,9 +122,9 @@ class Cpbvt::Aws2023
       servicediscovery_list_services
       servicediscovery_list_namespaces
     }
-    primary_region_commands = [] #override
-    primary_region_commands.each do |command|
-      result = Cpbvt::Payloads::Aws::Runner.run command, attrs.merge({
+    commands = [] #override
+    commands.each do |command|
+      result = Cpbvt::Payloads::Aws::Runner.run command, general_params.merge({
         filename: "#{command.gsub('_','-')}.json"
       })
       manifest.add_payload command, result
@@ -134,12 +134,12 @@ class Cpbvt::Aws2023
   def self.pull_alternate_specific_aws_resources(manifest:, general_params:)
     # Alternate Region-Specific Commands
     # - acm_list_certificates for CloudFront since it has to use one in us-east-1
-    alt_region_commands = %w{
+    commands = %w{
       acm_list_certificates
     }
-    alt_region_commands = [] # override
-    alt_region_commands.each do |command|
-      result = Cpbvt::Payloads::Aws::Runner.run command, attrs.merge({
+    commands = [] # override
+    commands.each do |command|
+      result = Cpbvt::Payloads::Aws::Runner.run command, general_params.merge({
         user_region: 'us-east-1',
         filename: "#{command.gsub('_','-')}.json"
       })
@@ -148,14 +148,14 @@ class Cpbvt::Aws2023
   end
 
   # Global Commands
-  def self.pull_global_resources(manifest: general_params:)
-    global_commands = %w{
+  def self.pull_global_resources(manifest:, general_params:)
+    commands = %w{
       cloudfront_list_distributions
       s3api_list_buckets
     }
-    global_commands = [] #override
-    global_commands.each do |command|
-      result = Cpbvt::Payloads::Aws::Runner.run command, attrs.merge({
+    commands = [] #override
+    commands.each do |command|
+      result = Cpbvt::Payloads::Aws::Runner.run command, general_params.merge({
         user_region: 'global',
         filename: "#{command.gsub('_','-')}.json"
       })
@@ -165,7 +165,7 @@ class Cpbvt::Aws2023
 
   def self.pull_specific_aws_resources(manifest:, general_params:)
     # Specific Regional AWS Resources Commands
-    specific_aws_resources = [
+    commands = [
       {
         command: 'acm_describe_certificate',
         params: {certificate_arn: 'acm_list_certificates'}
@@ -187,7 +187,7 @@ class Cpbvt::Aws2023
         params: {pipeline_name: 'codepipeline_list_pipelines'}
       }
     ]
-    specific_aws_resources = [
+    commands = [
       {
         command: 'cognito_idp_describe_user_pool',
         params: {user_pool_id: 'cognito_idp_list_user_pools'}
@@ -202,13 +202,13 @@ class Cpbvt::Aws2023
       }
     ]
     # - cognito_idp_describe_user_pool_client
-    specific_aws_resources.each do |specific_attrs|
+    commands.each do |attrs|
       Cpbvt::Payloads::Aws::Runner.iter_run!(
         manifest: manifest,
-        command: specific_attrs[:command], 
-        specific_params: specific_attrs[:params], 
-        general_params: attrs.merge({
-          filename: "#{specific_attrs[:command].gsub('_','-')}.json"
+        command: attrs[:command], 
+        specific_params: attrs[:params], 
+        general_params: general_params.merge({
+          filename: "#{attrs[:command].gsub('_','-')}.json"
         })
       )
     end
@@ -229,7 +229,7 @@ class Cpbvt::Aws2023
 
   # Specific Regional AWS Resources Commands
   def self.pull_specific_global_aws_resources(manifest:, general_params:)
-    specific_global_aws_resources = [
+    commands = [
       {
         command: 'cloudfront_get_distribution',
         params: {distribution_id: 'cloudfront_list_distributions'}
@@ -239,15 +239,15 @@ class Cpbvt::Aws2023
         params: {distribution_id: 'cloudfront_list_distributions'}
       }
     ]
-    specific_global_aws_resources = []
-    specific_global_aws_resources.each do |specific_attrs|
+    commands = []
+    commands.each do |attrs|
       Cpbvt::Payloads::Aws::Runner.iter_run!(
         manifest: manifest,
-        command: specific_attrs[:command], 
-        specific_params: specific_attrs[:params], 
+        command: attrs[:command], 
+        specific_params: attrs[:params], 
         general_params: general_params.merge({
           user_region: 'global',
-          filename: "#{specific_attrs[:command].gsub('_','-')}.json"
+          filename: "#{attrs[:command].gsub('_','-')}.json"
         })
       )
     end
