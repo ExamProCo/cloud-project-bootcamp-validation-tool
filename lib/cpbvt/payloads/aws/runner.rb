@@ -109,9 +109,18 @@ module Cpbvt::Payloads::Aws::Runner
 
   # When we have an AWS API Call that needs a specific value from a list of resources.
   # eg. in order to get describe_user_pool we have to extract the user_pool_ids from list_user_pools
-  def self.iter_run! manifest:, command:, :param, general_params:
+  def self.iter_run!(
+      manifest:,
+      command:,
+      specific_params:,
+      general_params:
+    )
     # all the results from the command being run
     results = []
+
+    # harcoded to only work with one param until
+    # we know how to support multiple nested params
+    param, data_key = specific_params.first
 
     # automatically pull the other required data if it is not already loaded
     unless manifest.has_payload?(data_key.to_s)

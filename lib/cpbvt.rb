@@ -244,9 +244,8 @@ class Cpbvt::Aws2023
       Cpbvt::Payloads::Aws::Runner.iter_run!(
         manifest: manifest,
         command: specific_attrs[:command], 
-        data_keys: specific_attrs[:data_keys], 
-        extractor: specific_attrs[:extractor], 
-        params: general_params.merge({
+        specific_params: specific_attrs[:params], 
+        general_params: general_params.merge({
           user_region: 'global',
           filename: "#{specific_attrs[:command].gsub('_','-')}.json"
         })
