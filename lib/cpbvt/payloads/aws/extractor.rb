@@ -6,6 +6,7 @@ class Cpbvt::Payloads::Aws::Extractor
   include Cpbvt::Payloads::Aws::Extractors::Codepipeline
   include Cpbvt::Payloads::Aws::Extractors::CognitoIdp
   include Cpbvt::Payloads::Aws::Extractors::Dynamodb
+  include Cpbvt::Payloads::Aws::Extractors::Dynamodbstreams
   include Cpbvt::Payloads::Aws::Extractors::Ecr
   include Cpbvt::Payloads::Aws::Extractors::Ecs
   include Cpbvt::Payloads::Aws::Extractors::Elbv2

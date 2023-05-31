@@ -70,14 +70,32 @@ class Cpbvt::Aws2023
     )
 
     # Complex usecase
-    #{
-    #
-    #  command: 'cognito_idp_describe_user_pool_client',
-    #  params: {
-    #    user_pool_id: 'cognito_idp_list_user_pools',
-    #    client_id: 'cognito_idp_list_user_pool_clients'
-    #  }
-    #}
+    complex = [
+      {
+        command: 'cognito_idp_describe_user_pool_client',
+        params: {
+          user_pool_id: 'cognito_idp_list_user_pools',
+          client_id: 'cognito_idp_list_user_pool_clients'
+        }
+      },
+      {
+        command: 'ecs_describe_tasks',
+        params: {
+          cluster: 'ecs_describe_clusters',
+          tasks: 'ecs_list_tasks' # requires family and cluster
+        }
+      },
+      {
+        command: 'ecs_list_tasks',
+        params: {
+          cluster: '',
+          family: ''
+        }
+      }
+    ]
+    # A list of up to 100 cluster names or full cluster Amazon Resource Name (ARN) entries. If you do not specify a cluster, the default cluster is assumed.
+    # - ecs_describe_services
+
 
     manifest.write_file
     Cpbvt::Uploader.run(
@@ -185,9 +203,7 @@ class Cpbvt::Aws2023
       {
         command: 'codepipeline_get_pipeline',
         params: {pipeline_name: 'codepipeline_list_pipelines'}
-      }
-    ]
-    commands = [
+      },
       {
         command: 'cognito_idp_describe_user_pool',
         params: {user_pool_id: 'cognito_idp_list_user_pools'}
@@ -199,9 +215,45 @@ class Cpbvt::Aws2023
       {
         command: 'cognito_idp_list_users',
         params: {user_pool_id: 'cognito_idp_list_user_pools'}
+      },
+      {
+        command: 'dynamodb_describe_table',
+        params: {table_name: 'dynamodb_list_tables'}
+      },
+      {
+        command: 'dynamodbstreams_describe_stream',
+        params: {stream_arn: 'dynamodbstreams_list_streams' }
+      },
+      {
+        command: 'ecs_describe_services',
+        params: {services: 'dynamodbstreams_list_streams' }
+      },
+      {
+        command: 'ecr_describe_images',
+        params: {repository_name: 'ecr_describe_repositories'}
       }
     ]
-    # - cognito_idp_describe_user_pool_client
+    commands = [
+      {
+        command: 'elbv2_describe_listeners',
+        params: {load_balancer_arn: 'elbv2_describe_load_balancers'}
+      },
+      {
+        command: 'elbv2_describe_load_balancer_attributes',
+        params: {load_balancer_arn: 'elbv2_describe_load_balancers'}
+      },
+      {
+        command: 'elbv2_describe_rules',
+        params: {load_balancer_arn: 'elbv2_describe_load_balancers'}
+      },
+      {
+        command: 'elbv2_describe_target_group_attributes',
+        params: {target_group_arn: 'elbv2_describe_target_groups'}
+      }
+    ]
+    # - lambda_get_function
+    # - route53_get_hosted_zone
+    # - route53_list_resource_record_sets
     commands.each do |attrs|
       Cpbvt::Payloads::Aws::Runner.iter_run!(
         manifest: manifest,
@@ -212,19 +264,6 @@ class Cpbvt::Aws2023
         })
       )
     end
-    # - dynamodb_describe_table
-    # - dynamodbstreams_describe_stream
-    # - ecs_describe_services
-    # - ecs_describe_tasks
-    # - ecs_list_tasks
-    # - ecr_describe_images
-    # - elbv2_describe_target_group_attributes
-    # - elbv2_describe_load_balancer_attributes
-    # - elbv2_describe_listeners
-    # - elbv2_describe_rules
-    # - lambda_get_function
-    # - route53_get_hosted_zone
-    # - route53_list_resource_record_sets
   end
 
   # Specific Regional AWS Resources Commands

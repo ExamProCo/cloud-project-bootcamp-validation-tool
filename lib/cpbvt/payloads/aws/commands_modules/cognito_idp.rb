@@ -29,7 +29,7 @@ COMMAND
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/list-users.html
-def cognito_list_users(user_pool_id:)
+def cognito_idp_list_users(user_pool_id:)
 <<~COMMAND
 aws cognito-idp list-users \
 --user-pool-id #{user_pool_id}
@@ -37,7 +37,7 @@ COMMAND
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/describe-user-pool-client.html
-def cognito_describe_user_pool_client(user_pool_id:, client_id:)
+def cognito_idp_describe_user_pool_client(user_pool_id:, client_id:)
 <<~COMMAND
 aws cognito-idp describe-user-pool-client \
 --user-pool-id #{user_pool_id} \

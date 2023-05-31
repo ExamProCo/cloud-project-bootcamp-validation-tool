@@ -6,7 +6,7 @@ module ClassMethods
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-clusters.html
 def ecs_describe_clusters
 <<~COMMAND
-aws ecs describe-clusters
+aws ecs describe-clusters --region ca-central-1
 COMMAND
 end
 
