@@ -27,10 +27,10 @@ COMMAND
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/elbv2/describe-rules.html
-def elbv2_describe_rules(load_balancer_arn:)
+def elbv2_describe_rules(listern_arn:)
 <<~COMMAND
 aws elbv2 describe-rules \
---load-balancer-arn #{load_balancer_arn}
+--listener-arn #{listen_arn}
 COMMAND
 end
 

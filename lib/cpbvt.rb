@@ -91,6 +91,9 @@ class Cpbvt::Aws2023
           cluster: '',
           family: ''
         }
+      },
+      {
+        command: 'elbv2_describe_rules',
       }
     ]
     # A list of up to 100 cluster names or full cluster Amazon Resource Name (ARN) entries. If you do not specify a cluster, the default cluster is assumed.
@@ -231,9 +234,7 @@ class Cpbvt::Aws2023
       {
         command: 'ecr_describe_images',
         params: {repository_name: 'ecr_describe_repositories'}
-      }
-    ]
-    commands = [
+      },
       {
         command: 'elbv2_describe_listeners',
         params: {load_balancer_arn: 'elbv2_describe_load_balancers'}
@@ -243,17 +244,24 @@ class Cpbvt::Aws2023
         params: {load_balancer_arn: 'elbv2_describe_load_balancers'}
       },
       {
-        command: 'elbv2_describe_rules',
-        params: {load_balancer_arn: 'elbv2_describe_load_balancers'}
-      },
-      {
         command: 'elbv2_describe_target_group_attributes',
         params: {target_group_arn: 'elbv2_describe_target_groups'}
+      },
+      {
+        command: 'lambda_get_function' ,
+        params: {function_name: 'lambda_list_functions'}
       }
     ]
-    # - lambda_get_function
-    # - route53_get_hosted_zone
-    # - route53_list_resource_record_sets
+    commands = [
+      {
+        command: 'route53_get_hosted_zone',
+        params: {hosted_zone_id: 'route53_list_hosted_zones'}
+      },
+      {
+        command: 'route53_list_resource_record_sets',
+        params: {hosted_zone_id: 'route53_list_hosted_zones'}
+      },
+    ]
     commands.each do |attrs|
       Cpbvt::Payloads::Aws::Runner.iter_run!(
         manifest: manifest,
