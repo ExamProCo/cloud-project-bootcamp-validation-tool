@@ -1,0 +1,69 @@
+# a possible DSL for pulling all resources.
+
+
+pull :primary do
+  acm_list_certificates
+  apigatewayv2_get_apis
+  cloudformation_list_stacks
+  codebuild_list_projects
+  codebuild_list_builds
+  codepipeline_list_pipelines
+  cognito_list_user_pools
+  dynamodb_list_tables
+  dynamodbstreams_list_streams
+  ec2_describe_vpcs
+  ec2_describe_subnets
+  ec2_describe_route_tables
+  ec2_describe_internet_gateways
+  ec2_describe_security_groups
+  ec2_describe_route_tables
+  ecr_describe_repositories
+  ecs_describe_clusters
+  ecs_list_task_definitions
+  elbv2_describe_load_balancers
+  elbv2_describe_target_groups
+  lambda_list_functions
+  lambda_list_layers
+  rds_describe_db_instances
+  rds_describe_db_subnet_groups
+  rds_describe_db_snapshots
+  route53_list_hosted_zones
+  servicediscovery_list_services
+  servicediscovery_list_namespaces
+
+  all__acm_describe_certificate
+  all__apigatewayv2_get_authorizers
+  all__apigatewayv2_get_integrations
+  all__cloudformation_list_stack_resources
+  all__codepipeline_get_pipeline
+  all__cognito_idp_describe_user_pool
+  all__cognito_idp_list_user_pool_clients
+  all__cognito_idp_list_users
+  all__dynamodb_describe_table
+  all__dynamodbstreams_describe_stream
+  all__ecs_describe_services
+  all__ecr_describe_images
+  all__elbv2_describe_listeners
+  all__elbv2_describe_load_balancer_attributes
+  all__elbv2_describe_target_group_attributes
+  all__lambda_get_function
+  all__route53_get_hosted_zone
+  all__route53_list_resource_record_sets
+end
+
+pull :us_east_1 do
+  acm_list_certificates
+end
+
+pull :global do
+  cloudfront_list_distributions
+  s3api_list_buckets
+
+  all__cloudfront_get_distribution
+  all__cloudfront_list_invalidations
+  all__s3api_get_bucket_notification_configuration
+  all__s3api_get_bucket_policy
+  all__s3api_get_bucket_cors
+  all__s3api_get_bucket_website
+  all__s3api_get_public_access_block
+end
