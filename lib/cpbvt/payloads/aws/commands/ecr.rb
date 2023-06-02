@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::CommandsModules::Ecr
+module Cpbvt::Payloads::Aws::Commands::Ecr
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------

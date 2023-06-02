@@ -4,7 +4,7 @@ module Cpbvt
   module Validations; end
   module Payloads
     module Aws
-      module CommandsModules; end
+      module Commands; end
       module Extractors; end
     end
   end

@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::CommandsModules::Apigatewayv2
+module Cpbvt::Payloads::Aws::Commands::Apigatewayv2
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 

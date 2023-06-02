@@ -24,7 +24,7 @@ module Cpbvt::Payloads::Aws::Runner
       filename: attrs.filename
     )
 
-    command = Cpbvt::Payloads::Aws::Commands.send(command, **params)
+    command = Cpbvt::Payloads::Aws::Command.send(command, **params)
     command = command.strip.gsub("\n", " ")
     command = "#{command} --region #{attrs.user_region}" unless attrs.user_region == 'global'
     command = "#{command} --output json > #{output_file}"

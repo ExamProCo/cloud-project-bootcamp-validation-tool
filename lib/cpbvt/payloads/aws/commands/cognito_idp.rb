@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::CommandsModules::CognitoIdp
+module Cpbvt::Payloads::Aws::Commands::CognitoIdp
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------

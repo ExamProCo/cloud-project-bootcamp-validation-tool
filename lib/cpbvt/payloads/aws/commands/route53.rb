@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::CommandsModules::Route53
+module Cpbvt::Payloads::Aws::Commands::Route53
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------

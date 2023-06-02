@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::CommandsModules::Cloudfront
+module Cpbvt::Payloads::Aws::Commands::Cloudfront
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------

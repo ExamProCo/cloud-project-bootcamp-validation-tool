@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::CommandsModules::S3api
+module Cpbvt::Payloads::Aws::Commands::S3api
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------

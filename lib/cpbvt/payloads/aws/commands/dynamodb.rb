@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::CommandsModules::Dynamodb
+module Cpbvt::Payloads::Aws::Commands::Dynamodb
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------

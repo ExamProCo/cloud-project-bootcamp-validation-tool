@@ -8,11 +8,11 @@ Dir.glob(aws_commands_path,&method(:require))
 # ---
 require_relative 'cpbvt/payloads/aws/extractor'
 # --- require cpbvt/payloads/aws/commands/*
-aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','aws','commands_modules','*.rb')
+aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','aws','commands','*.rb')
 Dir.glob(aws_commands_path,&method(:require))
 # ---
 require_relative 'cpbvt/payloads/aws/runner'
-require_relative 'cpbvt/payloads/aws/commands.rb'
+require_relative 'cpbvt/payloads/aws/command.rb'
 require_relative 'cpbvt/payloads/aws/policies'
 require_relative 'cpbvt/validations/aws_2023'
 
@@ -120,7 +120,7 @@ class Cpbvt::Aws2023
       codebuild_list_projects
       codebuild_list_builds
       codepipeline_list_pipelines
-      cognito_list_user_pools
+      cognito_idp_list_user_pools
       dynamodb_list_tables
       dynamodbstreams_list_streams
       ec2_describe_vpcs
@@ -143,7 +143,6 @@ class Cpbvt::Aws2023
       servicediscovery_list_services
       servicediscovery_list_namespaces
     }
-    commands = [] #override
     commands.each do |command|
       result = Cpbvt::Payloads::Aws::Runner.run command, general_params.merge({
         filename: "#{command.gsub('_','-')}.json"
@@ -174,7 +173,6 @@ class Cpbvt::Aws2023
       cloudfront_list_distributions
       s3api_list_buckets
     }
-    commands = [] #override
     commands.each do |command|
       result = Cpbvt::Payloads::Aws::Runner.run command, general_params.merge({
         user_region: 'global',
@@ -228,10 +226,6 @@ class Cpbvt::Aws2023
         params: {stream_arn: 'dynamodbstreams_list_streams' }
       },
       {
-        command: 'ecs_describe_services',
-        params: {services: 'dynamodbstreams_list_streams' }
-      },
-      {
         command: 'ecr_describe_images',
         params: {repository_name: 'ecr_describe_repositories'}
       },
@@ -259,8 +253,6 @@ class Cpbvt::Aws2023
         command: 'route53_list_resource_record_sets',
         params: {hosted_zone_id: 'route53_list_hosted_zones'}
       }
-    ]
-    commands = [
     ]
     commands.each do |attrs|
       Cpbvt::Payloads::Aws::Runner.iter_run!(
@@ -306,7 +298,6 @@ class Cpbvt::Aws2023
         params: {bucket: 's3api_list_buckets'}
       }
     ]
-    commands = []
     commands.each do |attrs|
       Cpbvt::Payloads::Aws::Runner.iter_run!(
         manifest: manifest,

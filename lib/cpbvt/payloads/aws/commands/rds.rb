@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::CommandsModules::Rds
+module Cpbvt::Payloads::Aws::Commands::Rds
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------

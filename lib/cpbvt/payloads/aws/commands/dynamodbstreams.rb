@@ -1,4 +1,4 @@
-module Cpbvt::Payloads::Aws::CommandsModules::Dynamodbstreams
+module Cpbvt::Payloads::Aws::Commands::Dynamodbstreams
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
