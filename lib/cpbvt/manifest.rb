@@ -19,6 +19,10 @@ class Cpbvt::Manifest
     @payloads = {}
   end # init
 
+  # Pull S3 if the local files don't exist
+  def pull!
+  end
+
   def output_file
     File.join(
       @output_path, 

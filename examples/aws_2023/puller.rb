@@ -296,4 +296,4 @@ class Aws2023::Puller
     # - s3api_get_object
     # - s3api_list_objects_v2
   end
-end # class AwsBootcamp2023
+end # class
