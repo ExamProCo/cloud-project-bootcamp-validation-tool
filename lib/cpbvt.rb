@@ -250,9 +250,7 @@ class Cpbvt::Aws2023
       {
         command: 'lambda_get_function' ,
         params: {function_name: 'lambda_list_functions'}
-      }
-    ]
-    commands = [
+      },
       {
         command: 'route53_get_hosted_zone',
         params: {hosted_zone_id: 'route53_list_hosted_zones'}
@@ -260,7 +258,9 @@ class Cpbvt::Aws2023
       {
         command: 'route53_list_resource_record_sets',
         params: {hosted_zone_id: 'route53_list_hosted_zones'}
-      },
+      }
+    ]
+    commands = [
     ]
     commands.each do |attrs|
       Cpbvt::Payloads::Aws::Runner.iter_run!(
@@ -284,6 +284,26 @@ class Cpbvt::Aws2023
       {
         command: 'cloudfront_list_invalidations',
         params: {distribution_id: 'cloudfront_list_distributions'}
+      },
+      {
+        command: 's3api_get_bucket_notification_configuration',
+        params: {bucket: 's3api_list_buckets'}
+      },
+      {
+        command: 's3api_get_bucket_policy',
+        params: {bucket: 's3api_list_buckets'}
+      },
+      {
+        command: 's3api_get_bucket_cors',
+        params: {bucket: 's3api_list_buckets'}
+      },
+      {
+        command: 's3api_get_bucket_website',
+        params: {bucket: 's3api_list_buckets'}
+      },
+      {
+        command: 's3api_get_public_access_block',
+        params: {bucket: 's3api_list_buckets'}
       }
     ]
     commands = []
@@ -299,13 +319,8 @@ class Cpbvt::Aws2023
       )
     end
     # - s3api_head_bucket
-    # - s3api_get_bucket_notification_configuration
-    # - s3api_get_bucket_policy
-    # - s3api_get_bucket_cors
-    # - s3api_get_bucket_website
     # - s3api_get_head_object
     # - s3api_get_object
-    # - s3api_get_public_access_block
     # - s3api_list_objects_v2
   end
 end # class AwsBootcamp2023
