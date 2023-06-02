@@ -6,6 +6,7 @@ module Cpbvt
     module Aws
       module Commands; end
       module Extractors; end
+      module Policies; end
     end
   end
 end

@@ -1,17 +1,17 @@
 require_relative '../lib/cpbvt'
 require 'dotenv'
 require 'securerandom'
+require 'fileutils'
 
 #require 'json'
 #require 'openai'
 
 Dotenv.load
 
-namespace :run do
+namespace :pull do
   task :aws_2023 do
-    puts "aws_2023 =="
-
-    Cpbvt::Aws2023.run(
+    puts "pulling for: aws_2023 =="
+    Aws2023::Puller.run(
       project_scope: "aws-bootcamp-2023",
       run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
       user_uuid: ENV['USER_UUID'],
@@ -20,6 +20,23 @@ namespace :run do
       region: ENV['AWS_REGION'],
       aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
       aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+      payloads_bucket: ENV['PAYLOADS_BUCKET']
+    )
+  end
+end
+
+namespace :validate do
+  task :aws_2023 do
+
+    run_uuid = 'provide me'
+    manifest_file = 'provide me'
+
+    puts "validating for: aws_2023 =="
+    Aws2023::Validator.run(
+      project_scope: "aws-bootcamp-2023",
+      run_uuid: run_uuid,
+      user_uuid: ENV['USER_UUID'],
+      manifest_file: manifest_file
       payloads_bucket: ENV['PAYLOADS_BUCKET']
     )
   end
