@@ -6,6 +6,10 @@ require 'fileutils'
 #require 'json'
 #require 'openai'
 
+module Aws2023; end
+require_relative 'aws_2023/puller.rb'
+require_relative 'aws_2023/validator.rb'
+
 Dotenv.load
 
 namespace :pull do
@@ -27,16 +31,26 @@ end
 
 namespace :validate do
   task :aws_2023 do
-
-    run_uuid = 'provide me'
-    manifest_file = 'provide me'
+    glob_path = File.join(
+      "/workspace",
+      "cloud-project-bootcamp-validation-tool",
+      "examples",
+      "output",
+      "aws-bootcamp-2023",
+      "user-#{ENV['USER_UUID']}",
+      "/*")
+    run_uuids = Dir.glob(glob_path).map{|t| t.split('/').last.sub("run-","") }
+    run_uuid = run_uuids.first
 
     puts "validating for: aws_2023 =="
     Aws2023::Validator.run(
       project_scope: "aws-bootcamp-2023",
       run_uuid: run_uuid,
       user_uuid: ENV['USER_UUID'],
-      manifest_file: manifest_file
+      output_path: ENV['OUTPUT_PATH'],
+      region: ENV['AWS_REGION'],
+      aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
       payloads_bucket: ENV['PAYLOADS_BUCKET']
     )
   end

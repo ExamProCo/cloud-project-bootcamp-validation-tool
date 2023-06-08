@@ -23,6 +23,28 @@ class Cpbvt::Manifest
   def pull!
   end
 
+  # Load a manifest file
+  def load_from_file!
+    path = self.output_file
+    if File.exist?(path)
+      json = File.read(path)
+      data = JSON.parse(json)
+      @user_uuid = data['metadata']['user_uuid']
+      @run_uuid = data['metadata']['run_uuid']
+      @project_scope = data['metadata']['project_scope']
+      @payloads = {}
+      data['payloads'].each do |key,payload|
+        @payloads[key] = {
+          object_key: payload['object_key'],
+          output_file: payload['output_file'],
+          command: payload['command']
+        }
+      end
+    else
+      raise "Manifest.load_from_file! Couldn't find Manifest file at: #{path}"
+    end
+  end
+
   def output_file
     File.join(
       @output_path, 

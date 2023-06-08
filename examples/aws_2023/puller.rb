@@ -30,23 +30,23 @@ class Aws2023::Puller
       payloads_bucket: payloads_bucket
     }
 
-    Cpbvt::Aws2023.pull_primary_region_aws_resources(
+    Aws2023::Puller.pull_primary_region_aws_resources(
       manifest: manifest,
       general_params: general_params
     )
-    Cpbvt::Aws2023.pull_alternate_specific_aws_resources(
+    Aws2023::Puller.pull_alternate_specific_aws_resources(
       manifest: manifest,
       general_params: general_params
     )
-    Cpbvt::Aws2023.pull_global_resources(
+    Aws2023::Puller.pull_global_resources(
       manifest: manifest,
       general_params: general_params
     )
-    Cpbvt::Aws2023.pull_specific_aws_resources(
+    Aws2023::Puller.pull_specific_aws_resources(
       manifest: manifest,
       general_params: general_params
     )
-    Cpbvt::Aws2023.pull_specific_global_aws_resources(
+    Aws2023::Puller.pull_specific_global_aws_resources(
       manifest: manifest,
       general_params: general_params
     )

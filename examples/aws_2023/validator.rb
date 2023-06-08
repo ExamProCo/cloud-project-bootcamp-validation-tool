@@ -3,14 +3,36 @@ class Aws2023::Validator
       project_scope:,
       run_uuid:,
       user_uuid:,
-      manifest_file:,
+      output_path:,
+      region:,
+      aws_access_key_id:,
+      aws_secret_access_key:,
       payloads_bucket:
   )
 
-  manifest = Cpbvt::Manifest.load_from_file manifest_file
+  raise "Validator.run: run_uuid should not be null" if run_uuid.nil?
+  raise "Validator.run: user_uuid should not be null" if user_uuid.nil?
+  raise "Validator.run: project_scope should not be null" if project_scope.nil?
+  raise "Validator.run: output_path should not be null" if output_path.nil?
+  raise "Validator.run: region should not be null" if region.nil?
+  raise "Validator.run: aws_access_key_id should not be null" if aws_access_key_id.nil?
+  raise "Validator.run: aws_secret_access_key should not be null" if aws_secret_access_key.nil?
+  raise "Validator.run: payloads_bucket should not be null" if payloads_bucket.nil?
+
+  manifest_file =  '/workspace/cloud-project-bootcamp-validation-tool/examples/output/aws-bootcamp-2023/user-da124fec-133b-45c5-8423-04b768c886c2/run-1686187402-531bc63a-b5cd-414d-b066-c9b940f300be/manifest.json'
+  manifest = Cpbvt::Manifest.new(
+    user_uuid: user_uuid,
+    run_uuid: run_uuid,
+    output_path: output_path,
+    project_scope: project_scope,
+    payloads_bucket: payloads_bucket
+  )
+  manifest.load_from_file!
   manifest.pull!
 
   # Networking Validation
+  result = Aws2023::Validator.should_have_custom_vpc(manifest)
+  puts result
     # should have a custom vpc 
     # with 3 public subnets
     # with a IGW
@@ -66,4 +88,55 @@ class Aws2023::Validator
   # Container Repo Storage?
 
   end # def self.run
+
+  def self.should_have_custom_vpc manifest
+    key = 'ec2_describe_vpcs'
+    if manifest.has_payload?(key)
+      data =  manifest.get_output(key)
+    else
+      raise "#{key} not found in manifest"
+    end
+
+
+    # return back only the custom vpcs
+    vpcs = data['Vpcs'].select do |vpc|
+      # we assume that if its not default than its custom
+      # it should be avaliable, otherwise it can't actually be working
+      vpc['IsDefault'] == false &&
+      vpc['State'] == 'available' 
+    end
+
+    # We would prefer if there is only once custom vpc
+    if vpcs.count == 1
+      # did it have the name we expected?
+      expected_vpc_name = vpcs.first['Tags'].any? do |tag| 
+        tag['Key'] == 'Name'
+        tag['Value'] == 'CrdNetVPC'
+      end
+
+      # was it provisioned with Cloudformation?
+      expected_cfn_stack = vpcs.first['Tags'].any? do |tag| 
+        tag['Key'] == 'aws:cloudformation:stack-name'
+        # We
+        #tag['Value'] == 'CrdNet'
+      end
+
+      score = 5
+      message =  "Found a custom VPCs [non default VPC] that is avaliable."
+      if expected_vpc_name
+        score += 2
+        message += " Has the expected name CrdNet."
+      end
+      if expected_cfn_stack
+        score += 3
+        message += " Provisioned with Cloudformation."
+      end
+      {score: score, message: message}
+    elsif vpcs.count > 1
+      # Partial marks if we find multiple even though we expect 1.
+      {score: 5, message: "Found multiple custom VPCs [non default VPC] that are avaliable. Uncertain which is the correct one."}
+    else
+      {score: 0, message: "Failed to find any custom VPC [non default VPC] that is avaliable"}
+    end
+  end
 end # class
