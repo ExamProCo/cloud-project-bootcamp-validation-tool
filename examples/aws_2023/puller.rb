@@ -1,34 +1,17 @@
 class Aws2023::Puller
-  def self.run(project_scope:,
-               user_uuid:,
-               run_uuid:,
-               region:,
-               user_region:,
-               output_path:,
-               aws_access_key_id:,
-               aws_secret_access_key:,
-               payloads_bucket:
-              )
+  def self.run(general_params:,specific_params:)
+    unless general_params.valid?
+      puts general_params.errors.full_messages
+      raise "failed to pass general params validation"
+    end
 
     manifest = Cpbvt::Manifest.new(
-      user_uuid: user_uuid, 
-      run_uuid: run_uuid, 
-      project_scope: project_scope,
-      output_path: output_path,
-      payloads_bucket: payloads_bucket
+      user_uuid: general_params.user_uuid, 
+      run_uuid: general_params.run_uuid, 
+      project_scope: general_params.project_scope,
+      output_path: general_params.output_path,
+      payloads_bucket: general_params.payloads_bucket
     )
-
-    general_params = {
-      project_scope: project_scope,
-      run_uuid: run_uuid,
-      user_uuid: user_uuid,
-      region: region,
-      user_region: user_region,
-      output_path: output_path,
-      aws_access_key_id: aws_access_key_id,
-      aws_secret_access_key: aws_secret_access_key,
-      payloads_bucket: payloads_bucket
-    }
 
     Aws2023::Puller.pull_primary_region_aws_resources(
       manifest: manifest,
@@ -126,7 +109,7 @@ class Aws2023::Puller
       servicediscovery_list_namespaces
     }
     commands.each do |command|
-      result = Cpbvt::Payloads::Aws::Runner.run command, general_params.merge({
+      result = Cpbvt::Payloads::Aws::Runner.run command, general_params.to_h.merge({
         filename: "#{command.gsub('_','-')}.json"
       })
       manifest.add_payload command, result
@@ -141,7 +124,7 @@ class Aws2023::Puller
     }
     commands = [] # override
     commands.each do |command|
-      result = Cpbvt::Payloads::Aws::Runner.run command, general_params.merge({
+      result = Cpbvt::Payloads::Aws::Runner.run command, general_params.to_h.merge({
         user_region: 'us-east-1',
         filename: "#{command.gsub('_','-')}.json"
       })
@@ -156,7 +139,7 @@ class Aws2023::Puller
       s3api_list_buckets
     }
     commands.each do |command|
-      result = Cpbvt::Payloads::Aws::Runner.run command, general_params.merge({
+      result = Cpbvt::Payloads::Aws::Runner.run command, general_params.to_h.merge({
         user_region: 'global',
         filename: "#{command.gsub('_','-')}.json"
       })
@@ -241,7 +224,7 @@ class Aws2023::Puller
         manifest: manifest,
         command: attrs[:command], 
         specific_params: attrs[:params], 
-        general_params: general_params.merge({
+        general_params: general_params.to_h.merge({
           filename: "#{attrs[:command].gsub('_','-')}.json"
         })
       )
@@ -285,7 +268,7 @@ class Aws2023::Puller
         manifest: manifest,
         command: attrs[:command], 
         specific_params: attrs[:params], 
-        general_params: general_params.merge({
+        general_params: general_params.to_h.merge({
           user_region: 'global',
           filename: "#{attrs[:command].gsub('_','-')}.json"
         })

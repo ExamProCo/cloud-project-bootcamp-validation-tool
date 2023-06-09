@@ -6,18 +6,8 @@ require 'time'
 module Cpbvt::Payloads::Aws::Runner
   def self.run command, attrs, params={}
     starts_at = Time.now.to_i
-    attrs = OpenStruct.new attrs
 
-    raise "Runner.run: run_uuid should not be null" if attrs.run_uuid.nil?
-    raise "Runner.run: user_uuid should not be null" if attrs.user_uuid.nil?
-    raise "Runner.run: project_scope should not be null" if attrs.project_scope.nil?
-    raise "Runner.run: user_region should not be null" if attrs.user_region.nil?
-    raise "Runner.run: output_path should not be null" if attrs.output_path.nil?
-    raise "Runner.run: filename should not be null" if attrs.filename.nil?
-    raise "Runner.run: region should not be null" if attrs.region.nil?
-    raise "Runner.run: aws_access_key_id should not be null" if attrs.aws_access_key_id.nil?
-    raise "Runner.run: aws_secret_access_key should not be null" if attrs.aws_secret_access_key.nil?
-    raise "Runner.run: payloads_bucket should not be null" if attrs.payloads_bucket.nil?
+    attrs = OpenStruct.new attrs
 
     output_file = Cpbvt::Payloads::Aws::Runner::output_file(
       run_uuid: attrs.run_uuid,
@@ -208,4 +198,6 @@ module Cpbvt::Payloads::Aws::Runner
     # run the command which will download the json
     system command
   end
+
+  # Create Ostruct and validate general params
 end

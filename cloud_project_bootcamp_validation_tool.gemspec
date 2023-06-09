@@ -16,6 +16,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'ruby-openai'
   s.add_dependency 'aws-sdk-s3'
+  s.add_dependency 'activemodel'
+
   s.files = Dir["{app,config,db,lib}/**/*", "README.md"]
   s.test_files = Dir["spec/**/*"]
 end

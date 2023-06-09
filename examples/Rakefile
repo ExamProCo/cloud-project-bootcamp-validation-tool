@@ -10,12 +10,15 @@ module Aws2023; end
 require_relative 'aws_2023/puller.rb'
 require_relative 'aws_2023/validator.rb'
 
+unless File.exist?('.env')
+  raise "Did not find a .env file"
+end
 Dotenv.load
 
 namespace :pull do
   task :aws_2023 do
     puts "pulling for: aws_2023 =="
-    Aws2023::Puller.run(
+    general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
       project_scope: "aws-bootcamp-2023",
       run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
       user_uuid: ENV['USER_UUID'],
@@ -25,6 +28,11 @@ namespace :pull do
       aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
       aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
       payloads_bucket: ENV['PAYLOADS_BUCKET']
+    )
+
+    Aws2023::Puller.run(
+      general_params: general_params,
+      specific_params: {}
     )
   end
 end
