@@ -7,6 +7,7 @@ require 'fileutils'
 #require 'openai'
 
 module Aws2023; end
+require_relative 'aws_2023/specific_params.rb'
 require_relative 'aws_2023/puller.rb'
 require_relative 'aws_2023/validator.rb'
 
@@ -30,9 +31,13 @@ namespace :pull do
       payloads_bucket: ENV['PAYLOADS_BUCKET']
     )
 
+    specific_params Aws2023::SpecificParams(
+      naked_domain_name: 'cruddur.com'
+    )
+
     Aws2023::Puller.run(
       general_params: general_params,
-      specific_params: {}
+      specific_params: specific_params
     )
   end
 end

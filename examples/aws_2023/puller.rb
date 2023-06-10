@@ -5,6 +5,11 @@ class Aws2023::Puller
       raise "failed to pass general params validation"
     end
 
+    unless specific_params.valid?
+      puts specific_params.errors.full_messages
+      raise "failed to specific params validation"
+    end
+
     manifest = Cpbvt::Manifest.new(
       user_uuid: general_params.user_uuid, 
       run_uuid: general_params.run_uuid, 
