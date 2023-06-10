@@ -3,7 +3,7 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def codepipeline_list_pipelines__pipeline_name data
+def codepipeline_list_pipelines__pipeline_name data, filters={}
   data['pipelines'].map do |t|
     {
       iter_id: t['name'],

@@ -2,7 +2,8 @@ module Cpbvt::Payloads::Aws::Extractors::Dynamodbstreams
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
-def dynamodbstreams_list_streams__stream_arn data
+
+def dynamodbstreams_list_streams__stream_arn data, filters={}
   data['Streams'].map do |t|
     {
       iter_id: t['StreamLabel'],
@@ -10,5 +11,6 @@ def dynamodbstreams_list_streams__stream_arn data
     }
   end
 end
+
 # ------
 end; end

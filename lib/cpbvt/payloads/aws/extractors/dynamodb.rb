@@ -3,7 +3,7 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def dynamodb_list_tables__table_name data
+def dynamodb_list_tables__table_name data, filters={}
   data['TableNames'].map do |table_name|
     {
       iter_id: table_name,

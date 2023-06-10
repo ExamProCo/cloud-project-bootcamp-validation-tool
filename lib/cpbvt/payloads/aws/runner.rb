@@ -7,6 +7,10 @@ module Cpbvt::Payloads::Aws::Runner
   def self.run command, attrs, params={}
     starts_at = Time.now.to_i
 
+    # if no filename provided base it on the provided command
+    unless attrs[:filename]
+      attrs[:filename] = "#{command.gsub('_','-')}.json"
+    end
     attrs = OpenStruct.new attrs
 
     output_file = Cpbvt::Payloads::Aws::Runner::output_file(
@@ -108,14 +112,17 @@ module Cpbvt::Payloads::Aws::Runner
   #    manifest.add_payload t[0], t[1]
   #  end # results.each
   #end
+  # ------
 
+  # Iterrun will take a a file and iterate over every single resource to further describe it.
   # When we have an AWS API Call that needs a specific value from a list of resources.
   # eg. in order to get describe_user_pool we have to extract the user_pool_ids from list_user_pools
   def self.iter_run!(
       manifest:,
       command:,
       specific_params:,
-      general_params:
+      general_params:,
+      extractor_filters: {}
     )
     # all the results from the command being run
     results = []
@@ -123,6 +130,10 @@ module Cpbvt::Payloads::Aws::Runner
     # harcoded to only work with one param until
     # we know how to support multiple nested params
     param, data_key = specific_params.first
+
+    unless general_params[:filename]
+      general_params[:filename] = "#{command.gsub('_','-')}.json"
+    end
 
     # automatically pull the other required data if it is not already loaded
     unless manifest.has_payload?(data_key.to_s)
@@ -140,7 +151,8 @@ module Cpbvt::Payloads::Aws::Runner
     # extract the data from the local file that we'll use to iterate
     iter_data = Cpbvt::Payloads::Aws::Extractor.send(
       "#{data_key}__#{param}",
-      data
+      data,
+      extractor_filters
     )
 
     iter_data.each do |extractor_attrs|

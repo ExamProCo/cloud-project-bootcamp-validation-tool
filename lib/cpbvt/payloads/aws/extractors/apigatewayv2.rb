@@ -3,7 +3,7 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def apigatewayv2_get_apis__app_id(data)
+def apigatewayv2_get_apis__app_id(data,filters={})
   data['Items'].map do |x| 
     {
       iter_id: x['ApiId'],

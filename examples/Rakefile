@@ -31,7 +31,7 @@ namespace :pull do
       payloads_bucket: ENV['PAYLOADS_BUCKET']
     )
 
-    specific_params Aws2023::SpecificParams(
+    specific_params = Aws2023::SpecificParams.new(
       naked_domain_name: 'cruddur.com'
     )
 

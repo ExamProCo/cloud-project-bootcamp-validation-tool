@@ -3,7 +3,7 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def lambda_list_functions__function_name data
+def lambda_list_functions__function_name data, filters={}
   data['Functions'].map do |t|
     name = t['FunctionName']
     {
