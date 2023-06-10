@@ -1,3 +1,4 @@
+#require 'async'
 class Aws2023::Puller
   def self.run(general_params:,specific_params:)
     unless general_params.valid?
@@ -17,6 +18,8 @@ class Aws2023::Puller
       output_path: general_params.output_path,
       payloads_bucket: general_params.payloads_bucket
     )
+
+    primary_region = general_params.user_region
 
     self.pull primary_region, :acm_list_certificates, manifest, general_params
     self.pull primary_region, :apigatewayv2_get_apis, manifest, general_params

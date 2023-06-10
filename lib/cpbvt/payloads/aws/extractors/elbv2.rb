@@ -14,7 +14,7 @@ def elbv2_describe_load_balancers__load_balancer_arn data, filters={}
   end
 end
 
-def elbv2_describe_target_groups__target_group_arn data
+def elbv2_describe_target_groups__target_group_arn data, filters={}
   data['TargetGroups'].map do |t|
     arn = t['TargetGroupArn']
     iter_id = arn.split('/').last

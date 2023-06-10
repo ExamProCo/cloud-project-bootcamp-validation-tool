@@ -1,5 +1,6 @@
 require 'time'
 require 'json'
+require 'zlib'
 
 class Cpbvt::Manifest
   attr_accessor :payloads, # store all the payloads data structures
@@ -102,4 +103,6 @@ class Cpbvt::Manifest
       payloads: @payloads
     }
   end
+
+  def 
 end # class

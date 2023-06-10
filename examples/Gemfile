@@ -7,3 +7,4 @@ gem 'dotenv', groups: [:development, :test]
 gem 'rake'
 gem 'ox'
 #gem 'ruby-openai'
+gem 'async'
