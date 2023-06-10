@@ -18,7 +18,6 @@ class Aws2023::Puller
       payloads_bucket: general_params.payloads_bucket
     )
 
-    primary_region = general_params.user_region
     self.pull primary_region, :acm_list_certificates, manifest, general_params
     self.pull primary_region, :apigatewayv2_get_apis, manifest, general_params
     self.pull primary_region, :cloudformation_list_stacks, manifest, general_params
@@ -58,7 +57,7 @@ class Aws2023::Puller
     # ============================================
     self.pull_specific('global',{
       command: 'cloudfront_get_distribution',
-      params: {distribution_id: 'cloudfront_list_distributions'}
+      params: {distribution_id: 'cloudfront_list_distributions'},
       filters: {
         aliases: [
           "#{specific_params.naked_domain_name}",
@@ -68,27 +67,70 @@ class Aws2023::Puller
     }, manifest, general_params)
     self.pull_specific('global',{
       command: 'cloudfront_list_invalidations',
-      params: {distribution_id: 'cloudfront_list_distributions'}
+      params: {distribution_id: 'cloudfront_list_distributions'},
+      filters: {
+        aliases: [
+          "#{specific_params.naked_domain_name}",
+          "assets.#{specific_params.naked_domain_name}"
+        ]
+      }
     }, manifest, general_params)
+    
+    primary_region = general_params.user_region
     self.pull_specific('global',{
       command: 's3api_get_bucket_notification_configuration',
-      params: {bucket: 's3api_list_buckets'}
+      params: {bucket: 's3api_list_buckets'},
+      filters: {
+        bucket_names: [
+          specific_params.naked_domain_name,
+          "www.#{specific_params.naked_domain_name}",
+          "assets.#{specific_params.naked_domain_name}"
+        ]
+      }
     }, manifest, general_params)
     self.pull_specific('global',{
       command: 's3api_get_bucket_policy',
-      params: {bucket: 's3api_list_buckets'}
+      params: {bucket: 's3api_list_buckets'},
+      filters: {
+        bucket_names: [
+          specific_params.naked_domain_name,
+          "www.#{specific_params.naked_domain_name}",
+          "assets.#{specific_params.naked_domain_name}"
+        ]
+      }
     }, manifest, general_params)
     self.pull_specific('global',{
       command: 's3api_get_bucket_cors',
-      params: {bucket: 's3api_list_buckets'}
+      params: {bucket: 's3api_list_buckets'},
+      filters: {
+        bucket_names: [
+          specific_params.naked_domain_name,
+          "www.#{specific_params.naked_domain_name}",
+          "assets.#{specific_params.naked_domain_name}"
+        ]
+      }
     }, manifest, general_params)
     self.pull_specific('global',{
       command: 's3api_get_bucket_website',
-      params: {bucket: 's3api_list_buckets'}
+      params: {bucket: 's3api_list_buckets'},
+      filters: {
+        bucket_names: [
+          specific_params.naked_domain_name,
+          "www.#{specific_params.naked_domain_name}",
+          "assets.#{specific_params.naked_domain_name}"
+        ]
+      }
     }, manifest, general_params)
     self.pull_specific('global',{
       command: 's3api_get_public_access_block',
-      params: {bucket: 's3api_list_buckets'}
+      params: {bucket: 's3api_list_buckets'},
+      filters: {
+        bucket_names: [
+          specific_params.naked_domain_name,
+          "www.#{specific_params.naked_domain_name}",
+          "assets.#{specific_params.naked_domain_name}"
+        ]
+      }
     }, manifest, general_params)
     # ============================================
     # Primary Region Specific ====================
@@ -209,7 +251,7 @@ class Aws2023::Puller
     manifest.add_payload command.to_s, result
   end
 
-  def self.pull_specific(user_region, command, manifest, general_params)
+  def self.pull_specific(user_region, rule, manifest, general_params)
     # Specific Regional AWS Resources Commands
     Cpbvt::Payloads::Aws::Runner.iter_run!(
       manifest: manifest,
