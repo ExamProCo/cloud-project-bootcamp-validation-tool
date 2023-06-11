@@ -1,25 +1,7 @@
 require_relative 'validations/networking'
-
-class Aws2023::State
-  attr_accessor :results,
-                :vpc_id,
-                :public_subnet_id_1,
-                :public_subnet_id_2,
-                :public_subnet_id_3
-
-  def initialize
-    @results = {}
-  end
-
-  def push_score key,data
-    @results[:key] = data
-  end
-end
+require 'pp'
 
 class Aws2023::Validator
-  include Validations::Networking
-
-  attr_accessor :results, :attrs
 
   def self.run(
       project_scope:,
@@ -52,23 +34,31 @@ class Aws2023::Validator
   )
   manifest.load_from_file!
   manifest.pull!
+  state.manifest = manifest
 
-  attrs = {}
-  data = Validations::Networking.should_have_custom_vpc(manifest)
-  state.push_score :should_have_cusome_vpc, data[:result]
-  state.vpc_id = data[:vpc_id]
-  if state.vpc_id
-    data = Validations::Networking.should_have_three_public_subnets(manifest,state.vpc_id)
-    data.public_subnet_id_1 = data.public_subnet_id_1
-    data.public_subnet_id_2 = data.public_subnet_id_2
-    data.public_subnet_id_3 = data.public_subnet_id_3
-    state.push_score :should_have_three_public_subnets, data[:result]
-
-    state.add Validations::Networking.should_have_an_igw(manifest,state.vpc_id)
-    data - 
-    state.add Validations::Networking.should_have_a_route_to_internet(manifest)
-  end
-  puts state.results
+  state.process(
+    klass: Validations::Networking,
+    function_name: :should_have_custom_vpc, 
+    output_params: [:vpc_id]
+  )
+  state.process(
+    klass: Validations::Networking,
+    function_name: :should_have_three_public_subnets, 
+    input_params: [:vpc_id],
+    output_params: [:public_subnet_id_1]
+  )
+  state.process(
+    klass: Validations::Networking,
+    function_name: :should_have_an_igw,
+    input_params: [:vpc_id],
+    output_params: [:igw_id]
+  )
+  state.process(
+    klass: Validations::Networking,
+    function_name: :should_have_a_route_to_internet,
+    input_params: [:igw_id,:vpc_id]
+  )
+  pp state.results
 
   # CI/CD Validation
     # should have a codepipeline

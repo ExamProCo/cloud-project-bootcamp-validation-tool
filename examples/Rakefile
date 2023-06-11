@@ -9,6 +9,7 @@ require 'fileutils'
 module Aws2023; end
 require_relative 'aws_2023/specific_params.rb'
 require_relative 'aws_2023/puller.rb'
+require_relative 'aws_2023/state.rb'
 require_relative 'aws_2023/validator.rb'
 
 unless File.exist?('.env')

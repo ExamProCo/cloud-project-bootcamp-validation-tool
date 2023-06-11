@@ -1,6 +1,6 @@
 module Validations; end
-module Validations::Networking
-  def self.should_have_custom_vpc manifest
+class Validations::Networking
+  def self.should_have_custom_vpc(manifest:)
     key = 'ec2_describe_vpcs'
     if manifest.has_payload?(key)
       data =  manifest.get_output(key)
@@ -56,7 +56,7 @@ module Validations::Networking
     end
   end
 
-  def self.should_have_three_public_subnets(manifest)
+  def self.should_have_three_public_subnets(manifest:,vpc_id:)
     key = 'ec2_describe_subnets'
     if manifest.has_payload?(key)
       data =  manifest.get_output(key)
@@ -68,11 +68,13 @@ module Validations::Networking
     # Subnet should have a tag of group:cruddur-networking
     # If its has MapPublicIpOnLaunch then we'll consider it a public subnet
     subnets = data['Subnets'].select do |subnet|
-      subnet['State'] == 'available' &&
-      subnet['Tags'].any? do |tag|
+      expected_tag = subnet.key?('Tags') && subnet['Tags'].any? do |tag|
         tag['Key'] == 'group'
         tag['Value'] == 'cruddur-networking'
       end
+
+      expected_tag &&
+      subnet['State'] == 'available' &&
       subnet['MapPublicIpOnLaunch'] == true
     end
 
@@ -85,7 +87,7 @@ module Validations::Networking
       }
     else
       {
-        result: {score: 0, message: "Found more than #{subnets.size} public subnets for VPC #{vpc_id} tagged with group:cruddur-networking but expected only 3"},
+        result: {score: 0, message: "Found #{subnets.size} public subnets for VPC #{vpc_id} tagged with group:cruddur-networking but expected only 3"},
         public_subnet_id_1: false,
         public_subnet_id_2: false,
         public_subnet_id_3: false
@@ -95,7 +97,7 @@ module Validations::Networking
 
   end
 
-  def self.should_have_an_igw(manifest,vpc_id)
+  def self.should_have_an_igw(manifest:,vpc_id:)
     key = 'ec2_describe_internet_gateways'
     if manifest.has_payload?(key)
       data =  manifest.get_output(key)
@@ -104,23 +106,49 @@ module Validations::Networking
     end
 
     igw = data['InternetGateways'].find do |igw|
-      igw['Attachements'].any? do |attachment|
+      igw['Attachments'].any? do |attachment|
         attachment['State'] == 'avaliable' &&
         attachment['VpcId'] == vpc_id
       end
-      subnet['Tags'].any? do |tag|
+      igw['Tags'].any? do |tag|
         tag['Key'] == 'group'
         tag['Value'] == 'cruddur-networking'
       end
     end
 
     if igw
-      {result: {score: 10, message: "Found an IGW attached to the vpc: #{vpc_id} tagged with group:cruddur-networking"},igw_id: vpc['InternetGatewayId']}
+      {result: {score: 10, message: "Found an IGW attached to the vpc: #{vpc_id} tagged with group:cruddur-networking"},igw_id: igw['InternetGatewayId']}
     else
-      {result: {score: 0, message: "Failed to find an IGW attached to the vpc: #{vpc_id} tagged with group:cruddur-networking"},igw_id: false]}
+      {result: {score: 0, message: "Failed to find an IGW attached to the vpc: #{vpc_id} tagged with group:cruddur-networking"},igw_id: false}
     end
   end
 
-  def self.should_have_a_route_to_internet(manifest)
+  def self.should_have_a_route_to_internet(manifest:,vpc_id:,igw_id:)
+    key = 'ec2_describe_route_tables'
+    if manifest.has_payload?(key)
+      data =  manifest.get_output(key)
+    else
+      raise "#{key} not found in manifest"
+    end
+
+    route_table = data['RouteTables'].find do |route_table|
+      expected_tag = route_table['Tags'].any? do |tag|
+        tag['Key'] == 'group'
+        tag['Value'] == 'cruddur-networking'
+      end 
+      expected_route = route_table['Routes'].any? do |route|
+        route['GatewayId'] == igw_id &&
+        route['DestinationCidrBlock'] == '0.0.0.0/0'
+      end
+      expected_tag &&
+      expected_route &&
+      route_table['VpcId'] = vpc_id
+    end
+
+    if route_table
+      {result: {score: 10, message: "Found a route table for vpc: #{vpc_id} that routes out to the internet"}}
+    else
+      {result: {score: 0, message: "failed to find a route table for vpc: #{vpc_id} that routes out to the internet"}}
+    end
   end
 end
