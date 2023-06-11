@@ -53,9 +53,10 @@ namespace :validate do
       "user-#{ENV['USER_UUID']}",
       "/*")
     run_uuids = Dir.glob(glob_path).map{|t| t.split('/').last.sub("run-","") }
-    run_uuid = run_uuids.first
+    run_uuid = run_uuids.last
 
     puts "validating for: aws_2023 =="
+    puts run_uuid
     Aws2023::Validator.run(
       project_scope: "aws-bootcamp-2023",
       run_uuid: run_uuid,

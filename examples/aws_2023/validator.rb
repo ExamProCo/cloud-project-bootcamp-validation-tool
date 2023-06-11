@@ -1,4 +1,26 @@
+require_relative 'validations/networking'
+
+class Aws2023::State
+  attr_accessor :results,
+                :vpc_id,
+                :public_subnet_id_1,
+                :public_subnet_id_2,
+                :public_subnet_id_3
+
+  def initialize
+    @results = {}
+  end
+
+  def push_score key,data
+    @results[:key] = data
+  end
+end
+
 class Aws2023::Validator
+  include Validations::Networking
+
+  attr_accessor :results, :attrs
+
   def self.run(
       project_scope:,
       run_uuid:,
@@ -10,6 +32,8 @@ class Aws2023::Validator
       payloads_bucket:
   )
 
+  state = Aws2023::State.new
+
   raise "Validator.run: run_uuid should not be null" if run_uuid.nil?
   raise "Validator.run: user_uuid should not be null" if user_uuid.nil?
   raise "Validator.run: project_scope should not be null" if project_scope.nil?
@@ -19,7 +43,6 @@ class Aws2023::Validator
   raise "Validator.run: aws_secret_access_key should not be null" if aws_secret_access_key.nil?
   raise "Validator.run: payloads_bucket should not be null" if payloads_bucket.nil?
 
-  manifest_file =  '/workspace/cloud-project-bootcamp-validation-tool/examples/output/aws-bootcamp-2023/user-da124fec-133b-45c5-8423-04b768c886c2/run-1686187402-531bc63a-b5cd-414d-b066-c9b940f300be/manifest.json'
   manifest = Cpbvt::Manifest.new(
     user_uuid: user_uuid,
     run_uuid: run_uuid,
@@ -30,13 +53,22 @@ class Aws2023::Validator
   manifest.load_from_file!
   manifest.pull!
 
-  # Networking Validation
-  result = Aws2023::Validator.should_have_custom_vpc(manifest)
-  puts result
-    # should have a custom vpc 
-    # with 3 public subnets
-    # with a IGW
-    # with a route table that routes to the internet
+  attrs = {}
+  data = Validations::Networking.should_have_custom_vpc(manifest)
+  state.push_score :should_have_cusome_vpc, data[:result]
+  state.vpc_id = data[:vpc_id]
+  if state.vpc_id
+    data = Validations::Networking.should_have_three_public_subnets(manifest,state.vpc_id)
+    data.public_subnet_id_1 = data.public_subnet_id_1
+    data.public_subnet_id_2 = data.public_subnet_id_2
+    data.public_subnet_id_3 = data.public_subnet_id_3
+    state.push_score :should_have_three_public_subnets, data[:result]
+
+    state.add Validations::Networking.should_have_an_igw(manifest,state.vpc_id)
+    data - 
+    state.add Validations::Networking.should_have_a_route_to_internet(manifest)
+  end
+  puts state.results
 
   # CI/CD Validation
     # should have a codepipeline
@@ -89,54 +121,5 @@ class Aws2023::Validator
 
   end # def self.run
 
-  def self.should_have_custom_vpc manifest
-    key = 'ec2_describe_vpcs'
-    if manifest.has_payload?(key)
-      data =  manifest.get_output(key)
-    else
-      raise "#{key} not found in manifest"
-    end
 
-
-    # return back only the custom vpcs
-    vpcs = data['Vpcs'].select do |vpc|
-      # we assume that if its not default than its custom
-      # it should be avaliable, otherwise it can't actually be working
-      vpc['IsDefault'] == false &&
-      vpc['State'] == 'available' 
-    end
-
-    # We would prefer if there is only once custom vpc
-    if vpcs.count == 1
-      # did it have the name we expected?
-      expected_vpc_name = vpcs.first['Tags'].any? do |tag| 
-        tag['Key'] == 'Name'
-        tag['Value'] == 'CrdNetVPC'
-      end
-
-      # was it provisioned with Cloudformation?
-      expected_cfn_stack = vpcs.first['Tags'].any? do |tag| 
-        tag['Key'] == 'aws:cloudformation:stack-name'
-        # We
-        #tag['Value'] == 'CrdNet'
-      end
-
-      score = 5
-      message =  "Found a custom VPCs [non default VPC] that is avaliable."
-      if expected_vpc_name
-        score += 2
-        message += " Has the expected name CrdNet."
-      end
-      if expected_cfn_stack
-        score += 3
-        message += " Provisioned with Cloudformation."
-      end
-      {score: score, message: message}
-    elsif vpcs.count > 1
-      # Partial marks if we find multiple even though we expect 1.
-      {score: 5, message: "Found multiple custom VPCs [non default VPC] that are avaliable. Uncertain which is the correct one."}
-    else
-      {score: 0, message: "Failed to find any custom VPC [non default VPC] that is avaliable"}
-    end
-  end
 end # class
