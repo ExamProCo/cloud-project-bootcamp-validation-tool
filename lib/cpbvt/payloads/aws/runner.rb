@@ -5,7 +5,7 @@ require 'time'
 
 module Cpbvt::Payloads::Aws::Runner
   def self.run command, attrs, params={}
-    starts_at = Time.now.to_i
+    starts_at = Time.now.to_f
 
     # if no filename provided base it on the provided command
     unless attrs[:filename]
@@ -22,39 +22,39 @@ module Cpbvt::Payloads::Aws::Runner
       filename: attrs.filename
     )
 
-    object_key = Cpbvt::Uploader::object_key(
-      user_uuid: attrs.user_uuid,
-      run_uuid: attrs.run_uuid,
-      project_scope: attrs.project_scope,
-      region: attrs.user_region, 
-      filename: attrs.filename
-    )
+    #object_key = Cpbvt::Uploader::object_key(
+    #  user_uuid: attrs.user_uuid,
+    #  run_uuid: attrs.run_uuid,
+    #  project_scope: attrs.project_scope,
+    #  region: attrs.user_region, 
+    #  filename: attrs.filename
+    #)
 
     command = Cpbvt::Payloads::Aws::Command.send(command, **params)
     command = command.strip.gsub("\n", " ")
     command = "#{command} --region #{attrs.user_region}" unless attrs.user_region == 'global'
     command = "#{command} --output json > #{output_file}"
     Cpbvt::Payloads::Aws::Runner.execute command
-    # upload json file to s3
-    Cpbvt::Uploader.run(
-      file_path: output_file, 
-      object_key: object_key,
-      aws_region: attrs.region,
-      aws_access_key_id: attrs.aws_access_key_id,
-      aws_secret_access_key: attrs.aws_secret_access_key,
-      payloads_bucket: attrs.payloads_bucket
-    )
 
-    ends_at = Time.now.to_i
+    # upload json file to s3
+    #Cpbvt::Uploader.run(
+    #  file_path: output_file, 
+    #  object_key: object_key,
+    #  aws_region: attrs.region,
+    #  aws_access_key_id: attrs.aws_access_key_id,
+    #  aws_secret_access_key: attrs.aws_secret_access_key,
+    #  payloads_bucket: attrs.payloads_bucket
+    #)
+
+    ends_at = Time.now.to_f
     return {
       params: params,
       benchmark: {
         starts_at: starts_at,
         ends_at:  ends_at,
-        duration_in_seconds: ends_at - starts_at
+        duration_in_ms: ((ends_at - starts_at)*1000).to_i
       },
       command: command,
-      object_key: object_key,
       output_file: output_file
     }
   end # run

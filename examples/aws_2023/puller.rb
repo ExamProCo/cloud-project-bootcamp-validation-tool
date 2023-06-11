@@ -49,7 +49,6 @@ class Aws2023::Puller
     self.pull primary_region, :route53_list_hosted_zones, manifest, general_params
     self.pull primary_region, :servicediscovery_list_services, manifest, general_params
     self.pull primary_region, :servicediscovery_list_namespaces, manifest, general_params
-
     self.pull 'us-east-1', :acm_list_certificates, manifest, general_params
 
     self.pull 'global', :cloudfront_list_distributions, manifest, general_params
@@ -236,7 +235,11 @@ class Aws2023::Puller
     ]
     # A list of up to 100 cluster names or full cluster Amazon Resource Name (ARN) entries. If you do not specify a cluster, the default cluster is assumed.
     # - ecs_describe_services
-    manifest.write_file
+=begin
+=end
+    manifest.write_file!
+    manifest.archive!
+
     Cpbvt::Uploader.run(
       file_path: manifest.output_file, 
       object_key: manifest.object_key,

@@ -10,6 +10,7 @@
 /test/version_tmp/
 /tmp/
 
+*.zip
 .env
 
 output/**/*

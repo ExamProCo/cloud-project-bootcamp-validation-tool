@@ -1,6 +1,7 @@
 require 'time'
 require 'json'
-require 'zlib'
+require 'zip'
+require 'pry'
 
 class Cpbvt::Manifest
   attr_accessor :payloads, # store all the payloads data structures
@@ -12,13 +13,29 @@ class Cpbvt::Manifest
                 :ends_at
 
   def initialize(user_uuid:, run_uuid:, output_path:, project_scope:, payloads_bucket:)
-    @starts_at = Time.now.to_i
+    @starts_at = Time.now.to_f
     @user_uuid = user_uuid
     @run_uuid = run_uuid
     @project_scope = project_scope
     @output_path = output_path
     @payloads = {}
   end # init
+
+  def archive!
+    path = self.output_path
+    zipfile_name = self.archive_path
+    if Dir[File.join(path,'*')].any?
+      Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+        files = Dir.glob(File.join(path,'**','*'))
+        basepath = File.join(@output_path, @project_scope, "user-#{@user_uuid}","/").to_s
+        files.each do |file|
+          zip_file_path = file.sub(basepath,"")
+          puts zip_file_path
+          zipfile.add(zip_file_path, file)
+        end
+      end
+    end
+  end # archive!
 
   # Pull S3 if the local files don't exist
   def pull!
@@ -55,6 +72,24 @@ class Cpbvt::Manifest
       "manifest.json"
     )
   end
+  
+  def output_path
+    File.join(
+      @output_path, 
+      @project_scope, 
+      "user-#{@user_uuid}",
+      "run-#{@run_uuid}"
+    )
+  end
+
+  def archive_path
+    File.join(
+      @output_path, 
+      @project_scope, 
+      "user-#{@user_uuid}",
+      "run-#{@run_uuid}.zip"
+    )
+  end
 
   def object_key
     File.join(
@@ -81,8 +116,8 @@ class Cpbvt::Manifest
   end
 
   # write content to a file
-  def write_file
-    @ends_at = Time.now.to_i
+  def write_file!
+    @ends_at = Time.now.to_f
     File.open(self.output_file, 'w') do |f|
       f.write(JSON.pretty_generate(self.contents))
     end
@@ -98,11 +133,9 @@ class Cpbvt::Manifest
       benchmark: {
         starts_at: @starts_at,
         ends_at: @ends_at,
-        duration_in_seconds: @ends_at - @starts_at
+        duration_in_ms: ((@ends_at - @starts_at)*1000).to_i
       },
       payloads: @payloads
     }
   end
-
-  def 
 end # class

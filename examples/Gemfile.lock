@@ -62,9 +62,12 @@ GEM
       faraday (>= 1)
       faraday-multipart (>= 1)
     ruby2_keywords (0.0.5)
+    rubyzip (2.3.2)
     timers (4.3.5)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    zip-zip (0.3)
+      rubyzip (>= 1.0.0)
 
 PLATFORMS
   x86_64-linux
@@ -75,6 +78,8 @@ DEPENDENCIES
   dotenv
   ox
   rake
+  rubyzip (~> 2.3.2)
+  zip-zip
 
 BUNDLED WITH
    2.4.9

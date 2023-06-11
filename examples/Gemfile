@@ -8,3 +8,6 @@ gem 'rake'
 gem 'ox'
 #gem 'ruby-openai'
 gem 'async'
+
+gem 'zip-zip'
+gem 'rubyzip', '~> 2.3.2'
