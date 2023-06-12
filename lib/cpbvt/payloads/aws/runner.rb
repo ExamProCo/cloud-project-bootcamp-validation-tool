@@ -140,17 +140,16 @@ module Cpbvt::Payloads::Aws::Runner
 
     # automatically pull the other required data if it is not already loaded
     unless manifest.has_payload?(data_key.to_s)
-      filename = "#{data_key.gsub('_','-')}.json"
+      parent_filename = "#{data_key.gsub('_','-')}.json"
       result = Cpbvt::Payloads::Aws::Runner.run(
         data_key,
-        general_params.merge({filename: filename}),
+        general_params.merge({filename: parent_filename}),
       )
-      id = filename.sub('json')
-      manifest.add_payload id, result
+      manifest.add_payload data_key, result
     end
 
     # load the local data
-    data = manifest.get_output data_key.to_s
+    data = manifest.get_output data_key
 
     # extract the data from the local file that we'll use to iterate
     iter_data = Cpbvt::Payloads::Aws::Extractor.send(

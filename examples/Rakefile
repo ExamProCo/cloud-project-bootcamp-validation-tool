@@ -9,6 +9,8 @@ require 'fileutils'
 module Aws2023
   module Validations
   end
+  module SpecificParams
+  end
 end
 require_relative 'aws_2023/specific_params.rb'
 require_relative 'aws_2023/puller.rb'
@@ -37,8 +39,8 @@ task :pull do
     payloads_bucket: ENV['PAYLOADS_BUCKET']
   )
 
-  specific_params = Aws2023::SpecificParams.new(
-    naked_domain_name: 'cruddur.com'
+  specific_params = Aws2023::SpecificParams::Puller.new(
+    naked_domain_name: ENV['NAKED_DOMAIN_NAME']
   )
 
   Aws2023::Puller.run(
@@ -59,17 +61,28 @@ task :validate do
   run_uuids = Dir.glob(glob_path).map{|t| t.split('/').last.sub("run-","") }
   run_uuid = run_uuids.last
 
-  puts "validating for: aws_2023 =="
-  puts run_uuid
-  Aws2023::Validator.run(
+  general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
     project_scope: "aws-bootcamp-2023",
     run_uuid: run_uuid,
     user_uuid: ENV['USER_UUID'],
+    user_region: ENV['USER_AWS_REGION'],
     output_path: ENV['OUTPUT_PATH'],
     region: ENV['AWS_REGION'],
     aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
     aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
     payloads_bucket: ENV['PAYLOADS_BUCKET']
+  )
+
+  puts "validating for: aws_2023 =="
+  puts run_uuid
+
+  specific_params = Aws2023::SpecificParams::Validator.new(
+    naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
+    github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME']
+  )
+  Aws2023::Validator.run(
+    general_params: general_params,
+    specific_params: specific_params
   )
 end
 

@@ -17,5 +17,12 @@ aws codebuild list-builds
 COMMAND
 end
 
+def codebuild_batch_get_projects(project_name:)
+<<~COMMAND
+  aws codebuild batch-get-projects \
+  --names "#{project_name}"
+COMMAND
+end
+
 # ------
 end; end

@@ -3,6 +3,7 @@ class Cpbvt::Payloads::Aws::Extractor
   include Cpbvt::Payloads::Aws::Extractors::Apigatewayv2
   include Cpbvt::Payloads::Aws::Extractors::Cloudformation
   include Cpbvt::Payloads::Aws::Extractors::Cloudfront
+  include Cpbvt::Payloads::Aws::Extractors::Codebuild
   include Cpbvt::Payloads::Aws::Extractors::Codepipeline
   include Cpbvt::Payloads::Aws::Extractors::CognitoIdp
   include Cpbvt::Payloads::Aws::Extractors::Dynamodb

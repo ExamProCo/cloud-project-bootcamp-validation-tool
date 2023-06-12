@@ -2,87 +2,78 @@ require 'pp'
 
 class Aws2023::Validator
 
-  def self.run(
-      project_scope:,
-      run_uuid:,
-      user_uuid:,
-      output_path:,
-      region:,
-      aws_access_key_id:,
-      aws_secret_access_key:,
-      payloads_bucket:
-  )
+  def self.run(general_params:,specific_params:)
+    unless general_params.valid?
+      puts general_params.errors.full_messages
+      raise "failed to pass general params validation"
+    end
 
-  state = Aws2023::State.new
+    unless specific_params.valid?
+      puts specific_params.errors.full_messages
+      raise "failed to specific params validation"
+    end
 
-  raise "Validator.run: run_uuid should not be null" if run_uuid.nil?
-  raise "Validator.run: user_uuid should not be null" if user_uuid.nil?
-  raise "Validator.run: project_scope should not be null" if project_scope.nil?
-  raise "Validator.run: output_path should not be null" if output_path.nil?
-  raise "Validator.run: region should not be null" if region.nil?
-  raise "Validator.run: aws_access_key_id should not be null" if aws_access_key_id.nil?
-  raise "Validator.run: aws_secret_access_key should not be null" if aws_secret_access_key.nil?
-  raise "Validator.run: payloads_bucket should not be null" if payloads_bucket.nil?
+    state = Aws2023::State.new
 
-  manifest = Cpbvt::Manifest.new(
-    user_uuid: user_uuid,
-    run_uuid: run_uuid,
-    output_path: output_path,
-    project_scope: project_scope,
-    payloads_bucket: payloads_bucket
-  )
-  manifest.load_from_file!
-  manifest.pull!
-  state.manifest = manifest
+    manifest = Cpbvt::Manifest.new(
+      user_uuid: general_params.user_uuid,
+      run_uuid: general_params.run_uuid,
+      output_path: general_params.output_path,
+      project_scope: general_params.project_scope,
+      payloads_bucket: general_params.payloads_bucket
+    )
+    manifest.load_from_file!
+    manifest.pull!
+    state.manifest = manifest
+    state.specific_params = specific_params
 
-  self.networking_validations state
-  self.cicd_validations state
+    self.networking_validations state
+    self.cicd_validations state
 
-  pp state.results
+    pp state.results
 
-  # IaC Validation
-    # should have CFN stacks named the following: <stack_names>
+    # IaC Validation
+      # should have CFN stacks named the following: <stack_names>
 
-  # Primary Compute Validation
-    # Should have an ECS cluster named <cluster_name>
-      # with fargate service running named <service_name> on port 4567
-        # and the service should have a security group <sg-serv-id>
-          # and it should provide access to the  alb securitygroup <sg-alb-id> on port 4567
+    # Primary Compute Validation
+      # Should have an ECS cluster named <cluster_name>
+        # with fargate service running named <service_name> on port 4567
+          # and the service should have a security group <sg-serv-id>
+            # and it should provide access to the  alb securitygroup <sg-alb-id> on port 4567
 
-    # should have a cloud map namespace named <cloudmap_namespace>
-  
-  # Frontend Static Website Hosting Validation
-    # should have an s3 bucket called <s3-website-bucket-name>
-      # with cors?
-      # with block public access turnred off?
-      # with a bucket policy?
-    # should have a CFN distribution
+      # should have a cloud map namespace named <cloudmap_namespace>
+    
+    # Frontend Static Website Hosting Validation
+      # should have an s3 bucket called <s3-website-bucket-name>
+        # with cors?
+        # with block public access turnred off?
+        # with a bucket policy?
+      # should have a CFN distribution
 
-  # Primary Db Validation
-    # should have an RDS instance running
-    # the RDS instance should be publically avaliable
-    # the RDS instance should have a security group <sg-rds-id>
-    # and it should provide access to the fargate service security group <sg-serv-id> on port 5432
+    # Primary Db Validation
+      # should have an RDS instance running
+      # the RDS instance should be publically avaliable
+      # the RDS instance should have a security group <sg-rds-id>
+      # and it should provide access to the fargate service security group <sg-serv-id> on port 5432
 
-  # DynamoDB Validation
-    # should have a dynamodb table named <db-table-name>
-      # should have a dynamodbstream
+    # DynamoDB Validation
+      # should have a dynamodb table named <db-table-name>
+        # should have a dynamodbstream
 
-  # Serverless Asset Pipeline Validation
-    # should have an HTTP API Gateway
-      # with an /avatar endpoint
-        # with lambda authorizer
-      # with a proxy endpoint
-        # with lambda authorizer
+    # Serverless Asset Pipeline Validation
+      # should have an HTTP API Gateway
+        # with an /avatar endpoint
+          # with lambda authorizer
+        # with a proxy endpoint
+          # with lambda authorizer
 
-  # Authenication Validation
-    # should have a Cognito User Pool
-      # with a trigger on post configuration
+    # Authenication Validation
+      # should have a Cognito User Pool
+        # with a trigger on post configuration
 
-  # Domain Management?
+    # Domain Management?
 
-  # Container Repo Storage?
-
+    # Container Repo Storage?
   end # def self.run
 
   def self.networking_validations state
@@ -116,9 +107,20 @@ class Aws2023::Validator
       function_name: :should_have_a_codepipeline,
       output_params: [:pipeline_name]
     )
-    # should have a codepipeline
-    # with a source from github to the expected bootcamp repo
-    # with a build step to codebuild
-    # with deployment using ECS deployer
+    state.process(
+      klass: Aws2023::Validations::Cicd,
+      function_name: :should_have_a_source_from_github,
+      input_params: [:pipeline_name]
+    )
+    state.process(
+      klass: Aws2023::Validations::Cicd,
+      function_name: :should_have_a_build_stage,
+      input_params: [:pipeline_name]
+    )
+    state.process(
+      klass: Aws2023::Validations::Cicd,
+      function_name: :should_have_a_deploy_stage,
+      input_params: [:pipeline_name]
+    )
   end
 end # class

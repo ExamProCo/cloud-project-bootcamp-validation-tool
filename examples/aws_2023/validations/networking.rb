@@ -1,5 +1,5 @@
 class Aws2023::Validations::Networking
-  def self.should_have_custom_vpc(manifest:)
+  def self.should_have_custom_vpc(manifest:,specific_params:)
     data =  manifest.get_output!('ec2_describe_vpcs')
 
     # return back only the custom vpcs
@@ -50,7 +50,7 @@ class Aws2023::Validations::Networking
     end
   end
 
-  def self.should_have_three_public_subnets(manifest:,vpc_id:)
+  def self.should_have_three_public_subnets(manifest:,specific_params:,vpc_id:)
     data = manifest.get_output!('ec2_describe_subnets')
 
     # Subnet should be avaliable
@@ -86,7 +86,7 @@ class Aws2023::Validations::Networking
 
   end
 
-  def self.should_have_an_igw(manifest:,vpc_id:)
+  def self.should_have_an_igw(manifest:,specific_params:,vpc_id:)
     data = manifest.get_output!('ec2_describe_internet_gateways')
 
     igw = data['InternetGateways'].find do |igw|
@@ -107,7 +107,7 @@ class Aws2023::Validations::Networking
     end
   end
 
-  def self.should_have_a_route_to_internet(manifest:,vpc_id:,igw_id:)
+  def self.should_have_a_route_to_internet(manifest:,specific_params:,vpc_id:,igw_id:)
     data = manifest.get_output!('ec2_describe_route_tables')
 
     route_table = data['RouteTables'].find do |route_table|

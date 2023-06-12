@@ -142,6 +142,10 @@ class Aws2023::Puller
     # ============================================
     Async do |task|
       self.pull_specific_async(task,primary_region,{
+        command: 'codebuild_batch_get_projects',
+        params: {project_name: 'codebuild_list_projects'}
+      }, manifest, general_params)
+      self.pull_specific_async(task,primary_region,{
         command: 'acm_describe_certificate',
         params: {certificate_arn: 'acm_list_certificates'}
       }, manifest, general_params)
