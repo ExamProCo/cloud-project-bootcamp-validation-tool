@@ -46,8 +46,11 @@ module Cpbvt::Payloads::Aws::Runner
     #  payloads_bucket: attrs.payloads_bucket
     #)
 
+    id = attrs.filename.sub(".json","")
+
     ends_at = Time.now.to_f
     return {
+      id: id,
       params: params,
       benchmark: {
         starts_at: starts_at,
@@ -142,7 +145,8 @@ module Cpbvt::Payloads::Aws::Runner
         data_key,
         general_params.merge({filename: filename}),
       )
-      manifest.add_payload data_key, result
+      id = filename.sub('json')
+      manifest.add_payload id, result
     end
 
     # load the local data
@@ -169,13 +173,8 @@ module Cpbvt::Payloads::Aws::Runner
         general_params.merge({filename: filename}),
         extractor_attrs
       )
-
-      # the new payload key with the identifer
-      payload_key = filename.sub(".json","")
-
-      results.push [payload_key, result]
+      results.push result
     end # iter_data.each 
-
     return results
   end # def self.iter_run!
 

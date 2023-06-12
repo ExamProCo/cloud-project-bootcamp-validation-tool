@@ -1,12 +1,6 @@
-module Validations; end
-class Validations::Networking
+class Aws2023::Validations::Networking
   def self.should_have_custom_vpc(manifest:)
-    key = 'ec2_describe_vpcs'
-    if manifest.has_payload?(key)
-      data =  manifest.get_output(key)
-    else
-      raise "#{key} not found in manifest"
-    end
+    data =  manifest.get_output!('ec2_describe_vpcs')
 
     # return back only the custom vpcs
     vpcs = data['Vpcs'].select do |vpc|
@@ -57,12 +51,7 @@ class Validations::Networking
   end
 
   def self.should_have_three_public_subnets(manifest:,vpc_id:)
-    key = 'ec2_describe_subnets'
-    if manifest.has_payload?(key)
-      data =  manifest.get_output(key)
-    else
-      raise "#{key} not found in manifest"
-    end
+    data = manifest.get_output!('ec2_describe_subnets')
 
     # Subnet should be avaliable
     # Subnet should have a tag of group:cruddur-networking
@@ -98,12 +87,7 @@ class Validations::Networking
   end
 
   def self.should_have_an_igw(manifest:,vpc_id:)
-    key = 'ec2_describe_internet_gateways'
-    if manifest.has_payload?(key)
-      data =  manifest.get_output(key)
-    else
-      raise "#{key} not found in manifest"
-    end
+    data = manifest.get_output!('ec2_describe_internet_gateways')
 
     igw = data['InternetGateways'].find do |igw|
       igw['Attachments'].any? do |attachment|
@@ -124,12 +108,7 @@ class Validations::Networking
   end
 
   def self.should_have_a_route_to_internet(manifest:,vpc_id:,igw_id:)
-    key = 'ec2_describe_route_tables'
-    if manifest.has_payload?(key)
-      data =  manifest.get_output(key)
-    else
-      raise "#{key} not found in manifest"
-    end
+    data = manifest.get_output!('ec2_describe_route_tables')
 
     route_table = data['RouteTables'].find do |route_table|
       expected_tag = route_table['Tags'].any? do |tag|

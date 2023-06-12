@@ -101,18 +101,45 @@ class Cpbvt::Manifest
   end
 
   def add_payload key, data
+    key = _format_key(key)
     @payloads[key] = data
   end
 
   def has_payload? key
+    key = _format_key(key)
     @payloads.has_key? key
   end
 
   def get_output key
+    key = _format_key(key)
+    return false unless @payloads.key?(key)
     output_file = @payloads[key][:output_file]
     json_data = File.read(output_file)
     hash = JSON.parse(json_data)
     return hash
+  end
+
+  # similar to get_output but has error handling
+  def get_output! key
+    key = _format_key(key)
+    unless @payloads.key?(key)
+      raise "#{key} not found in manifest"
+      return
+    end
+    output_file = @payloads[key][:output_file]
+    json_data = File.read(output_file)
+    hash = JSON.parse(json_data)
+    return hash
+  end
+
+  def _format_key key
+    # if the key is symbol conver it to a string
+    # if the key using hypens covert it to lowercase
+    key.to_s.gsub(/-/,'_')
+  end
+
+  def payload_keys
+    @payloads.keys
   end
 
   # write content to a file

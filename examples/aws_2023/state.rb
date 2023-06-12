@@ -5,7 +5,8 @@ class Aws2023::State
                 :public_subnet_id_1,
                 :public_subnet_id_2,
                 :public_subnet_id_3,
-                :igw_id
+                :igw_id,
+                :pipeline_name
 
   def initialize
     @results = {}

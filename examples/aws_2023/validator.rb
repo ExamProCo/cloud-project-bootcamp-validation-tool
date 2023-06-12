@@ -1,4 +1,3 @@
-require_relative 'validations/networking'
 require 'pp'
 
 class Aws2023::Validator
@@ -36,35 +35,10 @@ class Aws2023::Validator
   manifest.pull!
   state.manifest = manifest
 
-  state.process(
-    klass: Validations::Networking,
-    function_name: :should_have_custom_vpc, 
-    output_params: [:vpc_id]
-  )
-  state.process(
-    klass: Validations::Networking,
-    function_name: :should_have_three_public_subnets, 
-    input_params: [:vpc_id],
-    output_params: [:public_subnet_id_1]
-  )
-  state.process(
-    klass: Validations::Networking,
-    function_name: :should_have_an_igw,
-    input_params: [:vpc_id],
-    output_params: [:igw_id]
-  )
-  state.process(
-    klass: Validations::Networking,
-    function_name: :should_have_a_route_to_internet,
-    input_params: [:igw_id,:vpc_id]
-  )
-  pp state.results
+  self.networking_validations state
+  self.cicd_validations state
 
-  # CI/CD Validation
-    # should have a codepipeline
-    # with a source from github to the expected bootcamp repo
-    # with a build step to codebuild
-    # with deployment using ECS deployer
+  pp state.results
 
   # IaC Validation
     # should have CFN stacks named the following: <stack_names>
@@ -111,5 +85,40 @@ class Aws2023::Validator
 
   end # def self.run
 
+  def self.networking_validations state
+    state.process(
+      klass: Aws2023::Validations::Networking,
+      function_name: :should_have_custom_vpc, 
+      output_params: [:vpc_id]
+    )
+    state.process(
+      klass: Aws2023::Validations::Networking,
+      function_name: :should_have_three_public_subnets, 
+      input_params: [:vpc_id],
+      output_params: [:public_subnet_id_1]
+    )
+    state.process(
+      klass: Aws2023::Validations::Networking,
+      function_name: :should_have_an_igw,
+      input_params: [:vpc_id],
+      output_params: [:igw_id]
+    )
+    state.process(
+      klass: Aws2023::Validations::Networking,
+      function_name: :should_have_a_route_to_internet,
+      input_params: [:igw_id,:vpc_id]
+    )
+  end
 
+  def self.cicd_validations state
+    state.process(
+      klass: Aws2023::Validations::Cicd,
+      function_name: :should_have_a_codepipeline,
+      output_params: [:pipeline_name]
+    )
+    # should have a codepipeline
+    # with a source from github to the expected bootcamp repo
+    # with a build step to codebuild
+    # with deployment using ECS deployer
+  end
 end # class

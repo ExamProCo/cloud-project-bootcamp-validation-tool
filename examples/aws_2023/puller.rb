@@ -265,7 +265,7 @@ class Aws2023::Puller
     result = Cpbvt::Payloads::Aws::Runner.run command.to_s, general_params.to_h.merge({
       user_region: user_region
     })
-    manifest.add_payload command.to_s, result
+    manifest.add_payload result[:id], result
   end
 
   def self.pull_specific_async(task,user_region, rule, manifest, general_params)
@@ -276,7 +276,7 @@ class Aws2023::Puller
 
   def self.pull_specific(user_region, rule, manifest, general_params)
     # Specific Regional AWS Resources Commands
-    Cpbvt::Payloads::Aws::Runner.iter_run!(
+    results = Cpbvt::Payloads::Aws::Runner.iter_run!(
       manifest: manifest,
       command: rule[:command], 
       extractor_filters: rule[:filters],
@@ -285,6 +285,9 @@ class Aws2023::Puller
         user_region: user_region,
       })
     )
+    results.each do |result|
+      manifest.add_payload result[:id], result
+    end
   end
 
   # - s3api_head_bucket
