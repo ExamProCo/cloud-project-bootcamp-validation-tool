@@ -278,8 +278,8 @@ class Aws2023::Puller
     end
   end
 
+  # Specific Regional AWS Resources Commands
   def self.pull_specific(user_region, rule, manifest, general_params)
-    # Specific Regional AWS Resources Commands
     results = Cpbvt::Payloads::Aws::Runner.iter_run!(
       manifest: manifest,
       command: rule[:command], 

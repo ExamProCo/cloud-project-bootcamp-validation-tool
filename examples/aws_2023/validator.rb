@@ -50,11 +50,11 @@ class Aws2023::Validator
         # with a bucket policy?
       # should have a CFN distribution
 
-    # Primary Db Validation
-      # should have an RDS instance running
-      # the RDS instance should be publically avaliable
-      # the RDS instance should have a security group <sg-rds-id>
-      # and it should provide access to the fargate service security group <sg-serv-id> on port 5432
+    # == Primary Db Validation
+    # - should have an RDS instance running
+    # - the RDS instance should be publically avaliable
+    # - the RDS instance should have a security group <sg-rds-id>
+    # - and it should provide access to the fargate service security group <sg-serv-id> on port 5432
 
     # DynamoDB Validation
       # should have a dynamodb table named <db-table-name>

@@ -115,6 +115,7 @@ class Cpbvt::Manifest
     return false unless @payloads.key?(key)
     output_file = @payloads[key][:output_file]
     json_data = File.read(output_file)
+    puts "json_data: #{json_data}"
     hash = JSON.parse(json_data)
     return hash
   end
