@@ -1,23 +1,11 @@
 class Aws2023::Validations::Cicd
-  # CI/CD Validation
-    # should have a codepipeline
-    # with a source from github to the expected bootcamp repo
-    # with a build step to codebuild
-    # with deployment using ECS deployer
   def self.should_have_a_codepipeline(manifest:,specific_params:)
     cfn_stacks =  manifest.get_output!('cloudformation-list-stacks')
-    # Find the stack for CICD
-    cicd_stack = cfn_stacks['StackSummaries'].find do |stack|
-      stack['StackName'] == 'CrdCicd'
-    end
-    # extract the stack id
-    cicd_stack_id = cicd_stack['StackId'].split('/').last
-
-    cicd_stack_resources = manifest.get_output!("cloudformation-list-stack-resources__#{cicd_stack_id}")
-    resource_pipeline = cicd_stack_resources['StackResourceSummaries'].find do |resource|
-      resource["ResourceType"] == "AWS::CodePipeline::Pipeline"
-    end
-
+    resource_pipeline = Cpbvt::Payloads::Aws::Extractors::Cloudformation.cloudformation_list_stacks__by_stack_resource_type(
+      cfn_stacks,
+      'CrdCluster',
+      "AWS::CodePipeline::Pipeline"
+    )
     pipeline_name = resource_pipeline['PhysicalResourceId']
 
     if pipeline = manifest.get_output("codepipeline-get-pipeline__#{pipeline_name}")
@@ -90,18 +78,11 @@ class Aws2023::Validations::Cicd
 
   def self.should_have_a_deploy_stage(manifest:,specific_params:,pipeline_name:)
     cfn_stacks =  manifest.get_output!('cloudformation-list-stacks')
-    # Find the stack for CICD
-    cicd_stack = cfn_stacks['StackSummaries'].find do |stack|
-      stack['StackName'] == 'CrdCluster'
-    end
-    # extract the stack id
-    cicd_stack_id = cicd_stack['StackId'].split('/').last
-
-    cicd_stack_resources = manifest.get_output!("cloudformation-list-stack-resources__#{cicd_stack_id}")
-    resource_cluster = cicd_stack_resources['StackResourceSummaries'].find do |resource|
-      resource["ResourceType"] == "AWS::ECS::Cluster"
-    end
-
+    resource_cluster = Cpbvt::Payloads::Aws::Extractors::Cloudformation.cloudformation_list_stacks__by_stack_resource_type(
+      cfn_stacks,
+      'CrdCluster',
+      "AWS::ECS::Cluster"
+    )
     cluster_name = resource_cluster['PhysicalResourceId']
     # ----
 

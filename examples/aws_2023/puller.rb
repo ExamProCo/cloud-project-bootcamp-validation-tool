@@ -38,7 +38,6 @@ class Aws2023::Puller
       self.pull_async task, primary_region, :ec2_describe_security_groups, manifest, general_params
       self.pull_async task, primary_region, :ec2_describe_route_tables, manifest, general_params
       self.pull_async task, primary_region, :ecr_describe_repositories, manifest, general_params
-      self.pull_async task, primary_region, :ecs_describe_clusters, manifest, general_params
       self.pull_async task, primary_region, :ecs_list_task_definitions, manifest, general_params
       self.pull_async task, primary_region, :elbv2_describe_load_balancers, manifest, general_params
       self.pull_async task, primary_region, :elbv2_describe_target_groups, manifest, general_params
@@ -55,6 +54,7 @@ class Aws2023::Puller
       self.pull_async task, 'global', :s3api_list_buckets, manifest, general_params
     end
 
+    self.pull_ecs_describe_clusters primary_region, manifest, general_params
     # ============================================
     # Global Region Specific =====================
     # ============================================
@@ -292,6 +292,16 @@ class Aws2023::Puller
     results.each do |result|
       manifest.add_payload result[:id], result
     end
+  end
+
+  def self.pull_ecs_describe_clusters region, manifest, general_params
+    command = :ecs_describe_clusters
+    result = Cpbvt::Payloads::Aws::Runner.run(
+        command.to_s, 
+        general_params.to_h.merge({
+        user_region: user_region
+      })
+    )
   end
 
   # - s3api_head_bucket

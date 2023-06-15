@@ -4,6 +4,11 @@ require 'time'
 
 
 module Cpbvt::Payloads::Aws::Runner
+  # command 
+  # - the underlying AWS CLI command that will run
+  # - this is the name of the function under the Commands Modules 
+  # attrs
+  # params
   def self.run command, attrs, params={}
     starts_at = Time.now.to_f
 

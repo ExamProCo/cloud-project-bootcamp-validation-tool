@@ -27,19 +27,15 @@ class Aws2023::Validator
     state.manifest = manifest
     state.specific_params = specific_params
 
-    self.networking_validations state
-    self.cicd_validations state
+    #self.networking_validations state
+    self.cluster_validations state
+    #self.cicd_validations state
 
     pp state.results
 
     # IaC Validation
       # should have CFN stacks named the following: <stack_names>
 
-    # Primary Compute Validation
-      # Should have an ECS cluster named <cluster_name>
-        # with fargate service running named <service_name> on port 4567
-          # and the service should have a security group <sg-serv-id>
-            # and it should provide access to the  alb securitygroup <sg-alb-id> on port 4567
 
       # should have a cloud map namespace named <cloudmap_namespace>
     
@@ -123,4 +119,45 @@ class Aws2023::Validator
       input_params: [:pipeline_name]
     )
   end
+
+  def self.cluster_validations state
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_a_cluster
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_a_task_defintion
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_an_ecr_repo
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_a_service
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_a_running_task
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_an_alb
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_alb_sg
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_service_sg
+    )
+  end
+    # Primary Compute Validation
+      # Should have an ECS cluster named <cluster_name>
+        # with fargate service running named <service_name> on port 4567
+          # and the service should have a security group <sg-serv-id>
+            # and it should provide access to the  alb securitygroup <sg-alb-id> on port 4567
+
 end # class
