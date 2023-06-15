@@ -4,40 +4,35 @@ require 'time'
 
 
 module Cpbvt::Payloads::Aws::Runner
-  # command 
-  # - the underlying AWS CLI command that will run
-  # - this is the name of the function under the Commands Modules 
-  # attrs
-  # params
-  def self.run command, attrs, params={}
+  def self.run command, general_params, specific_params={}
     starts_at = Time.now.to_f
 
     # if no filename provided base it on the provided command
-    unless attrs[:filename]
-      attrs[:filename] = "#{command.gsub('_','-')}.json"
+    unless general_params[:filename]
+      general_params[:filename] = "#{command.gsub('_','-')}.json"
     end
-    attrs = OpenStruct.new attrs
+    general_params = OpenStruct.new general_params
 
     output_file = Cpbvt::Payloads::Aws::Runner::output_file(
-      run_uuid: attrs.run_uuid,
-      user_uuid: attrs.user_uuid,
-      project_scope: attrs.project_scope,
-      region: attrs.user_region, 
-      output_path: attrs.output_path,
-      filename: attrs.filename
+      run_uuid: general_params.run_uuid,
+      user_uuid: general_params.user_uuid,
+      project_scope: general_params.project_scope,
+      region: general_params.user_region, 
+      output_path: general_params.output_path,
+      filename: general_params.filename
     )
 
     #object_key = Cpbvt::Uploader::object_key(
-    #  user_uuid: attrs.user_uuid,
-    #  run_uuid: attrs.run_uuid,
-    #  project_scope: attrs.project_scope,
-    #  region: attrs.user_region, 
-    #  filename: attrs.filename
+    #  user_uuid: general_params.user_uuid,
+    #  run_uuid: general_params.run_uuid,
+    #  project_scope: general_params.project_scope,
+    #  region: general_params.user_region, 
+    #  filename: general_params.filename
     #)
 
-    command = Cpbvt::Payloads::Aws::Command.send(command, **params)
+    command = Cpbvt::Payloads::Aws::Command.send(command, **specific_params)
     command = command.strip.gsub("\n", " ")
-    command = "#{command} --region #{attrs.user_region}" unless attrs.user_region == 'global'
+    command = "#{command} --region #{general_params.user_region}" unless general_params.user_region == 'global'
     command = "#{command} --output json > #{output_file}"
     Cpbvt::Payloads::Aws::Runner.execute command
 
@@ -51,12 +46,12 @@ module Cpbvt::Payloads::Aws::Runner
     #  payloads_bucket: attrs.payloads_bucket
     #)
 
-    id = attrs.filename.sub(".json","")
+    id = general_params.filename.sub(".json","")
 
     ends_at = Time.now.to_f
     return {
       id: id,
-      params: params,
+      params: specific_params,
       benchmark: {
         starts_at: starts_at,
         ends_at:  ends_at,

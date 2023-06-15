@@ -22,6 +22,9 @@ class Aws2023::Puller
 
     primary_region = general_params.user_region
     Async do |task|
+      self.pull_async task, primary_region, :ecs_describe_clusters, manifest, general_params, {cluster_name: specific_params.cluster_name}
+      self.pull_async task, primary_region, :ecs_list_tasks, manifest, general_params, {cluster_name: specific_params.cluster_name, backend_family: specific_params.backend_family}
+=begin
       self.pull_async task, primary_region, :acm_list_certificates, manifest, general_params
       self.pull_async task, primary_region, :apigatewayv2_get_apis, manifest, general_params
       self.pull_async task, primary_region, :cloudformation_list_stacks, manifest, general_params
@@ -52,9 +55,13 @@ class Aws2023::Puller
       self.pull_async task, 'us-east-1', :acm_list_certificates, manifest, general_params
       self.pull_async task, 'global', :cloudfront_list_distributions, manifest, general_params
       self.pull_async task, 'global', :s3api_list_buckets, manifest, general_params
+=end
     end
 
-    self.pull_ecs_describe_clusters primary_region, manifest, general_params
+    data = manifest.output_file('ecs_list_tasks')
+    task_ids = Cpbvt::Aws:Payloads::Aws::Extractor.ecs_list_tasks__task_id(data)
+    self.pull, primary_region, :ecs_describe_tasks, manifest, general_params, {cluster_name: specific_params.cluster_name, task_ids: tasks_id}
+=begin
     # ============================================
     # Global Region Specific =====================
     # ============================================
@@ -244,7 +251,6 @@ class Aws2023::Puller
     ]
     # A list of up to 100 cluster names or full cluster Amazon Resource Name (ARN) entries. If you do not specify a cluster, the default cluster is assumed.
     # - ecs_describe_services
-=begin
 =end
     manifest.write_file!
     manifest.archive!
@@ -259,16 +265,20 @@ class Aws2023::Puller
     )
   end # def self.run
 
-  def self.pull_async(task,user_region,command,manifest,general_params)
+  def self.pull_async(task,user_region,command,manifest,general_params,specific_params={})
     task.async do
-      self.pull(user_region,command,manifest,general_params)
+      self.pull(user_region,command,manifest,general_params,specific_params)
     end
   end
 
-  def self.pull(user_region,command,manifest,general_params)
-    result = Cpbvt::Payloads::Aws::Runner.run command.to_s, general_params.to_h.merge({
-      user_region: user_region
-    })
+  def self.pull(user_region,command,manifest,general_params,specific_params={})
+    result = Cpbvt::Payloads::Aws::Runner.run(
+      command.to_s, 
+      general_params.to_h.merge({
+        user_region: user_region
+      }),
+      specific_params
+    )
     manifest.add_payload result[:id], result
   end
 
@@ -293,17 +303,6 @@ class Aws2023::Puller
       manifest.add_payload result[:id], result
     end
   end
-
-  def self.pull_ecs_describe_clusters region, manifest, general_params
-    command = :ecs_describe_clusters
-    result = Cpbvt::Payloads::Aws::Runner.run(
-        command.to_s, 
-        general_params.to_h.merge({
-        user_region: user_region
-      })
-    )
-  end
-
   # - s3api_head_bucket
   # - s3api_get_head_object
   # - s3api_get_object

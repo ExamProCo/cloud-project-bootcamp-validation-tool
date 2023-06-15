@@ -8,7 +8,7 @@ class Aws2023::Validations::Cluster
     )
     cluster_name = resource_cluster['PhysicalResourceId']
 
-    cluster = manifest.get_output!()
+    cluster = manifest.get_output!('')
   end
 
   def self.should_have_a_task_defintion(manifest:,specific_params:)

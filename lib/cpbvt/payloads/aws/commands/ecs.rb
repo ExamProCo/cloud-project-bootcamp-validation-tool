@@ -4,9 +4,10 @@ module ClassMethods
 # ------
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-clusters.html
-def ecs_describe_clusters
+def ecs_describe_clusters(cluster_name:)
 <<~COMMAND
-aws ecs describe-clusters --region ca-central-1
+aws ecs describe-clusters \
+--clusters #{cluster_name}
 COMMAND
 end
 
@@ -20,19 +21,19 @@ COMMAND
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-tasks.html
-def ecs_describe_tasks(cluster:, tasks:)
+def ecs_describe_tasks(cluster_name:, task_id:)
 <<~COMMAND
 aws ecs describe-tasks \
---tasks #{tasks} \
+--tasks #{task_ids} \
 --cluster #{cluster}
 COMMAND
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/list-tasks.html
-def ecs_list_tasks(cluster:, family:)
+def ecs_list_tasks(cluster_name:, family:)
 <<~COMMAND
 aws ecs list-tasks \
---cluster #{cluster} \
+--cluster #{cluster_name} \
 --family #{family}
 COMMAND
 end
