@@ -23,7 +23,13 @@ class Aws2023::Puller
     primary_region = general_params.user_region
     Async do |task|
       self.pull_async task, primary_region, :ecs_describe_clusters, manifest, general_params, {cluster_name: specific_params.cluster_name}
-      self.pull_async task, primary_region, :ecs_list_tasks, manifest, general_params, {cluster_name: specific_params.cluster_name, backend_family: specific_params.backend_family}
+      h = {
+        cluster_name: specific_params.cluster_name,
+        family: specific_params.backend_family
+      }.inspect
+      puts "=====HHHH"
+      puts h
+      self.pull_async task, primary_region, :ecs_list_tasks, manifest, general_params, {cluster_name: specific_params.cluster_name, family: specific_params.backend_family}
 =begin
       self.pull_async task, primary_region, :acm_list_certificates, manifest, general_params
       self.pull_async task, primary_region, :apigatewayv2_get_apis, manifest, general_params
