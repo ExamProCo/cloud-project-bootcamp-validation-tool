@@ -88,7 +88,43 @@ class Aws2023::Validations::Cicd
     end
   end
 
-  def should_have_a_deploy_stage(manifest:,specific_params:,pipeline_name:,cluster_name:)
+  def self.should_have_a_deploy_stage(manifest:,specific_params:,pipeline_name:)
+    cfn_stacks =  manifest.get_output!('cloudformation-list-stacks')
+    # Find the stack for CICD
+    cicd_stack = cfn_stacks['StackSummaries'].find do |stack|
+      stack['StackName'] == 'CrdCluster'
+    end
+    # extract the stack id
+    cicd_stack_id = cicd_stack['StackId'].split('/').last
+
+    cicd_stack_resources = manifest.get_output!("cloudformation-list-stack-resources__#{cicd_stack_id}")
+    resource_cluster = cicd_stack_resources['StackResourceSummaries'].find do |resource|
+      resource["ResourceType"] == "AWS::ECS::Cluster"
+    end
+
+    cluster_name = resource_cluster['PhysicalResourceId']
+    # ----
+
     pipeline = manifest.get_output!("codepipeline-get-pipeline__#{pipeline_name}")
-  end
-end
+
+    deploy_action = nil
+
+    pipeline['pipeline']['stages'].find do |stage|
+      stage['actions'].find do |action|
+        found = action['actionTypeId']['provider'] == 'ECS' &&
+                action['actionTypeId']['category'] == 'Deploy'
+        deploy_action = action if found
+        found
+      end
+    end
+    found_cluster = deploy_action['configuration']['ClusterName'] == cluster_name
+    found_service = deploy_action['configuration']['ServiceName'] == 'backend-flask'
+
+    if found_cluster && found_service
+      {result: {score: 10, message: "Found a Deploy with ECS for backend-flask service within the CodePipeline stages"}}
+    else
+      {result: {score: 0, message: "Failed to find Deploy with ECS for backend-flask service within the CodePipeline stages"}}
+    end
+
+  end # def self.should_have_a_deploy_stage
+end # class Aws2023::Validations::Cicd
