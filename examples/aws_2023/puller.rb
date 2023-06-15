@@ -60,7 +60,7 @@ class Aws2023::Puller
 
     data = manifest.output_file('ecs_list_tasks')
     task_ids = Cpbvt::Aws:Payloads::Aws::Extractor.ecs_list_tasks__task_id(data)
-    self.pull, primary_region, :ecs_describe_tasks, manifest, general_params, {cluster_name: specific_params.cluster_name, task_ids: tasks_id}
+    self.pull primary_region, :ecs_describe_tasks, manifest, general_params, {cluster_name: specific_params.cluster_name, task_ids: tasks_id}
 =begin
     # ============================================
     # Global Region Specific =====================

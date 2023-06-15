@@ -41,7 +41,8 @@ task :pull do
 
   specific_params = Aws2023::SpecificParams::Puller.new(
     naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
-    cluster_name: ENV['CLUSTER_NAME']
+    cluster_name: ENV['CLUSTER_NAME'],
+    backend_family: ENV['BACKEND_FAMILY']
   )
 
   Aws2023::Puller.run(
