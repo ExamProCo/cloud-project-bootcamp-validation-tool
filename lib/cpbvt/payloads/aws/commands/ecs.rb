@@ -11,21 +11,31 @@ aws ecs describe-clusters \
 COMMAND
 end
 
+# https://docs.aws.amazon.com/cli/latest/reference/ecs/list-services.html
+def ecs_list_services(cluster_name:)
+<<~COMMAND
+aws ecs list-services \
+--cluster #{cluster_name}
+COMMAND
+end
+
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-services.html
 # services is required - a list of services to describe
-def ecs_describe_services(services:)
+# can only return 10 service names
+def ecs_describe_services(cluster_name:,services:)
 <<~COMMAND
 aws ecs describe-services \
---services #{services}
+--cluster #{cluster_name}
+--services #{services.join(' ')}
 COMMAND
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-tasks.html
-def ecs_describe_tasks(cluster_name:, task_id:)
+def ecs_describe_tasks(cluster_name:, task_ids:)
 <<~COMMAND
 aws ecs describe-tasks \
---tasks #{task_ids} \
---cluster #{cluster}
+--tasks #{task_ids.join(' ')} \
+--cluster #{cluster_name}
 COMMAND
 end
 

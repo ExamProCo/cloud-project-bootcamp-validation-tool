@@ -81,7 +81,8 @@ task :validate do
   specific_params = Aws2023::SpecificParams::Validator.new(
     naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
     github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
-    cluster_name: ENV['CLUSTER_NAME']
+    cluster_name: ENV['CLUSTER_NAME'],
+    backend_family: ENV['BACKEND_FAMILY']
   )
   Aws2023::Validator.run(
     general_params: general_params,

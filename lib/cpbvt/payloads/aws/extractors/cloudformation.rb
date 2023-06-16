@@ -16,9 +16,9 @@ end
 
 # We often need to just grab a specific resource from a stack
 # based on its resource type.
-def cloudformation_list_stacks__by_stack_resource_type(data,stack_name,resource_type)
-  # Find the stack for CICD
-  cicd_stack = data['StackSummaries'].find do |stack|
+def cloudformation_list_stacks__by_stack_resource_type(manifest,stack_name,resource_type)
+  cfn_stacks = manifest.get_output!('cloudformation-list-stacks')
+  cicd_stack = cfn_stacks['StackSummaries'].find do |stack|
     stack['StackName'] == stack_name
   end
   # extract the stack id
@@ -28,7 +28,7 @@ def cloudformation_list_stacks__by_stack_resource_type(data,stack_name,resource_
   stack_resource = cicd_stack_resources['StackResourceSummaries'].find do |resource|
     resource["ResourceType"] == resource_type
   end
-  return stack_Resource
+  return stack_resource
 end
 
 # ------

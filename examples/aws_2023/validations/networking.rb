@@ -27,7 +27,6 @@ class Aws2023::Validations::Networking
       # was it provisioned with Cloudformation?
       expected_cfn_stack = vpc['Tags'].any? do |tag| 
         tag['Key'] == 'aws:cloudformation:stack-name'
-        # We
         #tag['Value'] == 'CrdNet'
       end
 
