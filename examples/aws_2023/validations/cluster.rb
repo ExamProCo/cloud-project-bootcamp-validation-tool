@@ -1,6 +1,5 @@
 class Aws2023::Validations::Cluster
   def self.should_have_a_cluster(manifest:,specific_params:)
-
     resource_cluster = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
       manifest,
       'CrdCluster',
@@ -8,10 +7,8 @@ class Aws2023::Validations::Cluster
     )
     cluster_name = resource_cluster['PhysicalResourceId']
 
-    clusters = manifest.get_output!('ecs-describe-clusters')
-    cluster = clusters['clusters'].find do |t| 
-      t['clusterName'] == cluster_name
-    end
+    clusters = manifest.get_output!("ecs-describe-clusters__#{cluster_name}")
+    cluster = clusters['clusters'].first
 
     found =
     cluster['status'] == 'ACTIVE' &&
@@ -43,7 +40,7 @@ class Aws2023::Validations::Cluster
     repo = data['repositories'].find{|t| t['repositoryName'] == specific_params.backend_family}
     # [TODO] Check if images are present in the container repo
 
-    if found
+    if repo
       {result: {score: 10, message: "Found a task defintition with a family: #{specific_params.backend_family}"}}
     else
       {result: {score: 0, message: "Failed to find a task defintition with a family: #{specific_params.backend_family}"}}
@@ -52,7 +49,11 @@ class Aws2023::Validations::Cluster
 
   def self.should_have_a_service(manifest:,specific_params:)
     cluster_name = specific_params.cluster_name
-    data = manifest.get_output!("ecs-list-services__#{cluster_name}")
+    data = manifest.get_output!("ecs-describe-services__#{cluster_name}")
+    backend_service = data['services'].find{|t|t['serviceName'] == specific_params.backend_family}
+
+    backend_service['status'] == 'ACTIVE'
+
   end
 
   def self.should_have_a_running_task(manifest:,specific_params:)

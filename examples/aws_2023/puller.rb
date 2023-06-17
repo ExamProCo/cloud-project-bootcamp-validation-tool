@@ -26,7 +26,6 @@ class Aws2023::Puller
       self.pull_cluster_async task, cluster_name, primary_region, :ecs_describe_clusters, manifest, general_params
       self.pull_cluster_async task, cluster_name, primary_region, :ecs_list_services    , manifest, general_params
       self.pull_cluster_async task, cluster_name, primary_region, :ecs_describe_services, manifest, general_params, { services: [specific_params.backend_family]}
-=begin
       self.pull_async task, primary_region, :ecs_list_tasks, manifest, general_params, {cluster_name: specific_params.cluster_name, family: specific_params.backend_family}
       self.pull_async task, primary_region, :acm_list_certificates, manifest, general_params
       self.pull_async task, primary_region, :apigatewayv2_get_apis, manifest, general_params
@@ -58,7 +57,6 @@ class Aws2023::Puller
       self.pull_async task, 'us-east-1', :acm_list_certificates, manifest, general_params
       self.pull_async task, 'global', :cloudfront_list_distributions, manifest, general_params
       self.pull_async task, 'global', :s3api_list_buckets, manifest, general_params
-=end
     end
 
     # Listing ECS tasks
@@ -66,7 +64,6 @@ class Aws2023::Puller
     tasks = Cpbvt::Payloads::Aws::Extractor.ecs_list_tasks__task_id(data)
     task_ids = tasks.map{|t|t[:task_id]}
     self.pull primary_region, :ecs_describe_tasks, manifest, general_params, {cluster_name: specific_params.cluster_name, task_ids: task_ids}
-=begin
 
     # ============================================
     # Global Region Specific =====================
@@ -241,7 +238,6 @@ class Aws2023::Puller
         command: 'elbv2_describe_rules'
       }
     ]
-=end
 
     # A list of up to 100 cluster names or full cluster Amazon Resource Name (ARN) entries. If you do not specify a cluster, the default cluster is assumed.
     # - ecs_describe_services
