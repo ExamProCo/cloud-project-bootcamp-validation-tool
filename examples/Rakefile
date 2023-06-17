@@ -37,7 +37,9 @@ task :permit do
     region: ENV['AWS_REGION'],
     aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
     aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    payloads_bucket: ENV['PAYLOADS_BUCKET']
+    payloads_bucket: ENV['PAYLOADS_BUCKET'],
+    target_aws_account_id: ENV['TARGET_AWS_ACCOUNT_ID'],
+    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
   )
 
   specific_params = Aws2023::SpecificParams::Puller.new(
@@ -63,7 +65,9 @@ task :pull do
     region: ENV['AWS_REGION'],
     aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
     aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    payloads_bucket: ENV['PAYLOADS_BUCKET']
+    payloads_bucket: ENV['PAYLOADS_BUCKET'],
+    target_aws_account_id: ENV['TARGET_AWS_ACCOUNT_ID'],
+    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
   )
 
   specific_params = Aws2023::SpecificParams::Puller.new(
@@ -99,7 +103,9 @@ task :validate do
     region: ENV['AWS_REGION'],
     aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
     aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    payloads_bucket: ENV['PAYLOADS_BUCKET']
+    payloads_bucket: ENV['PAYLOADS_BUCKET'],
+    target_aws_account_id: ENV['TARGET_AWS_ACCOUNT_ID'],
+    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
   )
 
   puts "validating for: aws_2023 =="

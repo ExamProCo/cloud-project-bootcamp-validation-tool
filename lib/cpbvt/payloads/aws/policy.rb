@@ -21,8 +21,11 @@ class Cpbvt::Payloads::Aws::Policy
 
   @@permissions = []
 
-  def self.add region, command, params
-    permissions = self.send command, **params
+  def self.add region, command, general_params, specific_params
+    specific_params[:aws_account_id] = general_params.target_aws_account_id
+    specific_params[:region] = region if region != 'global'
+
+    permissions = self.send command, **specific_params
     permissions = [permissions] if permissions.is_a?(Hash)
     if region != 'global'
       permissions.map! do |permission|

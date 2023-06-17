@@ -2,6 +2,8 @@ require 'active_model'
 class Cpbvt::Payloads::Aws::GeneralParams
   include ActiveModel::Validations
 
+  # target_aws_account_id = bootcamper's account
+  # source_aws_account_id = the account checking the bootcamper account
   attr_accessor :project_scope,
                 :user_uuid,
                 :run_uuid,
@@ -10,7 +12,9 @@ class Cpbvt::Payloads::Aws::GeneralParams
                 :output_path,
                 :aws_access_key_id,
                 :aws_secret_access_key,
-                :payloads_bucket
+                :payloads_bucket,
+                :target_aws_account_id,
+                :source_aws_account_id
 
   validates :project_scope, presence: true
   validates :user_uuid , presence: true
@@ -21,6 +25,8 @@ class Cpbvt::Payloads::Aws::GeneralParams
   validates :aws_access_key_id, presence: true
   validates :aws_secret_access_key, presence: true
   validates :payloads_bucket, presence: true
+  validates :target_aws_account_id, presence: true
+  validates :source_aws_account_id, presence: true
 
   def initialize(
     project_scope:,
@@ -31,7 +37,9 @@ class Cpbvt::Payloads::Aws::GeneralParams
     output_path:,
     aws_access_key_id:,
     aws_secret_access_key:,
-    payloads_bucket:
+    payloads_bucket:,
+    target_aws_account_id:,
+    source_aws_account_id:
   )
     @project_scope = project_scope
     @run_uuid = run_uuid
@@ -42,6 +50,8 @@ class Cpbvt::Payloads::Aws::GeneralParams
     @aws_access_key_id = aws_access_key_id
     @aws_secret_access_key = aws_secret_access_key
     @payloads_bucket = payloads_bucket
+    @target_aws_account_id = target_aws_account_id
+    @source_aws_account_id = source_aws_account_id
   end
 
   # to hash
@@ -55,7 +65,9 @@ class Cpbvt::Payloads::Aws::GeneralParams
       output_path: @output_path,
       aws_access_key_id: @aws_access_key_id,
       aws_secret_access_key: @aws_secret_access_key,
-      payloads_bucket: @payloads_bucket
+      payloads_bucket: @payloads_bucket,
+      target_aws_account_id: @target_aws_account_id,
+      source_aws_account_id: @source_aws_account_id
     }
   end
 end
