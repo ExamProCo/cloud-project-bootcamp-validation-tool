@@ -4,7 +4,7 @@ module ClassMethods
 # ------
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/elbv2/describe-load-balancers.html
-def elbv2_describe_load_balancers
+def elbv2_describe_load_balancers(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "elasticloadbalancing:DescribeLoadBalancers",
@@ -13,7 +13,7 @@ def elbv2_describe_load_balancers
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/elbv2/describe-listeners.html
-def elbv2_describe_listeners
+def elbv2_describe_listeners(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "elasticloadbalancing:DescribeListeners",
@@ -22,7 +22,7 @@ def elbv2_describe_listeners
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/elbv2/describe-load-balancer-attributes.html
-def elbv2_describe_load_balancer_attributes
+def elbv2_describe_load_balancer_attributes(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "elasticloadbalancing:DescribeLoadBalancerAttributes",
@@ -31,7 +31,7 @@ def elbv2_describe_load_balancer_attributes
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/elbv2/describe-rules.html
-def elbv2_describe_rules
+def elbv2_describe_rules(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "elasticloadbalancing:DescribeRules",
@@ -40,7 +40,7 @@ def elbv2_describe_rules
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/elbv2/describe-target-groups.html
-def elbv2_describe_target_groups
+def elbv2_describe_target_groups(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "elasticloadbalancing:DescribeTargetGroups",

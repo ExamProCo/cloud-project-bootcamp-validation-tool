@@ -3,7 +3,7 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def cloudformation_list_stacks
+def cloudformation_list_stacks(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "cloudformation:ListStacks",
@@ -11,7 +11,7 @@ def cloudformation_list_stacks
   }
 end
 
-def cloudformation_list_stack_resources(stack_name:)
+def cloudformation_list_stack_resources(aws_account_id:,region:,stack_name:)
   {
     "Effect" => "Allow",
     "Action" => "cloudformation:ListStackResources",

@@ -4,7 +4,7 @@ module ClassMethods
 # ------
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/codepipeline/list-pipelines.html
-def codepipeline_list_pipelines
+def codepipeline_list_pipelines(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "codepipeline:ListPipelines",
@@ -13,7 +13,7 @@ def codepipeline_list_pipelines
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/codepipeline/get-pipeline.html
-def codepipeline_get_pipeline
+def codepipeline_get_pipeline(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "codepipeline:GetPipeline",

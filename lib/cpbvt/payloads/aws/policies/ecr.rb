@@ -4,7 +4,7 @@ module ClassMethods
 # ------
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecr/describe-repositories.html
-def ecr_describe_repositories
+def ecr_describe_repositories(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "ecr:DescribeRepositories",
@@ -13,7 +13,7 @@ def ecr_describe_repositories
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecr/describe-images.html
-def ecr_describe_images(repository_name:)
+def ecr_describe_images(aws_account_id:,region:,repository_name:)
   {
     "Effect" => "Allow",
     "Action" => "ecr:DescribeImages",

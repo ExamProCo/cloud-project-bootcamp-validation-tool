@@ -4,7 +4,7 @@ module ClassMethods
 # ------
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/describe-user-pool.html
-def cognito_idp_describe_user_pool
+def cognito_idp_describe_user_pool(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "cognito-idp:DescribeUserPool",
@@ -14,7 +14,7 @@ end
 
 # we manually set max results to 10, we shouldn't really see that many
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/list-user-pools.html
-def cognito_idp_list_user_pools
+def cognito_idp_list_user_pools(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "cognito-idp:ListUserPools",
@@ -23,7 +23,7 @@ def cognito_idp_list_user_pools
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/list-user-pool-clients.html
-def cognito_idp_list_user_pool_clients
+def cognito_idp_list_user_pool_clients(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "cognito-idp:ListUserPoolClients",
@@ -32,7 +32,7 @@ def cognito_idp_list_user_pool_clients
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/list-users.html
-def cognito_idp_list_users
+def cognito_idp_list_users(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "cognito-idp:ListUsers",
@@ -41,7 +41,7 @@ def cognito_idp_list_users
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cognito-idp/describe-user-pool-client.html
-def cognito_idp_describe_user_pool_client
+def cognito_idp_describe_user_pool_client(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "cognito-idp:DescribeUserPoolClient",

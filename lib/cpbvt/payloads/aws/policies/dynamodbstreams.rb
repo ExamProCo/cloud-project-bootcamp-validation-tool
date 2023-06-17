@@ -4,7 +4,7 @@ module ClassMethods
 # ------
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/dynamodbstreams/list-streams.html
-def dynamodbstreams_list_streams
+def dynamodbstreams_list_streams(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "dynamodb:ListStreams",
@@ -13,7 +13,7 @@ def dynamodbstreams_list_streams
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/dynamodbstreams/describe-stream.html
-def dynamodbstreams_describe_stream(stream_arn:) 
+def dynamodbstreams_describe_stream(aws_account_id:,region:,stream_arn:) 
   {
     "Effect" => "Allow",
     "Action" => "dynamodb:DescribeStream",

@@ -4,7 +4,7 @@ module ClassMethods
 # ------
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-clusters.html
-def ecs_describe_clusters
+def ecs_describe_clusters(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "ecs:DescribeClusters",
@@ -12,7 +12,7 @@ def ecs_describe_clusters
 }
 end
 
-def ecs_list_services
+def ecs_list_services(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "ecs:ListServices",
@@ -21,16 +21,20 @@ def ecs_list_services
 end
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-services.html
 # services is required - a list of services to describe
-def ecs_describe_services
+def ecs_describe_services(aws_account_id:,region:,services:[],:,cluster_name:)
+  resources = services.map do |name|
+    "arn:aws:ecs:#{region}:#{aws_account_id}:service/#{cluster_name}/#{name}"
+  end
+  resources = "*" if resources.empty?
   {
     "Effect" => "Allow",
     "Action" => "ecs:DescribeServices",
-    "Resource" => "*"
+    "Resource" => resources
   }
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-tasks.html
-def ecs_describe_tasks
+def ecs_describe_tasks(aws_account_id:,region:)
   {
     "Effect": "Allow",
     "Action": "ecs:DescribeTasks",
@@ -39,7 +43,7 @@ def ecs_describe_tasks
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/list-tasks.html
-def ecs_list_tasks
+def ecs_list_tasks(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "ecs:ListTasks",
@@ -48,7 +52,7 @@ def ecs_list_tasks
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/list-task-definitions.html
-def ecs_list_task_definitions
+def ecs_list_task_definitions(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "ecs:ListTaskDefinitions",

@@ -26,7 +26,7 @@ unless File.exist?('.env')
 end
 Dotenv.load
 
-task :permission do
+task :permit do
   puts "gathering permission for: aws_2023 =="
   general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
     project_scope: "aws-bootcamp-2023",

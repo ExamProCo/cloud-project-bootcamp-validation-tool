@@ -68,82 +68,65 @@ class Aws2023::Puller
     # ============================================
     # Global Region Specific =====================
     # ============================================
+    aliases = [
+      "#{specific_params.naked_domain_name}",
+      "assets.#{specific_params.naked_domain_name}"
+    ]
     Async do |task|
       self.pull_specific_async(task,'global',{
         command: 'cloudfront_get_distribution',
         params: {distribution_id: 'cloudfront_list_distributions'},
         filters: {
-          aliases: [
-            "#{specific_params.naked_domain_name}",
-            "assets.#{specific_params.naked_domain_name}"
-          ]
+          aliases: aliases
         }
       }, manifest, general_params)
       self.pull_specific_async(task,'global',{
         command: 'cloudfront_list_invalidations',
         params: {distribution_id: 'cloudfront_list_distributions'},
         filters: {
-          aliases: [
-            "#{specific_params.naked_domain_name}",
-            "assets.#{specific_params.naked_domain_name}"
-          ]
+          aliases: aliases
         }
       }, manifest, general_params)
     end
+    bucket_names =  [
+      specific_params.naked_domain_name,
+      "www.#{specific_params.naked_domain_name}",
+      "assets.#{specific_params.naked_domain_name}"
+    ]
     Async do |task|
       self.pull_specific_async(task,'global',{
         command: 's3api_get_bucket_notification_configuration',
         params: {bucket: 's3api_list_buckets'},
         filters: {
-          bucket_names: [
-            specific_params.naked_domain_name,
-            "www.#{specific_params.naked_domain_name}",
-            "assets.#{specific_params.naked_domain_name}"
-          ]
+          bucket_names: bucket_names
         }
       }, manifest, general_params)
       self.pull_specific_async(task,'global',{
         command: 's3api_get_bucket_policy',
         params: {bucket: 's3api_list_buckets'},
         filters: {
-          bucket_names: [
-            specific_params.naked_domain_name,
-            "www.#{specific_params.naked_domain_name}",
-            "assets.#{specific_params.naked_domain_name}"
-          ]
+          bucket_names: bucket_names
         }
       }, manifest, general_params)
       self.pull_specific_async(task,'global',{
         command: 's3api_get_bucket_cors',
         params: {bucket: 's3api_list_buckets'},
         filters: {
-          bucket_names: [
-            specific_params.naked_domain_name,
-            "www.#{specific_params.naked_domain_name}",
-            "assets.#{specific_params.naked_domain_name}"
-          ]
+          bucket_names: bucket_names
         }
       }, manifest, general_params)
       self.pull_specific_async(task,'global',{
         command: 's3api_get_bucket_website',
         params: {bucket: 's3api_list_buckets'},
         filters: {
-          bucket_names: [
-            specific_params.naked_domain_name,
-            "www.#{specific_params.naked_domain_name}",
-            "assets.#{specific_params.naked_domain_name}"
-          ]
+          bucket_names: bucket_names
         }
       }, manifest, general_params)
       self.pull_specific_async(task,'global',{
         command: 's3api_get_public_access_block',
         params: {bucket: 's3api_list_buckets'},
         filters: {
-          bucket_names: [
-            specific_params.naked_domain_name,
-            "www.#{specific_params.naked_domain_name}",
-            "assets.#{specific_params.naked_domain_name}"
-          ]
+          bucket_names: bucket_names
         }
       }, manifest, general_params)
     end

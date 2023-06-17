@@ -4,7 +4,7 @@ module ClassMethods
 # ------
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/list-distributions.html
-def cloudfront_list_distributions
+def cloudfront_list_distributions(aws_account_id:)
   {
     "Effect" => "Allow",
     "Action" => "cloudfront:ListDistributions",
@@ -13,7 +13,7 @@ def cloudfront_list_distributions
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/get-distribution.html
-def cloudfront_get_distribution(distribution_id:)
+def cloudfront_get_distribution(aws_account_id:)
   {
     "Effect" => "Allow",
     "Action" => "cloudfront:GetDistribution",
@@ -22,7 +22,7 @@ def cloudfront_get_distribution(distribution_id:)
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/list-invalidations.html
-def cloudfront_list_invalidations(distribution_id:)
+def cloudfront_list_invalidations(aws_account_id:)
   {
     "Effect" => "Allow",
     "Action" => "cloudfront:ListInvalidations",
@@ -31,7 +31,7 @@ def cloudfront_list_invalidations(distribution_id:)
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/list-cloud-front-origin-access-identities.html
-def cloudfront_list_cloud_front_origin_access_identities
+def cloudfront_list_cloud_front_origin_access_identities(aws_account_id:)
   {
     "Effect" => "Allow",
     "Action" => "cloudfront:ListCloudFrontOriginAccessIdentities",
@@ -41,7 +41,7 @@ end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/get-cloud-front-origin-access-identity.html
 # Can't do this one if the above one doesn't work
-def cloudfront_get_cloud_front_origin_access_identity(identity_id:) 
+def cloudfront_get_cloud_front_origin_access_identity(aws_account_id:)
   {
     "Effect" => "Allow",
     "Action" => "cloudfront:GetCloudFrontOriginAccessIdentity",
@@ -50,7 +50,7 @@ def cloudfront_get_cloud_front_origin_access_identity(identity_id:)
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/get-cloud-front-origin-access-identity-config.html
-def cloudfront_get_cloud_front_origin_access_identity_config(identity_id:)
+def cloudfront_get_cloud_front_origin_access_identity_config(aws_account_id:)
   {
     "Effect" => "Allow",
     "Action" => "cloudfront:GetCloudFrontOriginAccessIdentityConfig",

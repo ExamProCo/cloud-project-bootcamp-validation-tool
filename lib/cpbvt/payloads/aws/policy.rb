@@ -22,17 +22,26 @@ class Cpbvt::Payloads::Aws::Policy
   @@permissions = []
 
   def self.add region, command, params
-    permissions = self.send command
-    if permissions.is_a?(Array)
-      permissions.each do |permission|
-        @@permissions.push permission
+    permissions = self.send command, **params
+    permissions = [permissions] if permissions.is_a?(Hash)
+    if region != 'global'
+      permissions.map! do |permission|
+        self.condition_region permission, region
       end
-    else
-      @@permissions.push permissions
+    end
+    permissions.each do |permission|
+      @@permissions.push permission
     end
   end
 
-  def generate!
+  def self.condition_region permission, region
+    permission['Condition'] ||= {}
+    permission['Conditions']['StringEquals'] ||= {}
+    permission['Conditions']['StringEquals']["ec2:Region"] = region
+    permission
+  end
+
+  def self.generate!
     cfn_template = YAML.load_file('cross-account-role-template.yaml')
     binding.pry
   end
