@@ -52,14 +52,56 @@ class Aws2023::Validations::Cluster
     data = manifest.get_output!("ecs-describe-services__#{cluster_name}")
     backend_service = data['services'].find{|t|t['serviceName'] == specific_params.backend_family}
 
-    backend_service['status'] == 'ACTIVE'
+    found = backend_service['status'] == 'ACTIVE'
 
+    if found
+      {result: {score: 10, message: "Found a fargate service a #{specific_params.backend_family}"}}
+    else
+      {result: {score: 0, message: "Failed to find a fargate service a #{specific_params.backend_family}"}}
+    end
   end
 
   def self.should_have_a_running_task(manifest:,specific_params:)
+    cluster_name = specific_params.cluster_name
+    data = manifest.get_output!("ecs-describe-tasks")
+
+    container = nil
+    data['tasks'].each do |task|
+      if task['clusterArn'].match(cluster_name)
+        container = task['containers'].find do |container|
+          container['name'] == specific_params.backend_family
+        end
+        if container
+          break
+        end
+      end
+    end
+
+    healthy = container['healthStatus'] == 'HEALTHY'
+
+    if healthy
+      {result: {score: 10, message: "Found an ECS task for: #{specific_params.backend_family} running in the expected cluster and service that is HEALTHY"}}
+    else
+      {result: {score: 0, message: "Failed to find an ECS task for: #{specific_params.backend_family} running in the expected cluster and service that is HEALTHY"}}
+    end
   end
 
   def self.should_have_an_alb(manifest:,specific_params:)
+    cluster_name = specific_params.cluster_name
+    service_name = specific_params.backend_family
+    data = manifest.get_output!("ecs-describe-services__#{cluster_name}")
+    backend_service = data['services'].find{|t|t['serviceName'] == service_name}
+
+    if backend_service.key?('loadBalancers')
+      found = backend_service['loadBalancers']['containerPort'] = 4567
+      if found 
+        {result: {score: 10, message: "Found attached load balancer for the fargate service: #{service_name}"}}
+      else
+        {result: {score: 5, message: "Failed to find an attached load balancer for the fargate service: #{service_name} for port 4567"}}
+      end
+    else
+      {result: {score: 0, message: "Failed to find an attached load balancer for the fargate service: #{service_name}"}}
+    end
   end
 
   def self.should_have_alb_sg(manifest:,specific_params:)

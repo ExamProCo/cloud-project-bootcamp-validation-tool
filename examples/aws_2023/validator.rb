@@ -133,18 +133,18 @@ class Aws2023::Validator
       klass: Aws2023::Validations::Cluster,
       function_name: :should_have_an_ecr_repo
     )
-    #state.process(
-    #  klass: Aws2023::Validations::Cluster,
-    #  function_name: :should_have_a_service
-    #)
-    #state.process(
-    #  klass: Aws2023::Validations::Cluster,
-    #  function_name: :should_have_a_running_task
-    #)
-    #state.process(
-    #  klass: Aws2023::Validations::Cluster,
-    #  function_name: :should_have_an_alb
-    #)
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_a_service
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_a_running_task
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_an_alb
+    )
     #state.process(
     #  klass: Aws2023::Validations::Cluster,
     #  function_name: :should_have_alb_sg
