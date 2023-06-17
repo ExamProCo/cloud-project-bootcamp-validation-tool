@@ -93,7 +93,7 @@ class Aws2023::Validations::Cluster
     backend_service = data['services'].find{|t|t['serviceName'] == service_name}
 
     if backend_service.key?('loadBalancers')
-      found = backend_service['loadBalancers']['containerPort'] = 4567
+      found = backend_service['loadBalancers'].first['containerPort'] = 4567
       if found 
         {result: {score: 10, message: "Found attached load balancer for the fargate service: #{service_name}"}}
       else
