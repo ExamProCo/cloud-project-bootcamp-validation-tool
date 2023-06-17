@@ -7,7 +7,7 @@ module ClassMethods
 # our code my dry elsewhere
 # We can't use s2 ls because it won't return json
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/list-buckets.html
-def s3api_list_buckets
+def s3api_list_buckets(aws_account_id:)
   {
     "Sid" => "AllowS3ListBuckets",
     "Effect" => "Allow",
@@ -20,7 +20,7 @@ end
 #permission to access it. The action returns a 200 OK if the bucket
 #exists and you have permission to access it.
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/head-bucket.html
-def s3api_head_bucket(bucket_names:)
+def s3api_head_bucket(aws_account_id:,bucket_names:)
   resources = bucket_names.map{|b|"arn:aws:s3:::#{b}"} 
   resources = "*" if resources.empty?
   {
@@ -31,7 +31,7 @@ def s3api_head_bucket(bucket_names:)
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-bucket-notification-configuration.html
-def s3api_get_bucket_notification_configuration(bucket_names: [])
+def s3api_get_bucket_notification_configuration(aws_account_id:,bucket_names: [])
   resources = bucket_names.map{|b|"arn:aws:s3:::#{b}"} 
   resources = "*" if resources.empty?
   {
@@ -42,7 +42,7 @@ def s3api_get_bucket_notification_configuration(bucket_names: [])
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-bucket-policy.html
-def s3api_get_bucket_policy(bucket_names: [])
+def s3api_get_bucket_policy(aws_account_id:,bucket_names: [])
   resources = bucket_names.map{|b|"arn:aws:s3:::#{b}"} 
   resources = "*" if resources.empty?
   {

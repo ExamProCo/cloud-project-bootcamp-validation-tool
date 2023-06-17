@@ -49,7 +49,7 @@ def elbv2_describe_target_groups(aws_account_id:,region:)
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/elbv2/describe-target-group-attributes.html
-def elbv2_describe_target_group_attributes(target_group_arn:) 
+def elbv2_describe_target_group_attributes(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "elasticloadbalancing:DescribeTargetGroupAttributes",

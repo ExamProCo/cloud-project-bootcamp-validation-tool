@@ -4,7 +4,7 @@ module ClassMethods
 # ------
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/get-function.html
-def lambda_get_function(function_name:)
+def lambda_get_function(aws_account_id:,region:,function_name:)
   {
     "Effect": "Allow",
     "Action": "lambda:GetFunction",
@@ -13,7 +13,7 @@ def lambda_get_function(function_name:)
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/list-functions.html
-def lambda_list_functions
+def lambda_list_functions(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "lambda:ListFunctions",
@@ -22,7 +22,7 @@ def lambda_list_functions
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/list-layers.html
-def lambda_list_layers
+def lambda_list_layers(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "lambda:ListLayers",
