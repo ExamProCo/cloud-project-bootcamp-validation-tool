@@ -5,10 +5,20 @@ module ClassMethods
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/codepipeline/list-pipelines.html
 def codepipeline_list_pipelines
+  {
+    "Effect" => "Allow",
+    "Action" => "codepipeline:ListPipelines",
+    "Resource" => "*"
+}
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/codepipeline/get-pipeline.html
-def codepipeline_get_pipeline(pipeline_name:)
+def codepipeline_get_pipeline
+  {
+    "Effect" => "Allow",
+    "Action" => "codepipeline:GetPipeline",
+    "Resource" => "*"
+  }
 end
 
 # ------
