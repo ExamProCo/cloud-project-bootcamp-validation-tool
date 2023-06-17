@@ -1,0 +1,29 @@
+Parameters:
+  SourceAccountId:
+    Type: String
+    Description: The ID of the source AWS account.
+    AllowedPattern: '[0-9]{12}'
+    ConstraintDescription: Must be a valid AWS account ID.
+  ExternalId:
+    Type: String
+    Description: An external ID that must be provided when assuming the cross-account role.
+Resources:
+  CrossAccountRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CrossAccountRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${SourceAccountId}:root"
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                "sts:ExternalId": !Ref ExternalId
+      Policies:
+        - PolicyName: Bootcamp Policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement: []

@@ -1,3 +1,4 @@
+require 'yaml'
 class Cpbvt::Payloads::Aws::Policy
   include Cpbvt::Payloads::Aws::Policies::Acm
   include Cpbvt::Payloads::Aws::Policies::Apigatewayv2
@@ -17,4 +18,22 @@ class Cpbvt::Payloads::Aws::Policy
   include Cpbvt::Payloads::Aws::Policies::Route53
   include Cpbvt::Payloads::Aws::Policies::S3api
   include Cpbvt::Payloads::Aws::Policies::Servicediscovery
+
+  @@permissions = []
+
+  def self.add region, command, params
+    permissions = self.send command
+    if permissions.is_a?(Array)
+      permissions.each do |permission|
+        @@permissions.push permission
+      end
+    else
+      @@permissions.push permissions
+    end
+  end
+
+  def generate!
+    cfn_template = YAML.load_file('cross-account-role-template.yaml')
+    binding.pry
+  end
 end
