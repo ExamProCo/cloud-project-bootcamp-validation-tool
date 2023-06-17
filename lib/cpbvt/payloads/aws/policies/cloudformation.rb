@@ -11,11 +11,15 @@ def cloudformation_list_stacks(aws_account_id:,region:)
   }
 end
 
-def cloudformation_list_stack_resources(aws_account_id:,region:,stack_name:)
+def cloudformation_list_stack_resources(aws_account_id:,region:,stack_names: [])
+  resources = stack_names.map do |stack_name| 
+    "arn:aws:cloudformation:#{region}:#{aws_account_id}:stack/#{stack_name}/*"
+  end
+  resources = "*" if resources.empty?
   {
     "Effect" => "Allow",
     "Action" => "cloudformation:ListStackResources",
-    "Resource" => "arn:aws:cloudformation:#{region}:#{account_id}:stack/#{stack_name}/*"
+    "Resource" => resources
   }
 end
 

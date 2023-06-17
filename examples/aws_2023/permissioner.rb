@@ -13,7 +13,7 @@ class Aws2023::Permissioner
     primary_region = general_params.user_region
     self.add primary_region, :ecs_describe_clusters, general_params
     self.add primary_region, :ecs_list_services, general_params
-    self.add primary_region, :ecs_describe_services, general_params, { services: [specific_params.backend_family]}
+    self.add primary_region, :ecs_describe_services, general_params, {cluster_name: specific_params.cluster_name, services: [specific_params.backend_family]}
     self.add primary_region, :ecs_list_tasks, general_params, {cluster_name: specific_params.cluster_name, family: specific_params.backend_family}
     self.add primary_region, :acm_list_certificates, general_params
     self.add primary_region, :apigatewayv2_get_apis, general_params
@@ -89,7 +89,7 @@ class Aws2023::Permissioner
     Cpbvt::Payloads::Aws::Policy.generate!
   end
 
-  def self.add region, command, general_params, specifc_params={}
+  def self.add region, command, general_params, specific_params={}
     Cpbvt::Payloads::Aws::Policy.add region, command, general_params, specific_params
   end
 end

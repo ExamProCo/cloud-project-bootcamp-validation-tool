@@ -21,7 +21,7 @@ def ecs_list_services(aws_account_id:,region:)
 end
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-services.html
 # services is required - a list of services to describe
-def ecs_describe_services(aws_account_id:,region:,services:[],:,cluster_name:)
+def ecs_describe_services(aws_account_id:,region:,cluster_name:,services:[])
   resources = services.map do |name|
     "arn:aws:ecs:#{region}:#{aws_account_id}:service/#{cluster_name}/#{name}"
   end
@@ -34,16 +34,16 @@ def ecs_describe_services(aws_account_id:,region:,services:[],:,cluster_name:)
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-tasks.html
-def ecs_describe_tasks(aws_account_id:,region:)
+def ecs_describe_tasks(aws_account_id:,region:,cluster_name:)
   {
-    "Effect": "Allow",
-    "Action": "ecs:DescribeTasks",
-    "Resource": "*"
+    "Effect" => "Allow",
+    "Action" => "ecs:DescribeTasks",
+    "Resource" => "*"
   }
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/list-tasks.html
-def ecs_list_tasks(aws_account_id:,region:)
+def ecs_list_tasks(aws_account_id:,region:,cluster_name:, family:)
   {
     "Effect" => "Allow",
     "Action" => "ecs:ListTasks",

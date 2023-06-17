@@ -13,7 +13,7 @@ def cloudfront_list_distributions(aws_account_id:)
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/get-distribution.html
-def cloudfront_get_distribution(aws_account_id:)
+def cloudfront_get_distribution(aws_account_id:,aliases:)
   {
     "Effect" => "Allow",
     "Action" => "cloudfront:GetDistribution",
@@ -22,7 +22,7 @@ def cloudfront_get_distribution(aws_account_id:)
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/list-invalidations.html
-def cloudfront_list_invalidations(aws_account_id:)
+def cloudfront_list_invalidations(aws_account_id:,aliases:)
   {
     "Effect" => "Allow",
     "Action" => "cloudfront:ListInvalidations",

@@ -46,14 +46,14 @@ def s3api_get_bucket_policy(aws_account_id:,bucket_names: [])
   resources = bucket_names.map{|b|"arn:aws:s3:::#{b}"} 
   resources = "*" if resources.empty?
   {
-    "Effect": "Allow",
-    "Action": "s3:GetBucketPolicy",
+    "Effect" => "Allow",
+    "Action" => "s3:GetBucketPolicy",
     "Resource" => resources
 }
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-bucket-cors.html
-def s3api_get_bucket_cors(bucket_names: [])
+def s3api_get_bucket_cors(aws_account_id:,bucket_names: [])
   resources = bucket_names.map{|b|"arn:aws:s3:::#{b}"} 
   resources = "*" if resources.empty?
   {
@@ -64,7 +64,7 @@ def s3api_get_bucket_cors(bucket_names: [])
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-bucket-website.html
-def s3api_get_bucket_website(bucket_names: [])
+def s3api_get_bucket_website(aws_account_id:,bucket_names: [])
   resources = bucket_names.map{|b|"arn:aws:s3:::#{b}"} 
   resources = "*" if resources.empty?
   {
@@ -75,7 +75,7 @@ def s3api_get_bucket_website(bucket_names: [])
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/head-object.html
-def s3api_get_head_object(bucket: '*', key: '*')
+def s3api_get_head_object(aws_account_id:,bucket: '*', key: '*')
   {
     "Effect" => "Allow",
     "Action" => [
@@ -88,7 +88,7 @@ end
 
 # special since we are downloading a file
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-object.html
-def s3api_get_object(bucket: '*', key: '*')
+def s3api_get_object(aws_account_id:,bucket: '*', key: '*')
   {
     "Effect" => "Allow",
     "Action" => [
@@ -100,7 +100,7 @@ def s3api_get_object(bucket: '*', key: '*')
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/get-public-access-block.html
-def s3api_get_public_access_block(bucket_names: [])
+def s3api_get_public_access_block(aws_account_id:,bucket_names: [])
   resources = bucket_names.map{|b|"arn:aws:s3:::#{b}"} 
   resources = "*" if resources.empty?
   {
@@ -111,7 +111,7 @@ def s3api_get_public_access_block(bucket_names: [])
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/list-objects-v2.html
-def s3api_list_objects_v2(bucket: '*', prefix: '')
+def s3api_list_objects_v2(aws_account_id:,bucket: '*', prefix: '')
   [{
     "Effect" => "Allow",
     "Action" => [

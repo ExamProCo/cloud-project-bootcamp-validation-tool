@@ -6,9 +6,9 @@ module ClassMethods
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/codebuild/list-projects.html
 def codebuild_list_projects(aws_account_id:,region:)
   {
-    "Effect": "Allow",
-    "Action": "codebuild:ListProjects",
-    "Resource": "*"
+    "Effect" => "Allow",
+    "Action" => "codebuild:ListProjects",
+    "Resource" => "*"
   }
 end
 
