@@ -35,18 +35,38 @@ end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ec2/describe-route-tables.html
 def ec2_describe_route_tables
+  {
+    "Effect" => "Allow",
+    "Action" => "ec2:DescribeRouteTables",
+    "Resource" => "*"
+  }
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ec2/describe-internet-gateways.html
 def ec2_describe_internet_gateways
+  {
+    "Effect" => "Allow",
+    "Action" => "ec2:DescribeInternetGateways",
+    "Resource" => "*"
+}
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ec2/describe-security-groups.html
 def ec2_describe_security_groups
+  {
+    "Effect" => "Allow",
+    "Action" => "ec2:DescribeSecurityGroups",
+    "Resource" => "*"
+}
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ec2/describe-route-tables.html
 def ec2_describe_route_tables
+  {
+    "Effect" => "Allow",
+    "Action" => "ec2:DescribeRouteTables",
+    "Resource" => "*"
+}
 end
 
 # ------

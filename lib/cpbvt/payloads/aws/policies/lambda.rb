@@ -5,14 +5,29 @@ module ClassMethods
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/get-function.html
 def lambda_get_function(function_name:)
+  {
+    "Effect": "Allow",
+    "Action": "lambda:GetFunction",
+    "Resource": "*"
+  }
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/list-functions.html
 def lambda_list_functions
+  {
+    "Effect" => "Allow",
+    "Action" => "lambda:ListFunctions",
+    "Resource" => "*"
+}
 end
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/list-layers.html
 def lambda_list_layers
+  {
+    "Effect" => "Allow",
+    "Action" => "lambda:ListLayers",
+    "Resource" => "*"
+  }
 end
 
 # ------
