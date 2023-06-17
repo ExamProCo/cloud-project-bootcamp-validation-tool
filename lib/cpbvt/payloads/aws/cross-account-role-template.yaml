@@ -17,11 +17,13 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS: !Sub "arn:aws:iam::${SourceAccountId}:root"
+              AWS: 
+                Fn::Sub: "arn:aws:iam::${SourceAccountId}:root"
             Action: sts:AssumeRole
             Condition:
               StringEquals:
-                "sts:ExternalId": !Ref ExternalId
+                "sts:ExternalId":
+                  Ref: ExternalId
       Policies:
         - PolicyName: Bootcamp Policy
           PolicyDocument:

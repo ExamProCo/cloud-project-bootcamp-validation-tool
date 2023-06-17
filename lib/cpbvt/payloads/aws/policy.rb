@@ -40,17 +40,26 @@ class Cpbvt::Payloads::Aws::Policy
   def self.condition_region permission, region
     permission['Condition'] ||= {}
     permission['Condition']['StringEquals'] ||= {}
-    permission['Condition']['StringEquals']["ec2:Region"] = region
+    permission['Condition']['StringEquals']["aws:RequestedRegion"] = region
     permission
   end
 
-  def self.generate!
+  def self.generate! general_params
     path = File.join(
       File.dirname(File.expand_path(__FILE__)),
       'cross-account-role-template.yaml'
     )
     cfn_template = YAML.load_file(path)
     cfn_template['Resources']['CrossAccountRole']['Properties']['Policies'][0]['PolicyDocument']['Statement'] = @@permissions
-    binding.pry
+
+    output_path = File.join(
+      general_params.output_path,
+      general_params.project_scope,
+      "user-#{general_params.user_uuid}",
+      "cross-account-role.yaml"
+    )
+    File.open(output_path, 'w') do |f|
+      f.write(cfn_template.to_yaml)
+    end
   end
 end

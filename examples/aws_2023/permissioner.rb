@@ -86,7 +86,7 @@ class Aws2023::Permissioner
     self.add primary_region, :route53_get_hosted_zone, general_params
     self.add primary_region, :route53_list_resource_record_sets, general_params
 
-    Cpbvt::Payloads::Aws::Policy.generate!
+    Cpbvt::Payloads::Aws::Policy.generate! general_params
   end
 
   def self.add region, command, general_params, specific_params={}

@@ -1,0 +1,392 @@
+---
+Parameters:
+  SourceAccountId:
+    Type: String
+    Description: The ID of the source AWS account.
+    AllowedPattern: "[0-9]{12}"
+    ConstraintDescription: Must be a valid AWS account ID.
+  ExternalId:
+    Type: String
+    Description: An external ID that must be provided when assuming the cross-account
+      role.
+Resources:
+  CrossAccountRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CrossAccountRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS:
+              Fn::Sub: arn:aws:iam::${SourceAccountId}:root
+          Action: sts:AssumeRole
+          Condition:
+            StringEquals:
+              sts:ExternalId:
+                Ref: ExternalId
+      Policies:
+      - PolicyName: Bootcamp Policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: ecs:DescribeClusters
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: ecs:ListServices
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: ecs:DescribeServices
+            Resource:
+            - arn:aws:ecs:ca-central-1:387543059434:service/CrdClusterFargateCluster/backend-flask
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: ecs:ListTasks
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: acm:ListCertificates
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: apigateway:GET
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: cloudformation:ListStacks
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: codebuild:ListProjects
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: codebuild:ListBuilds
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: codepipeline:ListPipelines
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: cognito-idp:ListUserPools
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: dynamodb:ListTables
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: dynamodb:ListStreams
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Sid: AllowEC2DescribeVPCs
+            Effect: Allow
+            Action: ec2:DescribeVpcs
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Sid: AllowEC2DescribeSubnets
+            Effect: Allow
+            Action: ec2:DescribeSubnets
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: ec2:DescribeRouteTables
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: ec2:DescribeInternetGateways
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: ec2:DescribeSecurityGroups
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: ec2:DescribeRouteTables
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: ecr:DescribeRepositories
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: ecs:ListTaskDefinitions
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: elasticloadbalancing:DescribeLoadBalancers
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: elasticloadbalancing:DescribeTargetGroups
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: lambda:ListFunctions
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: lambda:ListLayers
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: rds:DescribeDBInstances
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: rds:DescribeDBSubnetGroups
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: rds:DescribeDBSnapshots
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action:
+            - route53:ListHostedZones
+            - route53:ListHostedZonesByName
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: servicediscovery:ListServices
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: servicediscovery:ListNamespaces
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: acm:ListCertificates
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: us-east-1
+          - Effect: Allow
+            Action: cloudfront:ListDistributions
+            Resource: "*"
+          - Sid: AllowS3ListBuckets
+            Effect: Allow
+            Action: s3:ListAllMyBuckets
+            Resource: "*"
+          - Effect: Allow
+            Action: ecs:DescribeTasks
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: cloudfront:GetDistribution
+            Resource: "*"
+          - Effect: Allow
+            Action: cloudfront:ListInvalidations
+            Resource: "*"
+          - Effect: Allow
+            Action: s3:GetBucketNotificationConfiguration
+            Resource:
+            - arn:aws:s3:::cruddur.com
+            - arn:aws:s3:::www.cruddur.com
+            - arn:aws:s3:::assets.cruddur.com
+          - Effect: Allow
+            Action: s3:GetBucketPolicy
+            Resource:
+            - arn:aws:s3:::cruddur.com
+            - arn:aws:s3:::www.cruddur.com
+            - arn:aws:s3:::assets.cruddur.com
+          - Effect: Allow
+            Action: s3:GetBucketCors
+            Resource:
+            - arn:aws:s3:::cruddur.com
+            - arn:aws:s3:::www.cruddur.com
+            - arn:aws:s3:::assets.cruddur.com
+          - Effect: Allow
+            Action: s3:GetBucketWebsite
+            Resource:
+            - arn:aws:s3:::cruddur.com
+            - arn:aws:s3:::www.cruddur.com
+            - arn:aws:s3:::assets.cruddur.com
+          - Effect: Allow
+            Action: s3:GetPublicAccessBlock
+            Resource:
+            - arn:aws:s3:::cruddur.com
+            - arn:aws:s3:::www.cruddur.com
+            - arn:aws:s3:::assets.cruddur.com
+          - Effect: Allow
+            Action: codebuild:BatchGetProjects
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: acm:DescribeCertificate
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: apigateway:GET
+            Resource: arn:aws:apigateway:ca-central-1::/apis//authorizers/*
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: apigateway:GET
+            Resource: arn:aws:apigateway:ca-central-1::/apis//integrations/*
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: cloudformation:ListStackResources
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: codepipeline:GetPipeline
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: cognito-idp:DescribeUserPool
+            Resource: arn:aws:cognito-idp:region:account-id:userpool/user-pool-id
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: cognito-idp:ListUserPoolClients
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: cognito-idp:ListUsers
+            Resource: arn:aws:cognito-idp:region:account-id:userpool/user-pool-id
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: dynamodb:DescribeTable
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: dynamodb:DescribeStream
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: ecr:DescribeImages
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: elasticloadbalancing:DescribeListeners
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: elasticloadbalancing:DescribeLoadBalancerAttributes
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: elasticloadbalancing:DescribeTargetGroupAttributes
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action: lambda:GetFunction
+            Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action:
+            - route53:GetHostedZone
+            - route53:ListHostedZones
+            Resource:
+            - "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
+          - Effect: Allow
+            Action:
+            - route53:ListResourceRecordSets
+            - route53:ListHostedZones
+            :Resource: "*"
+            Condition:
+              StringEquals:
+                ec2:Region: ca-central-1
