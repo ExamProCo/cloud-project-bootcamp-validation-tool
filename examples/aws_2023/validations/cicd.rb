@@ -1,6 +1,6 @@
 class Aws2023::Validations::Cicd
   def self.should_have_a_codepipeline(manifest:,specific_params:)
-    resource_pipeline = Cpbvt::Payloads::Aws::Extractors::Cloudformation.cloudformation_list_stacks__by_stack_resource_type(
+    resource_pipeline = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
       manifest,
       'CrdCluster',
       "AWS::CodePipeline::Pipeline"
@@ -76,7 +76,7 @@ class Aws2023::Validations::Cicd
   end
 
   def self.should_have_a_deploy_stage(manifest:,specific_params:,pipeline_name:)
-    resource_cluster = Cpbvt::Payloads::Aws::Extractors::Cloudformation.cloudformation_list_stacks__by_stack_resource_type(
+    resource_cluster = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
       manifest,
       'CrdCluster',
       "AWS::ECS::Cluster"

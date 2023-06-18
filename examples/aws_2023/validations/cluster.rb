@@ -105,9 +105,72 @@ class Aws2023::Validations::Cluster
   end
 
   def self.should_have_alb_sg(manifest:,specific_params:)
+    resource_alb = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
+      manifest,
+      'CrdCluster',
+      "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    )
+    alb_arn = resource_alb['PhysicalResourceId']
+
+    data = manifest.get_output!('elbv2-describe-load-balancers')
+
+    alb =
+    data['LoadBalancers'].find do |lb|
+      lb['LoadBalancerArn'] == alb_arn
+    end
+
+    sg_id = alb['SecurityGroups'].first
+
+    sg_data = manifest.get_output!('ec2-describe-security-groups')
+
+    sg = sg_data['SecurityGroups'].find{|t| t['GroupId'] == sg_id}
+
+    http_sg_rule =
+    sg['IpPermissions'].find do |rule|
+      rule['FromPort'] == 80 &&
+      rule['ToPort'] == 80 &&
+      rule['IpRanges'].first['CidrIp'] == '0.0.0.0/0'
+    end
+
+    https_sg_rule =
+    sg['IpPermissions'].find do |rule|
+      rule['FromPort'] == 443 &&
+      rule['ToPort'] == 443 &&
+      rule['IpRanges'].first['CidrIp'] == '0.0.0.0/0'
+    end
+
+    if https_sg_rule && http_sg_rule
+      {result: {score: 10, message: "Found a Security Group for the ALB with ingress to internet for 80 and 443"}, alb_sg_id: sg_id }
+    else
+      {result: {score: 0, message: "Failed to find a Security Group for the ALB without ingress to internet for 80 and 443"}}
+    end
+
   end
 
-  def self.should_have_service_sg(manifest:,specific_params:)
+  def self.should_have_service_sg(manifest:,specific_params:,alb_sg_id:)
+    cluster_name = specific_params.cluster_name
+    service_name = specific_params.backend_family
+    data = manifest.get_output!("ecs-describe-services__#{cluster_name}")
+    backend_service = data['services'].find{|t|t['serviceName'] == service_name}
+
+    sg_id = backend_service['networkConfiguration']['awsvpcConfiguration']['securityGroups'].first
+    
+    sg_data = manifest.get_output!('ec2-describe-security-groups')
+
+    sg = sg_data['SecurityGroups'].find{|t| t['GroupId'] == sg_id}
+
+    alb_sg_rule =
+    sg['IpPermissions'].find do |rule|
+      rule['FromPort'] == 4567 &&
+      rule['ToPort'] == 4567 &&
+      rule['UserIdGroupPairs'].first['GroupId'] == alb_sg_id
+    end
+
+    if alb_sg_rule
+      {result: {score: 10, message: "Found a Security Group for the the backend service with ingress to the ALB SG on port 4567"}, alb_sg_id: sg_id }
+    else
+      {result: {score: 0, message: "Failed to find a Security Group for the the backend service with ingress to the ALB SG on port 4567"}}
+    end
   end
 
 end

@@ -145,14 +145,16 @@ class Aws2023::Validator
       klass: Aws2023::Validations::Cluster,
       function_name: :should_have_an_alb
     )
-    #state.process(
-    #  klass: Aws2023::Validations::Cluster,
-    #  function_name: :should_have_alb_sg
-    #)
-    #state.process(
-    #  klass: Aws2023::Validations::Cluster,
-    #  function_name: :should_have_service_sg
-    #)
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_alb_sg,
+      output_params: [:alb_sg_id]
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_service_sg,
+      input_params: [:alb_sg_id]
+    )
   end
     # Primary Compute Validation
       # Should have an ECS cluster named <cluster_name>
