@@ -57,5 +57,15 @@ def elbv2_describe_target_group_attributes(aws_account_id:,region:)
 }
 end
 
+def elbv2_describe_target_health(aws_account_id:,region:)
+  {
+    "Effect": "Allow",
+    "Action": [
+        "elasticloadbalancing:DescribeTargetHealth",
+        "elasticloadbalancing:DescribeLoadBalancerAttributes"
+    ],
+    "Resource": "*"
+  }
+end
 # ------
 end; end

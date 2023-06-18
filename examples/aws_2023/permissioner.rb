@@ -66,6 +66,8 @@ class Aws2023::Permissioner
     self.add 'global', :s3api_get_bucket_cors, general_params, {bucket_names: bucket_names}
     self.add 'global', :s3api_get_bucket_website, general_params, {bucket_names: bucket_names}
     self.add 'global', :s3api_get_public_access_block, general_params, {bucket_names: bucket_names}
+   
+    self.add primary_region, :elbv2_describe_target_health, general_params
 
     self.add primary_region, :codebuild_batch_get_projects, general_params
     self.add primary_region, :acm_describe_certificate, general_params

@@ -143,7 +143,13 @@ class Aws2023::Validator
     )
     state.process(
       klass: Aws2023::Validations::Cluster,
-      function_name: :should_have_an_alb
+      function_name: :should_have_an_alb,
+      output_params: [:backend_tg_arn]
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_target_group,
+      input_params: [:backend_tg_arn]
     )
     state.process(
       klass: Aws2023::Validations::Cluster,

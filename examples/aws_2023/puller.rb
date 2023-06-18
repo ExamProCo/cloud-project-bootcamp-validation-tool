@@ -195,6 +195,10 @@ class Aws2023::Puller
         params: {target_group_arn: 'elbv2_describe_target_groups'}
       }, manifest, general_params)
       self.pull_specific_async(task,primary_region,{
+        command: 'elbv2_describe_target_health',
+        params: {target_group_arn: 'elbv2_describe_target_groups'}
+      }, manifest, general_params)
+      self.pull_specific_async(task,primary_region,{
         command: 'lambda_get_function' ,
         params: {function_name: 'lambda_list_functions'}
       }, manifest, general_params)

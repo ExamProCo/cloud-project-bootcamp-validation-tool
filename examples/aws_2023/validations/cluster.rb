@@ -95,7 +95,8 @@ class Aws2023::Validations::Cluster
     if backend_service.key?('loadBalancers')
       found = backend_service['loadBalancers'].first['containerPort'] = 4567
       if found 
-        {result: {score: 10, message: "Found attached load balancer for the fargate service: #{service_name}"}}
+        backend_tg_arn = backend_service['loadBalancers'].first['targetGroupArn']
+        {result: {score: 10, message: "Found attached load balancer for the fargate service: #{service_name}"}, backend_tg_arn: backend_tg_arn}
       else
         {result: {score: 5, message: "Failed to find an attached load balancer for the fargate service: #{service_name} for port 4567"}}
       end
@@ -170,6 +171,34 @@ class Aws2023::Validations::Cluster
       {result: {score: 10, message: "Found a Security Group for the the backend service with ingress to the ALB SG on port 4567"}, alb_sg_id: sg_id }
     else
       {result: {score: 0, message: "Failed to find a Security Group for the the backend service with ingress to the ALB SG on port 4567"}}
+    end
+  end
+
+  def self.should_have_target_group(manifest:,specific_params:,backend_tg_arn:)
+    tg_id = backend_tg_arn.split("/").last
+    data = manifest.get_output!('elbv2-describe-target-groups')
+    tg = data['TargetGroups'].find{|t| t['TargetGroupArn'] == backend_tg_arn }
+
+    tg_health_data = manifest.get_output("elbv2-describe-target-health__#{tg_id}")
+
+    found_tg =
+    tg['Port'] == 4567 &&
+    tg['HealthCheckPort'] == 4567.to_s &&
+    tg['HealthCheckEnabled'] == true &&
+    tg['HealthCheckPath'] == "/api/health-check"
+
+
+    desc = tg_health_data['TargetHealthDescriptions'].first
+
+    found_tg_healthcheck = 
+    desc['Target']['Port'] == 4567 &&
+    desc['HealthCheckPort'] == 4567.to_s &&
+    desc['TargetHealth']["State"] == 'healthy'
+
+    if found_tg && found_tg_healthcheck 
+      {result: {score: 10, message: "Found Target Group with healthy target to backend-flask on port 4567"}}
+    else
+      {result: {score: 0, message: "Failed to find Target Group with healthy target to backend-flask on port 4567"}}
     end
   end
 

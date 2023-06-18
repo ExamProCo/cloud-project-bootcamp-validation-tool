@@ -8,6 +8,7 @@ class Aws2023::State
                 :public_subnet_id_3,
                 :igw_id,
                 :pipeline_name,
+                :backend_tg_arn,
                 :alb_sg_id
 
   def initialize

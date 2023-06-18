@@ -49,5 +49,13 @@ aws elbv2 describe-target-group-attributes \
 COMMAND
 end
 
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/elbv2/describe-target-health.html
+def elbv2_describe_target_health(target_group_arn:)
+<<~COMMAND
+aws elbv2 describe-target-health \
+--target-group-arn #{target_group_arn}
+COMMAND
+end
+
 # ------
 end; end
