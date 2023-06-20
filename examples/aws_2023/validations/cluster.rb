@@ -174,7 +174,7 @@ class Aws2023::Validations::Cluster
     end
 
     if alb_sg_rule
-      {result: {score: 10, message: "Found a Security Group for the the backend service with ingress to the ALB SG on port 4567"}, alb_sg_id: sg_id }
+      {result: {score: 10, message: "Found a Security Group for the the backend service with ingress to the ALB SG on port 4567"}, serv_sg_id: sg_id }
     else
       {result: {score: 0, message: "Failed to find a Security Group for the the backend service with ingress to the ALB SG on port 4567"}}
     end

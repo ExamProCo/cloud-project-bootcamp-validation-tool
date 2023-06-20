@@ -10,9 +10,9 @@ class Aws2023::State
                 :pipeline_name,
                 :backend_tg_arn,
                 :alb_sg_id,
+                :serv_sg_id,
                 :static_website_distribution_id,
-                :static_website_distribution_domain_name,
-                :alb
+                :static_website_distribution_domain_name
 
   def initialize
     @results = {}

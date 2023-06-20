@@ -57,7 +57,7 @@ class Aws2023::Validations::Networking
     # If its has MapPublicIpOnLaunch then we'll consider it a public subnet
     subnets = data['Subnets'].select do |subnet|
       expected_tag = subnet.key?('Tags') && subnet['Tags'].any? do |tag|
-        tag['Key'] == 'group'
+        tag['Key'] == 'group' &&
         tag['Value'] == 'cruddur-networking'
       end
 

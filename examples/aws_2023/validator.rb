@@ -27,12 +27,12 @@ class Aws2023::Validator
     state.manifest = manifest
     state.specific_params = specific_params
 
-    #self.networking_validations state
-    #self.cluster_validations state
+    self.networking_validations state
+    self.cluster_validations state
     #self.cicd_validations state
     #self.iac_validations state
     #self.static_website_hosting_validations state
-    self.db_validations
+    self.db_validations state
 
     pp state.results
 
@@ -144,7 +144,8 @@ class Aws2023::Validator
     state.process(
       klass: Aws2023::Validations::Cluster,
       function_name: :should_have_service_sg,
-      input_params: [:alb_sg_id]
+      input_params: [:alb_sg_id],
+      output_params: [:serv_sg_id]
     )
     state.process(
       klass: Aws2023::Validations::Cluster,
@@ -231,19 +232,15 @@ class Aws2023::Validator
 
   def self.db_validations state
     state.process(
-      klass: Aws2023::Validations::StaticWebsiteHosting,
+      klass: Aws2023::Validations::Db,
       function_name: :should_have_public_rds_instance,
       input_params: [:vpc_id]
     )
     state.process(
-      klass: Aws2023::Validations::StaticWebsiteHosting,
-      function_name: :should_have_db_sg
+      klass: Aws2023::Validations::Db,
+      function_name: :should_have_db_sg,
+      input_params: [:serv_sg_id]
     )
-    # == Primary Db Validation
-    # - should have an RDS instance running
-    # - the RDS instance should be publically avaliable
-    # - the RDS instance should have a security group <sg-rds-id>
-    # - and it should provide access to the fargate service security group <sg-serv-id> on port 5432
   end
 
 end # class
