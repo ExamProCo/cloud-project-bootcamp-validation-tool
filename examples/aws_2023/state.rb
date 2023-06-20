@@ -16,7 +16,19 @@ class Aws2023::State
     @specific_params = nil
   end
 
-  def process klass:, function_name:, input_params: [], output_params: []
+  # klass: The class that has the validator
+  # function_name: The function name we will dynamically call
+  # input_params: pass these values in from the state file as parameters
+  # output_params: set these values from the returned payload into the statefile
+  # override_params: pass the param and value but not from the state file
+  def process(
+    klass:, 
+    function_name:, 
+    input_params: [], 
+    output_params: [],
+    override_params: {},
+    rule_name: nil
+  )
     arguments = {
       manifest: self.manifest,
       specific_params: specific_params
@@ -29,12 +41,14 @@ class Aws2023::State
       arguments[param] = send(param)
     end
 
+    override_params.each{|k,v| arguments[k] = v}
 
     data = klass.send(function_name, **arguments)
     output_params.each do |param|
       puts "assigning output param: #{param}: #{data[param]}"
       send("#{param}=", data[param])
     end
-    @results[function_name] = data[:result]
+    rule_name ||= function_name
+    @results[rule_name] = data[:result]
   end
 end

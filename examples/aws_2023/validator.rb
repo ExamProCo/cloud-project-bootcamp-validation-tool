@@ -28,12 +28,13 @@ class Aws2023::Validator
     state.specific_params = specific_params
 
     #self.networking_validations state
-    self.cluster_validations state
+    #self.cluster_validations state
     #self.cicd_validations state
+    self.iac_validations state
 
     pp state.results
 
-    # IaC Validation
+    # IaC Validation - AB not sure we need to do this considering
       # should have CFN stacks named the following: <stack_names>
 
 
@@ -162,10 +163,29 @@ class Aws2023::Validator
       input_params: [:alb_sg_id]
     )
   end
-    # Primary Compute Validation
-      # Should have an ECS cluster named <cluster_name>
-        # with fargate service running named <service_name> on port 4567
-          # and the service should have a security group <sg-serv-id>
-            # and it should provide access to the  alb securitygroup <sg-alb-id> on port 4567
+
+  def self.iac_validations state
+    stacks = %w(
+      CrdMachinueUser
+      CrdSrvBackendFlask
+      CrdSyncRole
+      CrdFrontend
+      CrdCicd
+      CrdDb
+      CrdDdb
+      CrdCluster
+      CrdNet
+      ThumbingServerlessCdkStack
+      CDKToolkit
+    )
+    stacks.each do |stack_name|
+      state.process(
+        klass: Aws2023::Validations::Iac,
+        function_name: :should_have_stack,
+        override_params: {stack_name: stack_name},
+        rule_name: "should_have_#{stack_name}".downcase.to_sym
+      )
+    end
+  end
 
 end # class

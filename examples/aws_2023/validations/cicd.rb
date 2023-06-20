@@ -2,7 +2,7 @@ class Aws2023::Validations::Cicd
   def self.should_have_a_codepipeline(manifest:,specific_params:)
     resource_pipeline = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
       manifest,
-      'CrdCluster',
+      'CrdCicd',
       "AWS::CodePipeline::Pipeline"
     )
     pipeline_name = resource_pipeline['PhysicalResourceId']
