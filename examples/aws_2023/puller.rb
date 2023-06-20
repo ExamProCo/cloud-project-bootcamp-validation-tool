@@ -51,7 +51,7 @@ class Aws2023::Puller
       self.pull_async task, primary_region, :rds_describe_db_instances, manifest, general_params
       self.pull_async task, primary_region, :rds_describe_db_subnet_groups, manifest, general_params
       self.pull_async task, primary_region, :rds_describe_db_snapshots, manifest, general_params
-      self.pull_async task, primary_region, :route53_list_hosted_zones, manifest, general_params
+      self.pull_async task, 'global', :route53_list_hosted_zones, manifest, general_params
       self.pull_async task, primary_region, :servicediscovery_list_services, manifest, general_params
       self.pull_async task, primary_region, :servicediscovery_list_namespaces, manifest, general_params
       self.pull_async task, 'us-east-1', :acm_list_certificates, manifest, general_params
@@ -202,11 +202,11 @@ class Aws2023::Puller
         command: 'lambda_get_function' ,
         params: {function_name: 'lambda_list_functions'}
       }, manifest, general_params)
-      self.pull_specific_async(task,primary_region,{
+      self.pull_specific_async(task,'global',{
         command: 'route53_get_hosted_zone',
         params: {hosted_zone_id: 'route53_list_hosted_zones'}
       }, manifest, general_params)
-      self.pull_specific_async(task,primary_region,{
+      self.pull_specific_async(task,'global',{
         command: 'route53_list_resource_record_sets',
         params: {hosted_zone_id: 'route53_list_hosted_zones'}
       }, manifest, general_params)

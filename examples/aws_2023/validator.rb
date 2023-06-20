@@ -193,10 +193,37 @@ class Aws2023::Validator
   end
 
   def self.static_website_hosting_validations state
-      state.process(
-        klass: Aws2023::Validations::StaticWebsiteHosting,
-        function_name: :should_have_,
-      )
+    state.process(
+      klass: Aws2023::Validations::StaticWebsiteHosting,
+      function_name: :should_have_a_naked_domain_bucket_static_website_hosting
+    )
+    state.process(
+      klass: Aws2023::Validations::StaticWebsiteHosting,
+      function_name: :should_have_a_www_bucket_with_redirect
+    )
+    state.process(
+      klass: Aws2023::Validations::StaticWebsiteHosting,
+      function_name: :should_have_a_cloudfront_distrubition_to_static_website,
+      output_params: [
+        :static_website_distribution_id,
+        :static_website_distribution_domain_name
+      ]
+    )
+    state.process(
+      klass: Aws2023::Validations::StaticWebsiteHosting,
+      function_name: :should_have_ran_invalidation_on_distrubition,
+      input_params: [:static_website_distribution_id]
+    )
+    state.process(
+      klass: Aws2023::Validations::StaticWebsiteHosting,
+      function_name: :should_have_support_for_spa,
+      input_params: [:static_website_distribution_id]
+    )
+    state.process(
+      klass: Aws2023::Validations::StaticWebsiteHosting,
+      function_name: :should_have_route53_to_distribution,
+      input_params: [:static_website_distribution_domain_name]
+    )
   end
 
 end # class
