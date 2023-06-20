@@ -27,14 +27,13 @@ class Aws2023::Validator
     state.manifest = manifest
     state.specific_params = specific_params
 
-    self.networking_validations state
-    self.cluster_validations state
+    #self.networking_validations state
+    #self.cluster_validations state
     #self.cicd_validations state
     #self.iac_validations state
+    self.static_website_hosting_validations state
 
     pp state.results
-
-    # should have a cloud map namespace named <cloudmap_namespace>
     
     # Frontend Static Website Hosting Validation
       # should have an s3 bucket called <s3-website-bucket-name>
@@ -191,6 +190,13 @@ class Aws2023::Validator
         rule_name: "should_have_#{stack_name}".downcase.to_sym
       )
     end
+  end
+
+  def self.static_website_hosting_validations state
+      state.process(
+        klass: Aws2023::Validations::StaticWebsiteHosting,
+        function_name: :should_have_,
+      )
   end
 
 end # class
