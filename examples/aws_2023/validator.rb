@@ -27,34 +27,17 @@ class Aws2023::Validator
     state.manifest = manifest
     state.specific_params = specific_params
 
-    self.networking_validations state
-    self.cluster_validations state
+    #self.networking_validations state
+    #self.cluster_validations state
     #self.cicd_validations state
     #self.iac_validations state
     #self.static_website_hosting_validations state
-    self.db_validations state
+    #self.db_validations state
+    #self.ddb_validations state
+    self.serverless_validations state
+    self.authenication_validations state
 
     pp state.results
-
-
-    # DynamoDB Validation
-      # should have a dynamodb table named <db-table-name>
-        # should have a dynamodbstream
-
-    # Serverless Asset Pipeline Validation
-      # should have an HTTP API Gateway
-        # with an /avatar endpoint
-          # with lambda authorizer
-        # with a proxy endpoint
-          # with lambda authorizer
-
-    # Authenication Validation
-      # should have a Cognito User Pool
-        # with a trigger on post configuration
-
-    # Domain Management?
-
-    # Container Repo Storage?
   end # def self.run
 
   def self.networking_validations state
@@ -243,4 +226,35 @@ class Aws2023::Validator
     )
   end
 
+  def self.ddb_validations state
+    state.process(
+      klass: Aws2023::Validations::Ddb,
+      function_name: :should_have_ddb_table
+    )
+    state.process(
+      klass: Aws2023::Validations::Ddb,
+      function_name: :should_have_gsi
+    )
+    state.process(
+      klass: Aws2023::Validations::Ddb,
+      function_name: :should_have_ddb_stream
+    )
+  end
+
+  # Serverless Asset Pipeline Validation
+    # should have an HTTP API Gateway
+      # with an /avatar endpoint
+        # with lambda authorizer
+      # with a proxy endpoint
+        # with lambda authorizer
+  def self.serverless_validations state
+
+  end
+
+  # Authenication Validation
+    # should have a Cognito User Pool
+      # with a trigger on post configuration
+  def self.authenication_validations state
+
+  end
 end # class
