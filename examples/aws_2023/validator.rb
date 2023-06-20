@@ -34,13 +34,6 @@ class Aws2023::Validator
     self.static_website_hosting_validations state
 
     pp state.results
-    
-    # Frontend Static Website Hosting Validation
-      # should have an s3 bucket called <s3-website-bucket-name>
-        # with cors?
-        # with block public access turnred off?
-        # with a bucket policy?
-      # should have a CFN distribution
 
     # == Primary Db Validation
     # - should have an RDS instance running
@@ -193,6 +186,8 @@ class Aws2023::Validator
   end
 
   def self.static_website_hosting_validations state
+    # with cors? - turns out we don't need to check it
+
     state.process(
       klass: Aws2023::Validations::StaticWebsiteHosting,
       function_name: :should_have_a_naked_domain_bucket_static_website_hosting
@@ -200,6 +195,14 @@ class Aws2023::Validator
     state.process(
       klass: Aws2023::Validations::StaticWebsiteHosting,
       function_name: :should_have_a_www_bucket_with_redirect
+    )
+    state.process(
+      klass: Aws2023::Validations::StaticWebsiteHosting,
+      function_name: :should_unblock_public_access
+    )
+    state.process(
+      klass: Aws2023::Validations::StaticWebsiteHosting,
+      function_name: :should_have_bucket_policy
     )
     state.process(
       klass: Aws2023::Validations::StaticWebsiteHosting,

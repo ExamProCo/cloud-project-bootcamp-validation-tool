@@ -1,5 +1,41 @@
 class Aws2023::Validations::StaticWebsiteHosting
 
+  def self.should_unblock_public_access(manifest:,specific_params:)
+    naked_domain_name = specific_params.naked_domain_name
+
+    access = manifest.get_output!("s3api-get-public-access-block__#{naked_domain_name}")
+
+    found =
+    access['PublicAccessBlockConfiguration']['BlockPublicPolicy'] == false &&
+    access['PublicAccessBlockConfiguration']['RestrictPublicBuckets'] == false
+
+    if found
+      {result: {score: 10, message: "Found s3 static website for #{naked_domain_name} to allow bucket policies"}}
+    else
+      {result: {score: 0, message: "Failed to find ss3 static website for #{naked_domain_name} to allow bucket policies"}}
+    end
+  end
+
+  def self.should_have_bucket_policy(manifest:,specific_params:)
+    naked_domain_name = specific_params.naked_domain_name
+
+    data = manifest.get_output!("s3api-get-bucket-policy__#{naked_domain_name}")
+    policy = JSON.parse(data['Policy'])
+
+    found =
+    policy['Statement'].find do |statement|
+      statement['Effect'] == 'Allow' &&
+      statement['Action'] == 's3:GetObject' &&
+      statement['Resource'] == "arn:aws:s3:::#{naked_domain_name}/*"
+    end
+
+    if found
+      {result: {score: 10, message: "Found valid bucket policy for #{naked_domain_name}"}}
+    else
+      {result: {score: 0, message: "Failed to find valid bucket policy for #{naked_domain_name}"}}
+    end
+  end
+
   def self.should_have_a_naked_domain_bucket_static_website_hosting(manifest:,specific_params:)
     naked_domain_name = specific_params.naked_domain_name
     data = manifest.get_output!('s3api-list-buckets')
