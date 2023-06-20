@@ -27,18 +27,14 @@ class Aws2023::Validator
     state.manifest = manifest
     state.specific_params = specific_params
 
-    #self.networking_validations state
-    #self.cluster_validations state
+    self.networking_validations state
+    self.cluster_validations state
     #self.cicd_validations state
-    self.iac_validations state
+    #self.iac_validations state
 
     pp state.results
 
-    # IaC Validation - AB not sure we need to do this considering
-      # should have CFN stacks named the following: <stack_names>
-
-
-      # should have a cloud map namespace named <cloudmap_namespace>
+    # should have a cloud map namespace named <cloudmap_namespace>
     
     # Frontend Static Website Hosting Validation
       # should have an s3 bucket called <s3-website-bucket-name>
@@ -161,6 +157,15 @@ class Aws2023::Validator
       klass: Aws2023::Validations::Cluster,
       function_name: :should_have_service_sg,
       input_params: [:alb_sg_id]
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_cloudmap_namespace
+    )
+
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_cloudmap_service
     )
   end
 

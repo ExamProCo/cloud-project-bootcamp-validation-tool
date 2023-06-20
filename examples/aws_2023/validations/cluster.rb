@@ -202,4 +202,34 @@ class Aws2023::Validations::Cluster
     end
   end
 
+  def self.should_have_cloudmap_namespace(manifest:,specific_params:)
+    data = manifest.get_output!('servicediscovery-list-namespaces')
+    found = 
+    data['Namespaces'].find do |service|
+      service['Name'] == 'cruddur'
+    end
+
+    if found 
+      {result: {score: 10, message: "Found a CloudMap Namespace named cruddur"}}
+    else
+      {result: {score: 0, message: "Failed to find a CloudMap Namespace named cruddur"}}
+    end
+  end
+
+  def self.should_have_cloudmap_service(manifest:,specific_params:)
+    service_name = specific_params.backend_family
+    data = manifest.get_output!('servicediscovery-list-services')
+
+    found = 
+    data['Services'].find do |service|
+      service['Name'] == service_name
+    end
+
+    if found 
+      {result: {score: 10, message: "Found a CloudMap Service named #{service_name}"}}
+    else
+      {result: {score: 0, message: "Failed to find a CloudMap Service named #{service_name}"}}
+    end
+  end
+
 end
