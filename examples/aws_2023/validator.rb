@@ -28,18 +28,14 @@ class Aws2023::Validator
     state.specific_params = specific_params
 
     #self.networking_validations state
-    self.cluster_validations state
+    #self.cluster_validations state
     #self.cicd_validations state
     #self.iac_validations state
     #self.static_website_hosting_validations state
+    self.db_validations
 
     pp state.results
 
-    # == Primary Db Validation
-    # - should have an RDS instance running
-    # - the RDS instance should be publically avaliable
-    # - the RDS instance should have a security group <sg-rds-id>
-    # - and it should provide access to the fargate service security group <sg-serv-id> on port 5432
 
     # DynamoDB Validation
       # should have a dynamodb table named <db-table-name>
@@ -231,6 +227,23 @@ class Aws2023::Validator
       function_name: :should_have_route53_to_distribution,
       input_params: [:static_website_distribution_domain_name]
     )
+  end
+
+  def self.db_validations state
+    state.process(
+      klass: Aws2023::Validations::StaticWebsiteHosting,
+      function_name: :should_have_public_rds_instance,
+      input_params: [:vpc_id]
+    )
+    state.process(
+      klass: Aws2023::Validations::StaticWebsiteHosting,
+      function_name: :should_have_db_sg
+    )
+    # == Primary Db Validation
+    # - should have an RDS instance running
+    # - the RDS instance should be publically avaliable
+    # - the RDS instance should have a security group <sg-rds-id>
+    # - and it should provide access to the fargate service security group <sg-serv-id> on port 5432
   end
 
 end # class
