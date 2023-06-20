@@ -11,7 +11,8 @@ class Aws2023::State
                 :backend_tg_arn,
                 :alb_sg_id,
                 :static_website_distribution_id,
-                :static_website_distribution_domain_name
+                :static_website_distribution_domain_name,
+                :alb
 
   def initialize
     @results = {}

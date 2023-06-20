@@ -96,7 +96,13 @@ class Aws2023::Validations::Cluster
       found = backend_service['loadBalancers'].first['containerPort'] = 4567
       if found 
         backend_tg_arn = backend_service['loadBalancers'].first['targetGroupArn']
-        {result: {score: 10, message: "Found attached load balancer for the fargate service: #{service_name}"}, backend_tg_arn: backend_tg_arn}
+        {
+          result: {
+            score: 10, 
+            message: "Found attached load balancer for the fargate service: #{service_name}"
+          }, 
+          backend_tg_arn: backend_tg_arn
+        }
       else
         {result: {score: 5, message: "Failed to find an attached load balancer for the fargate service: #{service_name} for port 4567"}}
       end
@@ -232,4 +238,48 @@ class Aws2023::Validations::Cluster
     end
   end
 
+  def self.should_have_route53_to_alb(manifest:,specific_params:)
+    naked_domain_name = specific_params.naked_domain_name
+
+
+    resource_alb = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
+      manifest,
+      'CrdCluster',
+      "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    )
+    alb_arn = resource_alb['PhysicalResourceId']
+
+    data = manifest.get_output!('elbv2-describe-load-balancers')
+
+    alb =
+    data['LoadBalancers'].find do |lb|
+      lb['LoadBalancerArn'] == alb_arn
+    end
+    alb_domain_name = "dualstack.#{alb['DNSName'].downcase}"
+
+    data = manifest.get_output!('route53-list-hosted-zones')
+
+    zone =
+    data['HostedZones'].find do |zone|
+      zone['Name'] == "#{naked_domain_name}."
+    end
+
+    zone_id = zone['Id'].split("/").last
+
+    zone_data = manifest.get_output!("route53-list-resource-record-sets__#{zone_id}")
+
+    record =
+    zone_data['ResourceRecordSets'].find do |record|
+      record['Name'] == "api.#{naked_domain_name}." &&
+      record['Type'] == "A"
+    end
+
+    found = record['AliasTarget']['DNSName'] == "#{alb_domain_name}."
+
+    if found
+      {result: {score: 10, message: "Found route53 pointing to domain name for the api"}}
+    else
+      {result: {score: 0, message: "Failed to find route53 pointing to domain name for the api"}}
+    end
+  end
 end

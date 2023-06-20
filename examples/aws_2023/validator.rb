@@ -28,10 +28,10 @@ class Aws2023::Validator
     state.specific_params = specific_params
 
     #self.networking_validations state
-    #self.cluster_validations state
+    self.cluster_validations state
     #self.cicd_validations state
     #self.iac_validations state
-    self.static_website_hosting_validations state
+    #self.static_website_hosting_validations state
 
     pp state.results
 
@@ -158,6 +158,10 @@ class Aws2023::Validator
     state.process(
       klass: Aws2023::Validations::Cluster,
       function_name: :should_have_cloudmap_service
+    )
+    state.process(
+      klass: Aws2023::Validations::Cluster,
+      function_name: :should_have_route53_to_alb
     )
   end
 
