@@ -26,8 +26,8 @@ class Aws2023::Validations::Authenication
 
     data = manifest.get_output!("cognito-idp-describe-user-pool__#{pool_id}")['UserPool']
 
-    if lambda_arn = data['LambdaConfig'].key?('PostConfirmation')
-      lambda_name = data['LambdaConfig']['PostConfirmation'].split(':').last
+    if data['LambdaConfig'].key?('PostConfirmation')
+      lambda_name = lambda_arn.split(':').last
     end
 
     lambda_data = manifest.get_output("lambda-get-function__#{lambda_name}")['Configuration']

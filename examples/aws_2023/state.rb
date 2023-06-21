@@ -46,12 +46,17 @@ class Aws2023::State
 
     override_params.each{|k,v| arguments[k] = v}
 
+    raise "#{klass}: expected '#{function_name}' function to exist" unless klass.respond_to?(function_name.to_sym)
+
     data = klass.send(function_name, **arguments)
     output_params.each do |param|
       puts "assigning output param: #{param}: #{data[param]}"
       send("#{param}=", data[param])
     end
     rule_name ||= function_name
+
+    raise "#{rule_name}: no data returned" if data.nil?
+    raise "#{rule_name}: no data with result returned" unless data.key?(:result)
     @results[rule_name] = data[:result]
   end
 end

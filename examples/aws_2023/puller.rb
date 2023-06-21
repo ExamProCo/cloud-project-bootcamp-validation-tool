@@ -143,6 +143,10 @@ class Aws2023::Puller
         params: {certificate_arn: 'acm_list_certificates'}
       }, manifest, general_params)
       self.pull_specific_async(task,primary_region,{
+        command: 'apigatewayv2_get_routes',
+        params: {app_id: 'apigatewayv2_get_apis'}
+      }, manifest, general_params)
+      self.pull_specific_async(task,primary_region,{
         command: 'apigatewayv2_get_authorizers',
         params: {app_id: 'apigatewayv2_get_apis'}
       }, manifest, general_params)

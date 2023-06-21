@@ -27,15 +27,15 @@ class Aws2023::Validator
     state.manifest = manifest
     state.specific_params = specific_params
 
-    self.networking_validations state
+    #self.networking_validations state
     #self.cluster_validations state
     #self.cicd_validations state
     #self.iac_validations state
     #self.static_website_hosting_validations state
     #self.db_validations state
     #self.ddb_validations state
-    #self.serverless_validations state
-    self.authenication_validations state
+    self.serverless_validations state
+    #self.authenication_validations state
 
     pp state.results
   end # def self.run
@@ -241,13 +241,15 @@ class Aws2023::Validator
     )
   end
 
-  # Serverless Asset Pipeline Validation
-    # should have an HTTP API Gateway
-      # with an /avatar endpoint
-        # with lambda authorizer
-      # with a proxy endpoint
-        # with lambda authorizer
   def self.serverless_validations state
+    state.process(
+      klass: Aws2023::Validations::Serverless,
+      function_name: :should_have_key_upload_route
+    )
+    state.process(
+      klass: Aws2023::Validations::Serverless,
+      function_name: :should_have_proxy_route
+    )
   end
 
   def self.authenication_validations state
