@@ -27,14 +27,14 @@ class Aws2023::Validator
     state.manifest = manifest
     state.specific_params = specific_params
 
-    #self.networking_validations state
+    self.networking_validations state
     #self.cluster_validations state
     #self.cicd_validations state
     #self.iac_validations state
     #self.static_website_hosting_validations state
     #self.db_validations state
     #self.ddb_validations state
-    self.serverless_validations state
+    #self.serverless_validations state
     self.authenication_validations state
 
     pp state.results
@@ -248,13 +248,17 @@ class Aws2023::Validator
       # with a proxy endpoint
         # with lambda authorizer
   def self.serverless_validations state
-
   end
 
-  # Authenication Validation
-    # should have a Cognito User Pool
-      # with a trigger on post configuration
   def self.authenication_validations state
-
+    state.process(
+      klass: Aws2023::Validations::Authenication,
+      function_name: :should_have_cognito_user_pool
+    )
+    state.process(
+      klass: Aws2023::Validations::Authenication,
+      function_name: :should_have_trigger_on_post_confirmation,
+      input_params: [:vpc_id]
+    )
   end
 end # class

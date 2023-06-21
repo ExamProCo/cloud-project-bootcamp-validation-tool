@@ -115,7 +115,8 @@ task :validate do
     naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
     github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
     cluster_name: ENV['CLUSTER_NAME'],
-    backend_family: ENV['BACKEND_FAMILY']
+    backend_family: ENV['BACKEND_FAMILY'],
+    cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME']
   )
   Aws2023::Validator.run(
     general_params: general_params,
