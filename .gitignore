@@ -21,6 +21,8 @@ output/**/**/**/**/**/*
 output/**/*.json
 /output/**/*.json
 examples/output/**/*.json
+output/**/*.yaml
+/output/**/*.yaml
 
 # Used by dotenv library to load environment variables.
 # .env
