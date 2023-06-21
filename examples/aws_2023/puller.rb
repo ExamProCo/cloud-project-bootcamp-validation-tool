@@ -93,12 +93,16 @@ class Aws2023::Puller
       "www.#{specific_params.naked_domain_name}",
       "assets.#{specific_params.naked_domain_name}"
     ]
+    bucket_names_events = [
+      specific_params.raw_assets_bucket_name,
+      "assets.#{specific_params.naked_domain_name}"
+    ]
     Async do |task|
       self.pull_specific_async(task,'global',{
         command: 's3api_get_bucket_notification_configuration',
         params: {bucket: 's3api_list_buckets'},
         filters: {
-          bucket_names: bucket_names
+          bucket_names: bucket_names_events
         }
       }, manifest, general_params)
       self.pull_specific_async(task,'global',{
@@ -108,13 +112,14 @@ class Aws2023::Puller
           bucket_names: bucket_names
         }
       }, manifest, general_params)
-      self.pull_specific_async(task,'global',{
-        command: 's3api_get_bucket_cors',
-        params: {bucket: 's3api_list_buckets'},
-        filters: {
-          bucket_names: bucket_names
-        }
-      }, manifest, general_params)
+      # We never needed changed CORS for S3 Buckets apparently...
+      #self.pull_specific_async(task,'global',{
+      #  command: 's3api_get_bucket_cors',
+      #  params: {bucket: 's3api_list_buckets'},
+      #  filters: {
+      #    bucket_names: bucket_names
+      #  }
+      #}, manifest, general_params)
       self.pull_specific_async(task,'global',{
         command: 's3api_get_bucket_website',
         params: {bucket: 's3api_list_buckets'},

@@ -20,19 +20,34 @@ class Aws2023::Validations::Serverless
 
     lambda_data = manifest.get_output("lambda-get-function__#{lambda_name}")['Configuration']
 
-    found =
-    lambda_data['Runtime'].match('ruby') &&
-    lambda_data['CodeSize'] > 0 &&
-    integration['ConnectionType'] == 'INTERNET' &&
-    integration['IntegrationMethod'] == 'POST' &&
-    integration['IntegrationType'] == 'AWS_PROXY' &&
-    route['AuthorizationType'] == 'CUSTOM'
+    bucket_name = specific_params.raw_assets_bucket_name
+
+    checks = {
+      runtime: lambda_data['Runtime'].match('ruby'),
+      codesize: lambda_data['CodeSize'] > 0,
+      connecetion_type: integration['ConnectionType'] == 'INTERNET',
+      post: integration['IntegrationMethod'] == 'POST',
+      integration_type: integration['IntegrationType'] == 'AWS_PROXY',
+      authorization_type: route['AuthorizationType'] == 'CUSTOM',
+      env_var_bucket: lambda_data['Environment']['Variables']['UPLOADS_BUCKET_NAME'] == bucket_name
+    }
+    found = checks.values.all?
 
     if found
-      return {result: {score: 10, message: "Found API Gateway route ruby lambda with custom authorization for POST /avatars/key_upload"}}
+      score = 10
+      message = "Found API Gateway route ruby lambda with custom authorization for POST /avatars/key_upload"
     else
-      return {result: {score: 0, message: "Failed to find API Gateway route ruby lambda with custom authorization for POST /avatars/key_upload"}}
+      score = 0
+      message = "Failed to find API Gateway route ruby lambda with custom authorization for POST /avatars/key_upload"
     end
+
+    return {
+      result: {
+        score: score,
+        message: message,
+        checks: checks
+      }
+    }
   end
 
   def self.should_have_proxy_route(manifest:,specific_params:)
@@ -81,11 +96,9 @@ class Aws2023::Validations::Serverless
     }
   end
 
-end
+  def should_have_s3_bucket(manifest:,specific_params:)
+    
+  end
 
-# Serverless Asset Pipeline Validation
-  # should have an HTTP API Gateway
-    # with an /avatar endpoint
-      # with lambda authorizer
-    # with a proxy endpoint
-      # with lambda authorizer
+
+end

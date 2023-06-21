@@ -45,7 +45,8 @@ task :permit do
   specific_params = Aws2023::SpecificParams::Puller.new(
     naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
     cluster_name: ENV['CLUSTER_NAME'],
-    backend_family: ENV['BACKEND_FAMILY']
+    backend_family: ENV['BACKEND_FAMILY'],
+    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME']
   )
 
   Aws2023::Permissioner.run(
@@ -73,7 +74,8 @@ task :pull do
   specific_params = Aws2023::SpecificParams::Puller.new(
     naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
     cluster_name: ENV['CLUSTER_NAME'],
-    backend_family: ENV['BACKEND_FAMILY']
+    backend_family: ENV['BACKEND_FAMILY'],
+    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME']
   )
 
   Aws2023::Puller.run(
@@ -117,7 +119,8 @@ task :validate do
     cluster_name: ENV['CLUSTER_NAME'],
     backend_family: ENV['BACKEND_FAMILY'],
     cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
-    apigateway_api_id: ENV['APIGATEWAY_API_ID']
+    apigateway_api_id: ENV['APIGATEWAY_API_ID'],
+    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME']
   )
   Aws2023::Validator.run(
     general_params: general_params,
