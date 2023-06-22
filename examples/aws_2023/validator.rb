@@ -250,6 +250,29 @@ class Aws2023::Validator
       klass: Aws2023::Validations::Serverless,
       function_name: :should_have_proxy_route
     )
+    state.process(
+      klass: Aws2023::Validations::Serverless,
+      function_name: :should_have_s3_bucket_with_event_notification
+    )
+    state.process(
+      klass: Aws2023::Validations::Serverless,
+      function_name: :should_block_public_access_for_assets_bucket,
+    )
+    state.process(
+      klass: Aws2023::Validations::Serverless,
+      function_name: :should_have_a_cloudfront_distrubition_to_assets,
+      output_params: [
+        :assets_distribution_id,
+        :assets_distribution_domain_name
+      ]
+    )
+    state.process(
+      klass: Aws2023::Validations::Serverless,
+      function_name: :should_have_route53_to_distribution_for_assets,
+      input_params: [
+        :assets_distribution_domain_name
+      ]
+    )
   end
 
   def self.authenication_validations state

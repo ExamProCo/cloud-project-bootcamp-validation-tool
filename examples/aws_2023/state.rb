@@ -12,7 +12,9 @@ class Aws2023::State
                 :alb_sg_id,
                 :serv_sg_id,
                 :static_website_distribution_id,
-                :static_website_distribution_domain_name
+                :static_website_distribution_domain_name,
+                :assets_distribution_id,
+                :assets_distribution_domain_name
 
   def initialize
     @results = {}
@@ -57,6 +59,6 @@ class Aws2023::State
 
     raise "#{rule_name}: no data returned" if data.nil?
     raise "#{rule_name}: no data with result returned" unless data.key?(:result)
-    @results[rule_name] = data[:result]
+    @results[rule_name] = data
   end
 end
