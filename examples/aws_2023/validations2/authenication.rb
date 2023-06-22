@@ -1,4 +1,4 @@
-class Aws2023::Validations2::Authenication
+Cpbvt::Tester::Runner.describe :authenication do
   test "should_have_cognito_user_pool" do |cognito_user_pool_name|
     pool_id   = assert_load('cognito-idp-list-user-pools').find('Name',cognito_user_pool_name).returns('Id')
     user_pool = assert_load("cognito-idp-describe-user-pool__#{pool_id}").returns('UserPool')
@@ -10,13 +10,13 @@ class Aws2023::Validations2::Authenication
   end
 
   test "should_have_trigger_on_post_confirmation" do |cognito_user_pool_name, vpc_id|
-    pool_id   = assert_load('cognito-idp-list-user-pools').find('Name',cognito_user_pool_name).return('Id')
-    user_pool = assert_load("cognito-idp-describe-user-pool__#{pool_id}").return('UserPool')
+    pool_id   = assert_load('cognito-idp-list-user-pools').find('Name',cognito_user_pool_name).returns('Id')
+    user_pool = assert_load("cognito-idp-describe-user-pool__#{pool_id}").returns('UserPool')
 
-    lambda_arn = assert_json('LambdaConfig','PostConfirmation').return(:all)
+    lambda_arn = assert_json('LambdaConfig','PostConfirmation').returns(:all)
     lambda_name = lambda_arn.split(':').last
 
-    lambda_config = assert_load("lambda-get-function__#{lambda_name}").return('Configuration')
+    lambda_config = assert_load("lambda-get-function__#{lambda_name}").returns('Configuration')
     
     assert_json(lambda_config,'Runtime').expects_match('python3')
     assert_json(lambda_config,'CodeSize').expects_gt(0)

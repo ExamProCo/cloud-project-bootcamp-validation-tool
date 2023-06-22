@@ -1,7 +1,7 @@
-class Aws2023::Validations2::Cicd
+Cpbvt::Tester::Runner.describe :cicd do
   test "should_have_a_codepipeline" do
-    pipeline_name = assert_cfn_resource('CrdCicd',"AWS::CodePipeline::Pipeline").return('PhysicalResourceId')
-    pipeline_name2 = assert_load("codepipeline-get-pipeline__#{pipeline_name}").return('name')
+    pipeline_name = assert_cfn_resource('CrdCicd',"AWS::CodePipeline::Pipeline").returns('PhysicalResourceId')
+    pipeline_name2 = assert_load("codepipeline-get-pipeline__#{pipeline_name}").returns('name')
 
     set_pass_message "Found a pipeline: #{pipeline_name} via a CFN Stack called CrdCicd"
     set_fail_message "Failed to find a pipeline via CFN stack called CrdCicd"
@@ -10,10 +10,10 @@ class Aws2023::Validations2::Cicd
   end # self.should_have_a_codepipeline
 
   test "should_have_a_source_from_github" do |pipeline_name, github_full_repo_name|
-    pipeline = assert_load("codepipeline-get-pipeline__#{pipeline_name}").return(:all)
+    pipeline = assert_load("codepipeline-get-pipeline__#{pipeline_name}").returns(:all)
 
     source_codestar_action =
-    assert_json(pipeline,'pipeline','stages').find_and_return do |stage|
+    assert_json(pipeline,'pipeline','stages').find_and_returns do |stage|
       stage['actions'].find do |action|
         if action['actionTypeId']['provider'] == 'CodeStarSourceConnection'
           return_result action
@@ -31,7 +31,7 @@ class Aws2023::Validations2::Cicd
     pipeline = assert_load("codepipeline-get-pipeline__#{pipeline_name}")
 
     build_action =
-    assert_json(pipeline,'pipeline','stages').find_and_return do |stage|
+    assert_json(pipeline,'pipeline','stages').find_and_returns do |stage|
       stage['actions'].find do |action|
         if action['actionTypeId']['provider'] == 'CodeBuild'
           return_result action
@@ -39,9 +39,9 @@ class Aws2023::Validations2::Cicd
       end
     end
 
-    project_name = assert_json(build_action,'configuration').return('ProjectName')
+    project_name = assert_json(build_action,'configuration').returns('ProjectName')
     
-    projects = assert_load("codebuild-batch-get-projects__#{project_name}").return('projects')
+    projects = assert_load("codebuild-batch-get-projects__#{project_name}").returns('projects')
     project = projects.first
 
     assert_json(project,'tags').expects_any? do |tag|
@@ -56,16 +56,9 @@ class Aws2023::Validations2::Cicd
     set_fail_message "Failed to find a codebuild action within the codepipeline and the codebuild project has privledge mode with tag group:cruddur-cicid"
   end
 
-  def self.should_have_a_deploy_stage(manifest:,specific_params:,pipeline_name:)
-    resource_cluster = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
-      manifest,
-      'CrdCluster',
-      "AWS::ECS::Cluster"
-    )
-    cluster_name = resource_cluster['PhysicalResourceId']
-    # ----
-
-    pipeline = manifest.get_output!("codepipeline-get-pipeline__#{pipeline_name}")
+  test "should_have_a_deploy_stage", do |pipeline_name|
+    cluster_name = assert_cfn_resource('CrdCluster',"AWS::ECS::Cluster").returns('PhysicalResourceId')
+    pipeline = assert_load!("codepipeline-get-pipeline__#{pipeline_name}")
 
     deploy_action = nil
 
@@ -77,14 +70,21 @@ class Aws2023::Validations2::Cicd
         found
       end
     end
-    found_cluster = deploy_action['configuration']['ClusterName'] == cluster_name
-    found_service = deploy_action['configuration']['ServiceName'] == 'backend-flask'
 
-    if found_cluster && found_service
-      {result: {score: 10, message: "Found a Deploy with ECS for backend-flask service within the CodePipeline stages"}}
-    else
-      {result: {score: 0, message: "Failed to find Deploy with ECS for backend-flask service within the CodePipeline stages"}}
+    deploy_action =
+    assert_json(pipeline,'pipeline','stages').find_and_returns do |stage|
+      stage['actions'].find do |action|
+        if action['actionTypeId']['provider'] == 'ECS' &&
+           action['actionTypeId']['category'] == 'Deploy'
+          return_result action
+        end
+      end
     end
+ 
+    assert_json(deploy_action,'configuration','ClusterName').expects_eq(cluster_name)
+    assert_json(deploy_action,'configuration','ServiceName').expects_eq('backend-flask')
 
+    set_pass_message "Found a Deploy with ECS for backend-flask service within the CodePipeline stages"
+    set_fail_message "Failed to find Deploy with ECS for backend-flask service within the CodePipeline stages"
   end # def self.should_have_a_deploy_stage
 end # class Aws2023::Validations::Cicd

@@ -2,6 +2,7 @@
 # names in our files
 module Cpbvt
   module Validations; end
+  module Tester; end
   module Payloads
     module Aws
       module Commands; end
