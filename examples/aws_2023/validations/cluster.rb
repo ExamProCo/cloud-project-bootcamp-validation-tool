@@ -282,4 +282,6 @@ class Aws2023::Validations::Cluster
       {result: {score: 0, message: "Failed to find route53 pointing to domain name for the api"}}
     end
   end
+
+  # check for an ssl certificate?
 end

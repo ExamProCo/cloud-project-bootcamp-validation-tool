@@ -233,4 +233,7 @@ class Aws2023::Validations::Serverless
       }
     }
   end  
+
+  # check for a file?
+  # check for an ssl certificate?
 end
