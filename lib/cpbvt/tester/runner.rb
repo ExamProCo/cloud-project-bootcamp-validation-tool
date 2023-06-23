@@ -1,3 +1,4 @@
+require 'pp'
 class Cpbvt::Tester::Runner
   @@describes = {}
   @@loaded = false
@@ -28,7 +29,8 @@ class Cpbvt::Tester::Runner
     end
 
     # output the report
-    puts report.to_json
+    results = JSON.parse(report.to_json)
+    pp results
 
   end
 

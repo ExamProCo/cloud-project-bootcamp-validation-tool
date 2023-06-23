@@ -170,6 +170,7 @@ task :validate2 do
     apigateway_api_id: ENV['APIGATEWAY_API_ID'],
     raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME']
   )
+
   validations_path =  "/workspace/cloud-project-bootcamp-validation-tool/examples/aws_2023/validations2"
   Aws2023::Validator2.run(
     validations_path: validations_path,

@@ -20,15 +20,34 @@ class Cpbvt::Tester::AssertLoad
     @data_raw = nil
 
     # load data
-    @data_raw = manifest.get_output(manifest_payload_key)
-    self.assert! 'load_data', 
-
-    # apply filter if has key
-    if key
-      self.assert! 'load_data_key'
-      @data_first_filter = @data_raw[key]
-    end
-  end
+    begin
+      @data_raw = manifest.get_output(manifest_payload_key)
+      if @data_raw.is_a?(Hash)
+        self.pass! kind: 'load_data', status: :pass, message: 'loaded data from manifest', data: { key: manifest_payload_key }
+        if key
+          if @data_raw.key?(key)
+            @data_first_filter = @data_raw[key]
+            if @data_first_filter.nil?
+              self.fail! kind: 'load_data:first_filter', status: :fail, message: "first filter data returned nil", data: { key: key }
+            else
+              self.pass! kind: 'load_data:first_filter', status: :pass, message: "first filter data returned data", data: { key: key }
+              return self
+            end
+          else
+            self.fail! kind: 'load_data:first_filter', status: :fail, message: "first filter data key exists", data: { key: key }
+          end # if @data_raw.key?
+        end # if key
+      elsif @data_raw.nil?
+        self.fail! kind: 'load_data', status: :fail, message: 'loaded data from manifest and nil was found', data: {key: manifest_payload_key }
+      else
+        self.fail! kind: 'load_data', status: :fail, message: 'payload key found in manifest file', data: {key: manifest_payload_key}
+      end # if @data_raw.is_a?
+    rescue Errno::ENOENT
+      self.fail! kind: 'load_data', status: :fail, message: 'File not found', data: {key: manifest_payload_key}
+    rescue Errno::EACCES
+      self.fail! kind: 'load_data', status: :fail, message: 'access denied', data: {key: manifest_payload_key}
+    end # begin
+  end # def initialize
 
   def find key, value
     data = @data_first_filter || @data_raw
@@ -42,7 +61,25 @@ class Cpbvt::Tester::AssertLoad
     return data[key]
   end
 
-  def assert!
-    @report.assert! @describe_key, @spec_key
+  def pass! kind:, status:, message:, data: {}
+    @report.pass!(
+      describe_key: @describe_key, 
+      spec_key: @spec_key,
+      kind: kind,
+      status: status,
+      message: message,
+      data: data
+    )
+  end
+
+  def fail! kind:, status:, message:, data: {}
+    @report.pass!(
+      describe_key: @describe_key, 
+      spec_key: @spec_key,
+      kind: kind,
+      status: status,
+      message: message,
+      data: data
+    )
   end
 end
