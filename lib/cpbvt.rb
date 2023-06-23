@@ -20,5 +20,8 @@ Dir.glob(aws_commands_path,&method(:require))
 # ---
 require_relative 'cpbvt/payloads/aws/policy'
 
+require_relative 'cpbvt/tester/report'
 require_relative 'cpbvt/tester/runner'
 require_relative 'cpbvt/tester/describe'
+require_relative 'cpbvt/tester/spec'
+require_relative 'cpbvt/tester/assert_load'

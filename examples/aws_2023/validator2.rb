@@ -28,6 +28,7 @@ class Aws2023::Validator2
     state.specific_params = specific_params
 
     Cpbvt::Tester::Runner.run!(
+      state: state,
       validations_path: "/workspace/cloud-project-bootcamp-validation-tool/examples/aws_2023/validations2"
     )
 
