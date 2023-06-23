@@ -52,13 +52,38 @@ class Cpbvt::Tester::AssertLoad
   def find key, value
     data = @data_first_filter || @data_raw
     @data_found = data.find{|t| t[key] == value}
-    return self
+    if @data_found
+      self.pass! kind: 'load_data:find', status: :pass, message: 'found value to match key', data: {
+        key: key,
+        expected_value: value
+      }
+      return self
+    else
+      values = data.map{|t| t[key] }
+      self.fail! kind: 'load_data:find', status: :fail, message: 'failed to find value to match key', data: {
+        key: key,
+        expected_value: value,
+        found_values: values
+      }
+    end
   end
 
   def returns key
     data = @data_found || @data_raw
-    return data if key == :all
-    return data[key]
+    if key == :all || key.nil?
+      self.fail! kind: 'load_data:return', status: :pass, message: 'return all data'
+      return data 
+    end
+    if data.key?(key)
+      self.fail! kind: 'load_data:return', status: :pass, message: 'return all data with provided key', data: { 
+        provided_key: key 
+      }
+      return data[key]
+    else
+      self.fail! kind: 'load_data:return', status: :pass, message: 'failed to return data with provided key since key does not exist', data: {
+        provided_key: key 
+      }
+    end
   end
 
   def pass! kind:, status:, message:, data: {}
