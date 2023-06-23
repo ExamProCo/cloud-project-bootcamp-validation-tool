@@ -24,7 +24,13 @@ class Cpbvt::Tester::Runner
     # run the actual specs
     @@describes.each do |describe_key,describe_instance|
       describe_instance.specs.each do |spec_key,spec_instance|
-        spec_instance.evaluate! report, manifest, general_params, specific_params, dynamic_params
+        begin
+          spec_instance.evaluate! report, manifest, general_params, specific_params, dynamic_params
+        rescue Cpbvt::Tester::AssertFail
+          results = JSON.parse(report.to_json)
+          pp results
+          return
+        end
       end
     end
 
