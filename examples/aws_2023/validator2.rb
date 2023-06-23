@@ -2,7 +2,12 @@ require 'pp'
 
 class Aws2023::Validator2
 
-  def self.run(general_params:,specific_params:)
+  def self.run(
+    validations_path:,
+    general_params:,
+    specific_params:,
+    dynamic_params:
+  )
     unless general_params.valid?
       puts general_params.errors.full_messages
       raise "failed to pass general params validation"
@@ -24,24 +29,13 @@ class Aws2023::Validator2
     )
     manifest.load_from_file!
     manifest.pull!
-    state.manifest = manifest
-    state.specific_params = specific_params
 
     Cpbvt::Tester::Runner.run!(
-      state: state,
-      validations_path: "/workspace/cloud-project-bootcamp-validation-tool/examples/aws_2023/validations2"
+      validations_path: "/workspace/cloud-project-bootcamp-validation-tool/examples/aws_2023/validations2",
+      manifest: manifest,
+      general_params: general_params,
+      specific_params: specific_params,
+      dynamic_params: dynamic_params
     )
-
-    #self.networking_validations state
-    #self.cluster_validations state
-    #self.cicd_validations state
-    #self.iac_validations state
-    #self.static_website_hosting_validations state
-    #self.db_validations state
-    #self.ddb_validations state
-    #self.serverless_validations state
-    #self.authenication_validations state
-
-    #pp state.results
   end # def self.run
 end # class

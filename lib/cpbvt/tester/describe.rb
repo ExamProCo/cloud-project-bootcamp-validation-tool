@@ -17,6 +17,7 @@ class Cpbvt::Tester::Describe
     key = key.to_sym
     # test is a revserved word which is why we say test_instances
     spec_instance = Cpbvt::Tester::Spec.new(
+      describe: self,
       key: key,
       context: block
     )

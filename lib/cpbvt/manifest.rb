@@ -115,7 +115,6 @@ class Cpbvt::Manifest
     return false unless @payloads.key?(key)
     output_file = @payloads[key][:output_file]
     json_data = File.read(output_file)
-    puts "json_data: #{json_data}"
     hash = JSON.parse(json_data)
     return hash
   end
@@ -124,7 +123,7 @@ class Cpbvt::Manifest
   def get_output! key
     key = _format_key(key)
     unless @payloads.key?(key)
-      raise "#{key} not found in manifest"
+      raise StandardError.new "#{key} not found in manifest"
       return
     end
     output_file = @payloads[key][:output_file]

@@ -12,6 +12,7 @@ module Aws2023
   module SpecificParams
   end
 end
+require_relative 'aws_2023/dynamic_params.rb'
 require_relative 'aws_2023/specific_params.rb'
 require_relative 'aws_2023/permissioner.rb'
 require_relative 'aws_2023/puller.rb'
@@ -158,6 +159,8 @@ task :validate2 do
   puts "validating for: aws_2023 =="
   puts run_uuid
 
+  dynamic_params = Aws2023::DynamicParams.new
+
   specific_params = Aws2023::SpecificParams::Validator.new(
     naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
     github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
@@ -167,7 +170,10 @@ task :validate2 do
     apigateway_api_id: ENV['APIGATEWAY_API_ID'],
     raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME']
   )
+  validations_path =  "/workspace/cloud-project-bootcamp-validation-tool/examples/aws_2023/validations2"
   Aws2023::Validator2.run(
+    validations_path: validations_path,
+    dynamic_params: dynamic_params,
     general_params: general_params,
     specific_params: specific_params
   )

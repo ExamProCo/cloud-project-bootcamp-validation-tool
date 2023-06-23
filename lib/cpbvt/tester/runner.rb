@@ -2,7 +2,13 @@ class Cpbvt::Tester::Runner
   @@describes = {}
   @@loaded = false
 
-  def self.run! validations_path:, state:
+  def self.run!(
+    validations_path:, 
+    manifest:, 
+    general_params:, 
+    specific_params:, 
+    dynamic_params:
+  )
     report = Cpbvt::Tester::Report.new
     # loads the validations files
     # and the registers the describes and their specs
@@ -17,12 +23,12 @@ class Cpbvt::Tester::Runner
     # run the actual specs
     @@describes.each do |describe_key,describe_instance|
       describe_instance.specs.each do |spec_key,spec_instance|
-        spec_instance.evaluate! state
+        spec_instance.evaluate! report, manifest, general_params, specific_params, dynamic_params
       end
     end
 
     # output the report
-    puts reports.to_json
+    puts report.to_json
 
   end
 
