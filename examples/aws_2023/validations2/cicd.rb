@@ -14,20 +14,24 @@ Cpbvt::Tester::Runner.describe :cicd do |t|
     pipeline_name = t.dynamic_params.pipeline_name
     pipeline = assert_load("codepipeline-get-pipeline__#{pipeline_name}",'pipeline').returns(:all)
 
-    #source_codestar_action =
-    #assert_json(pipeline,'pipeline','stages').find_and_returns do |stage|
-    #  stage['actions'].find do |action|
-    #    if action['actionTypeId']['provider'] == 'CodeStarSourceConnection'
-    #      return_result action
-    #    end
-    #  end
-    #end
+    assert_json(pipeline,'stages').expects_not_nil
 
-    #assert_json(source_codestar_action,'configuration','BranchName').expects_eq('prod')
-    #assert_json(source_codestar_action,'configuration','FullRepositoryId').expects_eq(github_full_repo_name)
+    source_codestar_action = nil
+    pipeline['stages'].each do |stage|
+      source_codestar_action =
+      stage['actions'].find do |action|
+        if action['actionTypeId']['provider'] == 'CodeStarSourceConnection'
+          source_codestar_action = action
+        end
+      end
+      break if source_codestar_action
+    end
 
-    #set_pass_message "Found a CodeStar source action for Branch prod for the repo at: #{github_full_repo_name}"
-    #set_fail_message "Failedto find a CodeStar source action for Branch prod for the repo at: #{github_full_repo_name}"
+    assert_json(source_codestar_action,'configuration','BranchName').expects_eq('prod')
+    assert_json(source_codestar_action,'configuration','FullRepositoryId').expects_eq(github)
+
+    set_pass_message "Found a CodeStar source action for Branch prod for the repo at: #{github}"
+    set_fail_message "Failed to find a CodeStar source action for Branch prod for the repo at: #{github}"
   end
 
   spec :should_have_a_build_stage do |t|

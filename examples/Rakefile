@@ -183,9 +183,11 @@ task :validate2 do
 
   print "\n\n\n"
   results.each do |key,group|
-    puts key
+    puts "== #{key.capitalize} ====================================".truncate(50, omission: '')
     group.each do |key,spec|
-      puts "+--" + key
+      puts ""
+      puts "#{key} =============================".truncate(50, omission: '')
+      puts ""
       spec.each do |assert|
         kind =
         if assert['status'] == 'pass'
@@ -196,7 +198,7 @@ task :validate2 do
         message = assert['message']
 
         data = assert['data'].map { |key, value| "#{key}=#{value}" }.join(' ')
-        puts "+---- #{kind} #{message} #{data}"
+        puts "#{kind} #{message} #{data}"
       end
     end
   end

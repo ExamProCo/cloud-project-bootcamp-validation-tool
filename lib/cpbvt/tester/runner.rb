@@ -27,7 +27,8 @@ class Cpbvt::Tester::Runner
         begin
           spec_instance.evaluate! report, manifest, general_params, specific_params, dynamic_params
         rescue Cpbvt::Tester::AssertFail => e
-          return JSON.parse(report.to_json)
+          # just skip to the next one...
+          next
         end
       end
     end

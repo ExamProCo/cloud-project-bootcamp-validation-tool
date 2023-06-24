@@ -20,7 +20,7 @@ class Cpbvt::Tester::AssertJson
   end
 
   def expects_eq value
-    if @data == value
+    if @value == value
       self.pass!(
         kind: 'assert_json:expects_eq', 
         message: 'value was equal to', 
