@@ -1,4 +1,4 @@
-class AssertJson
+class Cpbvt::Tester::AssertJson
   def initialize describe_key:, spec_key:, report:,data:, keys:
     @json_path = []
     @describe_key = describe_key
@@ -23,7 +23,6 @@ class AssertJson
     if @data == value
       self.pass!(
         kind: 'assert_json:expects_eq', 
-        status: :pass, 
         message: 'value was equal to', 
         data: { 
           provided_value: value,
@@ -34,7 +33,6 @@ class AssertJson
     else
       self.fail!(
         kind: 'assert_json:expects_eq',
-        status: :fail, 
         message: 'value was not equal to', 
         data: { 
           provided_value: value,
@@ -43,13 +41,13 @@ class AssertJson
         }
       )
     end
+    return self
   end
 
   def expects_gt value
     if @value.is_a?(Numeric) && @value > value
       self.pass!(
         kind: 'assert_json:expects_gt', 
-        status: :pass, 
         message: 'value was greater than', 
         data: { 
           provided_value: value,
@@ -60,7 +58,6 @@ class AssertJson
     else
       self.fail!(
         kind: 'assert_json:expects_match',
-        status: :fail, 
         message: 'value was not greater than', 
         data: { 
           provided_value: value,
@@ -69,13 +66,13 @@ class AssertJson
         }
       )
     end
+    return self
   end
 
   def expects_match value
     if @value.is_a?(String) && @value.match(value)
       self.pass!(
         kind: 'assert_json:expects_match', 
-        status: :pass, 
         message: 'matched as expected', 
         data: { 
           provided_value: value,
@@ -86,7 +83,6 @@ class AssertJson
     else
       self.fail!(
         kind: 'assert_json:expects_match',
-        status: :fail, 
         message: 'failed to match', 
         data: { 
           provided_value: value,
@@ -95,47 +91,69 @@ class AssertJson
         }
       )
     end
+    return self
+  end
+
+  def expects_not_nil
+    unless @value.nil?
+      self.pass!(
+        kind: 'assert_json:expects_not_nil', 
+        message: 'value was found to be not nil', 
+        data: { 
+          actual_value: @value,
+          json_path: @json_path
+        }
+      )
+    else
+      self.fail!(
+        kind: 'assert_json:expects_not_nil',
+        message: 'failed since value is nil', 
+        data: { 
+          actual_value: @value,
+          json_path: @json_path
+        }
+      )
+    end
+    return self
   end
 
   def returns key
-    data = @data
+    data = @value
     if key == :all || key.nil?
-      self.fail! kind: 'assert_json:return', status: :pass, message: 'return all data', data: {
+      self.pass! kind: 'assert_json:returns', message: 'return all data', data: {
         json_path: @json_path
       }
       return data 
     end
     if data.key?(key)
-      self.pass! kind: 'assert_json:return', status: :pass, message: 'return all data with provided key', data: { 
+      self.pass! kind: 'assert_json:returns', message: 'return all data with provided key', data: { 
         provided_key: key,
         json_path: @json_path + ".#{key}"
       }
       return data[key]
     else
-      self.fail! kind: 'assert_json:return', status: :pass, message: 'failed to return data with provided key since key does not exist', data: {
+      self.fail! kind: 'assert_json:returns', message: 'failed to return data with provided key since key does not exist', data: {
         provided_key: key ,
         json_path: @json_path + ".#{key}"
       }
     end
   end
 
-  def pass! kind:, status:, message:, data: {}
+  def pass! kind:, message:, data: {}
     @report.pass!(
       describe_key: @describe_key, 
       spec_key: @spec_key,
       kind: kind,
-      status: status,
       message: message,
       data: data
     )
   end
 
-  def fail! kind:, status:, message:, data: {}
+  def fail! kind:, message:, data: {}
     @report.fail!(
       describe_key: @describe_key, 
       spec_key: @spec_key,
       kind: kind,
-      status: status,
       message: message,
       data: data
     )

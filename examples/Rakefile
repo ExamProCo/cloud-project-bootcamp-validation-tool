@@ -172,12 +172,34 @@ task :validate2 do
   )
 
   validations_path =  "/workspace/cloud-project-bootcamp-validation-tool/examples/aws_2023/validations2"
+
+  results =
   Aws2023::Validator2.run(
     validations_path: validations_path,
     dynamic_params: dynamic_params,
     general_params: general_params,
     specific_params: specific_params
   )
+
+  print "\n\n\n"
+  results.each do |key,group|
+    puts key
+    group.each do |key,spec|
+      puts "+--" + key
+      spec.each do |assert|
+        kind =
+        if assert['status'] == 'pass'
+          "\e[32m#{assert['kind']}\e[0m" 
+        else
+          "\e[31m#{assert['kind']}\e[0m"
+        end
+        message = assert['message']
+
+        data = assert['data'].map { |key, value| "#{key}=#{value}" }.join(' ')
+        puts "+---- #{kind} #{message} #{data}"
+      end
+    end
+  end
 end
 #task :chat do 
 #  path = "/workspace/cloud-project-bootcamp-validation-tool/examples/output/aws-bootcamp-2023/user-da124fec-133b-45c5-8423-04b768c886c2/run-1685322793-80559fe1-534d-408c-b1c3-1628e3485d12/ca-central-1/ec2-describe-subnets.json"

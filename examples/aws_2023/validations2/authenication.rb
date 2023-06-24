@@ -17,7 +17,7 @@ Cpbvt::Tester::Runner.describe :authenication do
     pool_id   = assert_load('cognito-idp-list-user-pools','UserPools').find('Name',name).returns('Id')
     user_pool = assert_load("cognito-idp-describe-user-pool__#{pool_id}").returns('UserPool')
 
-    lambda_arn = assert_json(user_pool,'LambdaConfig','PostConfirmation').returns(:all)
+    lambda_arn = assert_json(user_pool,'LambdaConfig','PostConfirmation').expects_not_nil.returns(:all)
     lambda_name = lambda_arn.split(':').last
 
     lambda_config = assert_load("lambda-get-function__#{lambda_name}").returns('Configuration')

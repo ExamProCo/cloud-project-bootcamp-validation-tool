@@ -26,18 +26,13 @@ class Cpbvt::Tester::Runner
       describe_instance.specs.each do |spec_key,spec_instance|
         begin
           spec_instance.evaluate! report, manifest, general_params, specific_params, dynamic_params
-        rescue Cpbvt::Tester::AssertFail
-          results = JSON.parse(report.to_json)
-          pp results
-          return
+        rescue Cpbvt::Tester::AssertFail => e
+          return JSON.parse(report.to_json)
         end
       end
     end
 
-    # output the report
-    results = JSON.parse(report.to_json)
-    pp results
-
+    return JSON.parse(report.to_json)
   end
 
   def self.describe key, &block

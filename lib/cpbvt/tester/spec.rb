@@ -41,6 +41,15 @@ class Cpbvt::Tester::Spec
   end
 
   def assert_cfn_resource stack_name, resource_type
+    obj = Cpbvt::Tester::AssertCfnResource.new(
+      describe_key: self.describe.key,
+      spec_key: self.key,
+      report: @report,
+      manifest: @manifest,
+      stack_name: stack_name,
+      resource_type: resource_type
+    )
+    return obj
   end
 
   def assert_load manifest_payload_key, key=nil
@@ -56,7 +65,7 @@ class Cpbvt::Tester::Spec
   end
 
   def assert_json data, *keys
-    obj = AssertJson.new(
+    obj = Cpbvt::Tester::AssertJson.new(
       describe_key: self.describe.key,
       spec_key: self.key,
       report: @report,
