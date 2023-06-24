@@ -6,7 +6,8 @@ class Aws2023::Validator2
     validations_path:,
     general_params:,
     specific_params:,
-    dynamic_params:
+    dynamic_params:,
+    load_order: []
   )
     unless general_params.valid?
       puts general_params.errors.full_messages
@@ -32,6 +33,7 @@ class Aws2023::Validator2
 
     Cpbvt::Tester::Runner.run!(
       validations_path: "/workspace/cloud-project-bootcamp-validation-tool/examples/aws_2023/validations2",
+      load_order: load_order,
       manifest: manifest,
       general_params: general_params,
       specific_params: specific_params,

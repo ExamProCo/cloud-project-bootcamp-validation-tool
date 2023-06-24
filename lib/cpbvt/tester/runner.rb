@@ -5,6 +5,7 @@ class Cpbvt::Tester::Runner
 
   def self.run!(
     validations_path:, 
+    load_order: [],
     manifest:, 
     general_params:, 
     specific_params:, 
@@ -22,7 +23,9 @@ class Cpbvt::Tester::Runner
     end
 
     # run the actual specs
-    @@describes.each do |describe_key,describe_instance|
+    load_order ||= @@describe.keys
+    load_order.each do |describe_key|
+      describe_instance = @@describes[describe_key]
       describe_instance.specs.each do |spec_key,spec_instance|
         begin
           spec_instance.evaluate! report, manifest, general_params, specific_params, dynamic_params

@@ -178,11 +178,22 @@ task :validate2 do
     validations_path: validations_path,
     dynamic_params: dynamic_params,
     general_params: general_params,
-    specific_params: specific_params
+    specific_params: specific_params,
+    load_order: [
+      :networking,
+      :cluster,
+      :cicd,
+      :iac,
+      :static_website_hosting,
+      :db,
+      :ddb,
+      :serverless,
+      :authenication
+    ]
   )
 
-  print "\n\n\n"
   results.each do |key,group|
+    puts ""
     puts "== #{key.capitalize} ====================================".truncate(50, omission: '')
     group.each do |key,spec|
       puts ""
