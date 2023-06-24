@@ -82,4 +82,8 @@ class Cpbvt::Tester::Spec
   def set_fail_message msg
     @fail = msg
   end
+
+  def set_state_value key, value
+    @dynamic_params.send("#{key}=", value)
+  end
 end

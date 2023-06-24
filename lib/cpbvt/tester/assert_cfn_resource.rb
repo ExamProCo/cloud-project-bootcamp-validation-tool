@@ -80,11 +80,11 @@ class Cpbvt::Tester::AssertCfnResource
   def returns key
     data = @data
     if key == :all || key.nil?
-      self.fail! kind: 'asset_cfn_resource:returns', message: 'return all data'
+      self.pass! kind: 'asset_cfn_resource:returns', message: 'return all data'
       return data 
     end
     if data.key?(key)
-      self.fail! kind: 'asset_cfn_resource:returns', message: 'return all data with provided key', data: { 
+      self.pass! kind: 'asset_cfn_resource:returns', message: 'return all data with provided key', data: { 
         provided_key: key 
       }
       return data[key]
@@ -106,7 +106,7 @@ class Cpbvt::Tester::AssertCfnResource
   end
 
   def fail! kind:, message:, data: {}
-    @report.pass!(
+    @report.fail!(
       describe_key: @describe_key, 
       spec_key: @spec_key,
       kind: kind,

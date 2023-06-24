@@ -71,20 +71,29 @@ class Cpbvt::Tester::AssertLoad
   end
 
   def returns key
-    data = @data_found || @data_raw
+    data = @data_found || @data_first_filter || @data_raw
     if key == :all || key.nil?
-      self.fail! kind: 'load_data:returns', message: 'return all data'
+      self.pass!(
+        kind: 'load_data:returns',
+        message: 'return all data'
+      )
       return data 
     end
     if data.key?(key)
-      self.fail! kind: 'load_data:returns', message: 'return all data with provided key', data: { 
+      self.pass!(
+        kind: 'load_data:returns',
+        message: 'return all data with provided key', 
+        data: { 
         provided_key: key 
-      }
+      })
       return data[key]
     else
-      self.fail! kind: 'load_data:returns', message: 'failed to return data with provided key since key does not exist', data: {
-        provided_key: key 
-      }
+      self.fail!(
+        kind: 'load_data:returns',
+        message: 'failed to return data with provided key since key does not exist', 
+        data: {
+          provided_key: key 
+      })
     end
   end
 
@@ -99,7 +108,7 @@ class Cpbvt::Tester::AssertLoad
   end
 
   def fail! kind:, message:, data: {}
-    @report.pass!(
+    @report.fail!(
       describe_key: @describe_key, 
       spec_key: @spec_key,
       kind: kind,
