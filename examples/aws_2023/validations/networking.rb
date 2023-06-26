@@ -40,6 +40,7 @@ class Aws2023::Validations::Networking
         score += 3
         message += " Provisioned with Cloudformation."
       end
+
       {result: {score: score, message: message},vpc_id: vpc['VpcId']}
     elsif vpcs.count > 1
       # Partial marks if we find multiple even though we expect 1.
