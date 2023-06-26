@@ -112,7 +112,7 @@ class Cpbvt::Tester::AssertFind
       }
       return data 
     end
-    if data.key?(key)
+    if !data.nil? && data.key?(key)
       self.pass!(
         kind: kind, 
         message: 'return all data with provided key', 
@@ -123,7 +123,7 @@ class Cpbvt::Tester::AssertFind
     else
       self.fail!(
         kind: kind, 
-        message: 'failed to return data with provided key since key does not exist', 
+        message: 'failed to return data with provided key since key does not exist or data is nil', 
         data: {
           provided_key: key
         }

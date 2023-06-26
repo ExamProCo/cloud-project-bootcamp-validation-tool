@@ -34,22 +34,22 @@ Cpbvt::Tester::Runner.describe :networking do |t|
     igws = assert_load('ec2_describe_internet_gateways','InternetGateways').returns(:all)
 
     igw_id =
-    assert_find(igws) do |assert, vpc|
-      assert.expects_any?(vpc,'Tags', label: "Tags:group:cruddur-networking") do |tag|
+    assert_find(igws) do |assert, igw|
+      assert.expects_any?(igw,'Tags', label: "Tags:group:cruddur-networking") do |tag|
         tag['Key'] == 'group' &&
         tag['Value'] == 'cruddur-networking'
       end
-      assert.expects_any?(vpc,'Attachments') do |attachment|
-        attachment['State'] == 'avaliable' &&
+      assert.expects_any?(igw,'Attachments',label: "State:available,vpcid:#{vpc_id}") do |attachment|
+        attachment['State'] == 'available' &&
         attachment['VpcId'] == vpc_id
       end
     end.returns('InternetGatewayId') #assert_find
-    binding.pry
 
     set_pass_message "Found an IGW attached to the vpc: #{vpc_id} tagged with group:cruddur-networking"
     set_fail_message "Failed to find an IGW attached to the vpc: #{vpc_id} tagged with group:cruddur-networking"
 
-    binding.pry
+    igw_id = false if igw_id.nil?
+
     set_state_value :igw_id, igw_id
   end # spec
 end
