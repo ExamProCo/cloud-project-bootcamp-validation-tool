@@ -192,12 +192,10 @@ task :validate2 do
     ]
   )
 
-  results.each do |key,group|
-    puts ""
-    puts "== #{key.capitalize} ====================================".truncate(50, omission: '')
-    group.each do |key,spec|
+  results.each do |describe_key,group|
+    group.each do |spec_key,spec|
       puts ""
-      puts "#{key} =============================".truncate(50, omission: '')
+      puts "#{describe_key.capitalize}.#{spec_key} ========="
       puts ""
       spec.each do |assert|
         kind =
@@ -210,10 +208,25 @@ task :validate2 do
 
         data = assert['data'].map { |key, value| "#{key}=#{value}" }.join(' ')
         puts "#{kind} #{message} #{data}"
-      end
-    end
-  end
-end
+
+        if assert.key?('results')
+          assert['results'].each do |result|
+            result.each do |assert_result|
+              rkind =
+              if assert_result['status'] == 'pass'
+                "\e[32m#{assert_result['kind']}\e[0m" 
+              else
+                "\e[31m#{assert_result['kind']}\e[0m"
+              end
+              rdata = assert_result['data'].map { |key, value| "#{key}=#{value}" }.join(' ')
+              puts "#{rkind} #{assert_result['message']} #{data}"
+            end
+          end # assert[:results].each
+        end # if assert.key?
+      end # spec.each
+    end # group.each
+  end # results.each
+end #task
 #task :chat do 
 #  path = "/workspace/cloud-project-bootcamp-validation-tool/examples/output/aws-bootcamp-2023/user-da124fec-133b-45c5-8423-04b768c886c2/run-1685322793-80559fe1-534d-408c-b1c3-1628e3485d12/ca-central-1/ec2-describe-subnets.json"
 #  data = File.read(path)

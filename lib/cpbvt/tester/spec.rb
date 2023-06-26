@@ -75,6 +75,17 @@ class Cpbvt::Tester::Spec
     return obj
   end
 
+  def assert_find data, &block
+    obj = Cpbvt::Tester::AssertFind.new(
+      describe_key: self.describe.key,
+      spec_key: self.key,
+      report: @report,
+      data: data,
+      context: block
+    )
+    return obj
+  end
+
   def set_pass_message msg
     @pass_msg = msg
   end

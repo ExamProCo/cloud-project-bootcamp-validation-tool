@@ -1,5 +1,5 @@
 class Cpbvt::Tester::AssertJson
-  def initialize describe_key:, spec_key:, report:,data:, keys:
+  def initialize(describe_key:, spec_key:, report:,data:, keys:)
     @json_path = []
     @describe_key = describe_key
     @spec_key = spec_key
