@@ -219,7 +219,7 @@ task :validate2 do
                 "\e[31m#{assert_result['kind']}\e[0m"
               end
               rdata = assert_result['data'].map { |key, value| "#{key}=#{value}" }.join(' ')
-              puts "#{rkind} #{assert_result['message']} #{data}"
+              puts "#{rkind} #{assert_result['message']} #{rdata}"
             end
           end # assert[:results].each
         end # if assert.key?

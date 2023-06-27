@@ -133,5 +133,92 @@ Cpbvt::Tester::Runner.describe :cluster do
   end
 
   spec :should_have_service_sg do |t|
+    cluster_name = t.specific_params.cluster_name
+    family = t.specific_params.backend_family
+    alb_sg_id = t.dynamic_params.alb_sg_id
+
+    backend_service = assert_load("ecs-describe-services__#{cluster_name}",'services')
+      .find('serviceName', family)
+      .returns(:all)
+
+    sg_id = assert_json(backend_service,'networkConfiguration','awsvpcConfiguration','securityGroups').returns(:first)
+
+    sg = assert_load('ec2-describe-security-groups','SecurityGroups').find('GroupId',sg_id).returns(:all)
+
+    rules = assert_json(sg,'IpPermissions').returns(:all)
+
+    alb_sg_rule =
+    assert_find(rules) do |assert,rule|
+      assert.expects_eq(rule,'FromPort', 4567)
+      assert.expects_eq(rule,'ToPort', 4567)
+      pair = rule['UserIdGroupPairs'].first
+      assert.expects_eq(pair,'GroupIp',alb_sg_id)
+    end
+
+    assert_not_nil(alb_sg_rule)
+
+    set_state_value :serv_sg_id, sg_id
+
+    set_pass_message "Found a Security Group for the the backend service with ingress to the ALB SG on port 4567"
+    set_fail_message "Failed to find a Security Group for the the backend service with ingress to the ALB SG on port 4567"
+  end
+
+  spec :should_have_target_group do |t|
+    backend_tg_arn = t.dynamic_params.backend_tg_arn
+
+    tg_id = backend_tg_arn.split("/").last
+
+    tg = assert_load('elbv2-describe-target-groups','TargetGroups').find('TargetGroupArn',backend_tg_arn).returns(:all)
+    tg_health_data = assert_load("elbv2-describe-target-health__#{tg_id}").returns(:all)
+
+    assert_json(tg,'Port').expects_eq(4567)
+    assert_json(tg,'HealthCheckPort').expects_eq(4567.to_s)
+    assert_json(tg,'HealthCheckEnabled').expects_true
+    assert_json(tg,'HealthCheckPath').expects_eq('/api/health-check')
+
+    desc = assert_json(tg_health_data,'TargetHealthDescriptions').returns(:first)
+
+    assert_json(desc,'Target','Port').expects_eq(4567)
+    assert_json(desc,'HealthCheckPort').expects_eq(4567.to_s)
+    assert_json(desc,'TargetHealth','State').expects_eq('healthy')
+
+    set_pass_message "Found Target Group with healthy target to backend-flask on port 4567"
+    set_fail_message "Failed to find Target Group with healthy target to backend-flask on port 4567"
+  end
+
+  spec :should_have_cloudmap_namespace do |t|
+    namespace = assert_load('servicediscovery-list-namespaces','Namespaces').find('Name','cruddur').returns(:all)
+
+    assert_not_nil(namespace)
+
+    set_pass_message "Found a CloudMap Namespace named cruddur"
+    set_fail_message "Failed to find a CloudMap Namespace named cruddur"
+  end
+
+  spec :should_have_route53_to_alb do |t|
+    naked_domain_name = t.specific_params.naked_domain_name
+
+    alb_arn = assert_cfn_resource('CrdCluster',"AWS::ElasticLoadBalancingV2::LoadBalancer").returns('PhysicalResourceId')
+
+    alb = assert_load('elbv2-describe-load-balancers','LoadBalancers').find('LoadBalancerArn',alb_arn).returns(:all)
+
+    alb_domain_name = "dualstack.#{alb['DNSName'].downcase}"
+
+    zone_arn = assert_load('route53-list-hosted-zones','HostedZones').find('Name',"#{naked_domain_name}.").returns('Id')
+
+    zone_id = zone_arn.split("/").last
+
+    record_sets = assert_load("route53-list-resource-record-sets__#{zone_id}").returns('ResourceRecordSets')
+
+    record =
+    assert_find(record_sets) do |assert,record|
+      assert.expects_eq(record,'Name',"api.#{naked_domain_name}.")
+      assert.expects_eq(record,'Type',"A")
+    end.returns(:all)
+
+    assert_json(record,'AliasTarget','DNSName').expects_eq("#{alb_domain_name}.")
+
+    set_pass_message "Found route53 pointing to domain name for the api"
+    set_fail_message "Failed to find route53 pointing to domain name for the api"
   end
 end

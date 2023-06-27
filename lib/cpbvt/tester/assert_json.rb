@@ -19,6 +19,28 @@ class Cpbvt::Tester::AssertJson
     return self
   end
 
+  def expects_true
+    kind =  "assert_json:expects_true"
+    data_payload = {}
+    if @value == true
+      self.pass!(kind: kind, data: data_payload, message: 'value was found to be true')
+    else
+      self.fail!(kind: kind, data: data_payload, message: 'value was not found to be true')
+    end
+    return self
+  end
+
+  def expects_false
+    kind =  "assert_json:expects_false"
+    data_payload = {}
+    if @value == false
+      self.pass!(kind: kind, data: data_payload, message: 'value was equal found to be false')
+    else
+      self.fail!(kind: kind, data: data_payload, message: 'value was not found to be false')
+    end
+    return self
+  end
+
   def expects_eq value
     if @value == value
       self.pass!(
