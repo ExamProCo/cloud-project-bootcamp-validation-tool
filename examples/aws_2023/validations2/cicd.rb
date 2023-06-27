@@ -27,6 +27,8 @@ Cpbvt::Tester::Runner.describe :cicd do |t|
       break if source_codestar_action
     end
 
+    assert_not_nil(source_codestar_action)
+
     assert_json(source_codestar_action,'configuration','BranchName').expects_eq('prod')
     assert_json(source_codestar_action,'configuration','FullRepositoryId').expects_eq(github)
 
@@ -35,65 +37,70 @@ Cpbvt::Tester::Runner.describe :cicd do |t|
   end
 
   spec :should_have_a_build_stage do |t|
-    # t.dynamic_params.pipeline_name
-    #pipeline = assert_load("codepipeline-get-pipeline__#{pipeline_name}")
+    pipeline_name = t.dynamic_params.pipeline_name
+    pipeline = assert_load("codepipeline-get-pipeline__#{pipeline_name}",'pipeline').returns(:all)
 
-    #build_action =
-    #assert_json(pipeline,'pipeline','stages').find_and_returns do |stage|
-    #  stage['actions'].find do |action|
-    #    if action['actionTypeId']['provider'] == 'CodeBuild'
-    #      return_result action
-    #    end
-    #  end
-    #end
+    assert_json(pipeline,'stages').expects_not_nil
 
-    #project_name = assert_json(build_action,'configuration').returns('ProjectName')
+    build_action = nil
+    pipeline['stages'].each do |stage|
+      source_codestar_action =
+      stage['actions'].find do |action|
+        if action['actionTypeId']['provider'] == 'CodeBuild'
+          build_action = action
+        end
+      end
+      break if build_action
+    end
+
+    assert_not_nil(build_action)
+
+    project_name = assert_json(build_action,'configuration').returns('ProjectName')
     
-    #projects = assert_load("codebuild-batch-get-projects__#{project_name}").returns('projects')
-    #project = projects.first
+    project = assert_load("codebuild-batch-get-projects__#{project_name}",'projects').returns(:first)
 
-    #assert_json(project,'tags').expects_any? do |tag|
-    #  expects_json(tag,'key').eq('group')
-    #  expects_json(tag,'value').eq('cruddur-cicd')
-    #end
+    tags = assert_json(project,'tags').returns(:all)
 
-    #expects_json(project,'source','type').epects_eq('CODEPIPELINE')
-    #expects_json(project,'environment','privilegedMode').expects_true
+    tag =
+    assert_find(tags) do |assert, tag|
+      assert.expects_eq(tag,'key','group')
+      assert.expects_eq(tag,'value','cruddur-cicd')
+    end.returns(:all)
 
-    #set_pass_message "Found a codebuild action within the codepipeline and the codebuild project has privledge mode with tag group:cruddur-cicid"
-    #set_fail_message "Failed to find a codebuild action within the codepipeline and the codebuild project has privledge mode with tag group:cruddur-cicid"
+    assert_not_nil(tag)
+
+    assert_json(project,'source','type').expects_eq('CODEPIPELINE')
+    assert_json(project,'environment','privilegedMode').expects_true
+
+    set_pass_message "Found a codebuild action within the codepipeline and the codebuild project has privledge mode with tag group:cruddur-cicid"
+    set_fail_message "Failed to find a codebuild action within the codepipeline and the codebuild project has privledge mode with tag group:cruddur-cicid"
   end
 
   spec :should_have_a_deploy_stage do |t|
-    # t.dynamic_params.pipeline_name
-    #cluster_name = assert_cfn_resource('CrdCluster',"AWS::ECS::Cluster").returns('PhysicalResourceId')
-    #pipeline = assert_load!("codepipeline-get-pipeline__#{pipeline_name}")
+    cluster_name = t.specific_params.cluster_name
+    pipeline_name = t.dynamic_params.pipeline_name
+    pipeline = assert_load("codepipeline-get-pipeline__#{pipeline_name}",'pipeline').returns(:all)
 
-    #deploy_action = nil
+    assert_json(pipeline,'stages').expects_not_nil
 
-    #pipeline['pipeline']['stages'].find do |stage|
-    #  stage['actions'].find do |action|
-    #    found = action['actionTypeId']['provider'] == 'ECS' &&
-    #            action['actionTypeId']['category'] == 'Deploy'
-    #    deploy_action = action if found
-    #    found
-    #  end
-    #end
-
-    #deploy_action =
-    #assert_json(pipeline,'pipeline','stages').find_and_returns do |stage|
-    #  stage['actions'].find do |action|
-    #    if action['actionTypeId']['provider'] == 'ECS' &&
-    #       action['actionTypeId']['category'] == 'Deploy'
-    #      return_result action
-    #    end
-    #  end
-    #end
+    deploy_action = nil
+    pipeline['stages'].each do |stage|
+      source_codestar_action =
+      stage['actions'].find do |action|
+        if action['actionTypeId']['provider'] == 'ECS' &&
+           action['actionTypeId']['category'] == 'Deploy'
+          deploy_action = action
+        end
+      end
+      break if deploy_action
+    end
  
-    #assert_json(deploy_action,'configuration','ClusterName').expects_eq(cluster_name)
-    #assert_json(deploy_action,'configuration','ServiceName').expects_eq('backend-flask')
+    assert_not_nil(deploy_action)
 
-    #set_pass_message "Found a Deploy with ECS for backend-flask service within the CodePipeline stages"
-    #set_fail_message "Failed to find Deploy with ECS for backend-flask service within the CodePipeline stages"
+    assert_json(deploy_action,'configuration','ClusterName').expects_eq(cluster_name)
+    assert_json(deploy_action,'configuration','ServiceName').expects_eq('backend-flask')
+
+    set_pass_message "Found a Deploy with ECS for backend-flask service within the CodePipeline stages"
+    set_fail_message "Failed to find Deploy with ECS for backend-flask service within the CodePipeline stages"
   end # def self.should_have_a_deploy_stage
 end # class Aws2023::Validations::Cicd
