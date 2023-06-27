@@ -119,13 +119,20 @@ class Cpbvt::Tester::AssertFind
     return self
   end
 
-  def expects_true data, key
-    value = data[key]
+  def expects_true data, key=nil
+    if key
+      value = data[key]
+      data_payload = {
+        key: key,
+        provided_value: value
+      }
+    else
+      value = data
+      data_payload = {
+        provided_value: value
+      }
+    end
     kind =  "assert_find[#{self.iter_index}]:expects_true"
-    data_payload = {
-      key: key,
-      provided_value: value
-    }
     if value == true
       self.iter_pass!(kind: kind, data: data_payload, message: 'value was found to be true')
     else
