@@ -76,8 +76,13 @@ class Cpbvt::Tester::Spec
     return self
   end
 
-  def assert_include? data, key, expected_value
-    provided_value = data[key]
+  def assert_include? data, key=nil, expected_value
+    if key
+      provided_value = data[key]
+    else
+      provided_value = data
+    end
+
     if provided_value.include?(expected_value)
       self.pass!(
         kind: 'spec:assert_include?', 
