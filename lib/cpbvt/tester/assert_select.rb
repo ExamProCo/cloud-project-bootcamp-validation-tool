@@ -1,4 +1,4 @@
-class Cpbvt::Tester::AssertFind
+class Cpbvt::Tester::AssertSelect
   def initialize(describe_key:, spec_key:, report:, data:, context:)
     @describe_key = describe_key
     @spec_key = spec_key
@@ -13,11 +13,11 @@ class Cpbvt::Tester::AssertFind
     @report.iter_start!(
       describe_key: @describe_key, 
       spec_key: @spec_key,
-      kind: 'assert_find'
+      kind: 'assert_select'
     )
 
     found =
-    @data.find do |data|
+    @data.select do |data|
       #@self_before_instance_eval = eval("self", @context.binding)
       #instance_eval &@context, data
       @report.iter_add!(
@@ -29,7 +29,7 @@ class Cpbvt::Tester::AssertFind
       @report.iter_last(@describe_key,@spec_key).all?{|t| t[:status] == 'pass'}
     end
 
-    if found
+    if found.any?
       status = 'pass'
       @found_data = found
     else
@@ -46,9 +46,9 @@ class Cpbvt::Tester::AssertFind
   def expects_any? data, key, label: nil, &block
     kind =
     if label
-      "assert_find[#{self.iter_index}]:expects_any?:#{label}"
+      "assert_select[#{self.iter_index}]:expects_any?:#{label}"
     else
-      "assert_find[#{self.iter_index}]:expects_any?"
+      "assert_select[#{self.iter_index}]:expects_any?"
     end
 
     provided_value = data[key]
@@ -74,7 +74,7 @@ class Cpbvt::Tester::AssertFind
   end
 
   def expects_eq data, key, expected_value
-    kind =  "assert_find[#{self.iter_index}]:expects_eq"
+    kind =  "assert_select[#{self.iter_index}]:expects_eq"
     provided_value = data[key]
     data_payload = {
       key: key,
@@ -91,7 +91,7 @@ class Cpbvt::Tester::AssertFind
 
   def expects_true data, key
     value = data[key]
-    kind =  "assert_find[#{self.iter_index}]:expects_true"
+    kind =  "assert_select[#{self.iter_index}]:expects_true"
     data_payload = {
       key: key,
       provided_value: value
@@ -106,13 +106,13 @@ class Cpbvt::Tester::AssertFind
 
   def expects_false data, key
     value = data[key]
-    kind =  "assert_find[#{self.iter_index}]:expects_false"
+    kind =  "assert_select[#{self.iter_index}]:expects_false"
     data_payload = {
       key: key,
       provided_value: value
     }
     if value == false
-      self.iter_pass!(kind: kind, data: data_payload, message: 'value was equal found to be false')
+      self.iter_pass!(kind: kind, data: data_payload, message: 'value was found to be false')
     else
       self.iter_fail!(kind: kind, data: data_payload, message: 'value was not found to be false')
     end
@@ -120,7 +120,7 @@ class Cpbvt::Tester::AssertFind
   end
 
   def returns key
-    kind =  "assert_find:returns"
+    kind =  "assert_select:returns"
     data = @found_data
     if key == :all || key.nil?
       self.pass! kind: kind, message: 'return all data', data: {
