@@ -40,7 +40,7 @@ class Cpbvt::Tester::AssertLoad
             return self
           end
         else
-          self.fail! kind: 'load_data:first_filter', message: "first filter data key exists", data: { key: key }
+          self.fail! kind: 'load_data:first_filter', message: "first filter data key does not exists", data: { key: key }
         end # if @data_raw.key?
       end # if key
     elsif @data_raw.nil?
@@ -78,6 +78,20 @@ class Cpbvt::Tester::AssertLoad
         message: 'return all data'
       )
       return data 
+    end
+    if key == :first
+      if data.is_a?(Array) && data.count > 0
+        self.pass!(
+          kind: 'load_data:returns',
+          message: 'returns first record'
+        )
+        return data.first
+      else
+        self.fail!(
+          kind: 'load_data:returns',
+          message: 'failed to return first record'
+        )
+      end
     end
     if data.key?(key)
       self.pass!(

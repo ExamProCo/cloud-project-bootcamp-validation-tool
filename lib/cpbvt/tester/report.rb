@@ -55,7 +55,7 @@ class Cpbvt::Tester::Report
 
   # only for iter
   def iter_index describe_key, spec_key
-    @specs[describe_key][spec_key].last[:results].size
+    @specs[describe_key][spec_key].last[:results].size-1
   end
 
   def iter_add!(describe_key:,spec_key:)

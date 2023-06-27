@@ -125,6 +125,20 @@ class Cpbvt::Tester::AssertJson
       }
       return data 
     end
+    if key == :first
+      if data.is_a?(Array) && data.count > 0
+        self.pass!(
+          kind: 'assert_json:returns',
+          message: 'returns first record'
+        )
+        return data.first
+      else
+        self.fail!(
+          kind: 'assert_json:returns',
+          message: 'failed to return first record'
+        )
+      end
+    end
     if data.key?(key)
       self.pass! kind: 'assert_json:returns', message: 'return all data with provided key', data: { 
         provided_key: key,

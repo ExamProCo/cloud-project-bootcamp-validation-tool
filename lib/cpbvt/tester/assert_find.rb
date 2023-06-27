@@ -1,5 +1,8 @@
 class Cpbvt::Tester::AssertFind
   def initialize(describe_key:, spec_key:, report:, data:, context:)
+    unless data.is_a?(Array)
+      raise "expected Array but got #{data.class.to_s}"
+    end
     @describe_key = describe_key
     @spec_key = spec_key
     @report = report
@@ -43,7 +46,29 @@ class Cpbvt::Tester::AssertFind
     )
   end
 
-  def expects_any? data, key, label: nil, &block
+  def expects_match data, value
+    kind =  "assert_find[#{self.iter_index}]:expects_match"
+    if data.is_a?(String) && data.match(value)
+      self.iter_pass!(
+        kind: kind,
+        message: 'matched as expected', 
+        data: { 
+          provided_value: data
+        }
+      )
+    else
+      self.iter_fail!(
+        kind: kind,
+        message: 'failed to match', 
+        data: { 
+          provided_value: value
+        }
+      )
+    end
+    return self
+  end
+
+  def expects_any? data, key=nil, label: nil, &block
     kind =
     if label
       "assert_find[#{self.iter_index}]:expects_any?:#{label}"
@@ -51,10 +76,15 @@ class Cpbvt::Tester::AssertFind
       "assert_find[#{self.iter_index}]:expects_any?"
     end
 
-    provided_value = data[key]
-    data_payload = {
-      key: key,
-    }
+    if key.nil?
+      provided_value = data
+      data_payload = {}
+    else
+      provided_value = data[key]
+      data_payload = {
+        key: key,
+      }
+    end
 
     if provided_value.nil?
       self.iter_fail!(kind: kind, data: data_payload, message: 'any items was found to be nil')

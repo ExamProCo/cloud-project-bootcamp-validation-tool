@@ -52,6 +52,54 @@ class Cpbvt::Tester::Spec
     return obj
   end
 
+  def assert_eq data, key, expected_value
+    provided_value = data[key]
+    if provided_value == expected_value
+      self.pass!(
+        kind: 'spec:assert_eq', 
+        message: 'value was equal to', 
+        data: { 
+          provided_value: provided_value,
+          expected_value: expected_value
+        }
+      )
+    else
+      self.fail!(
+        kind: 'spec:assert_eq',
+        message: 'value was not equal to', 
+        data: { 
+          provided_value: provided_value,
+          expected_value: expected_value
+        }
+      )
+    end
+    return self
+  end
+
+  def assert_include? data, key, expected_value
+    provided_value = data[key]
+    if provided_value.include?(expected_value)
+      self.pass!(
+        kind: 'spec:assert_include?', 
+        message: 'value was included', 
+        data: { 
+          provided_value: provided_value,
+          expected_value: expected_value
+        }
+      )
+    else
+      self.fail!(
+        kind: 'spec:assert_include?',
+        message: 'value was not included', 
+        data: { 
+          provided_value: provided_value,
+          expected_value: expected_value
+        }
+      )
+    end
+    return self
+  end
+
   def assert_not_nil data, label: nil
     if label.nil?
       kind = "assert_not_nil"
@@ -132,5 +180,25 @@ class Cpbvt::Tester::Spec
 
   def set_state_value key, value
     @dynamic_params.send("#{key}=", value)
+  end
+
+  def pass! kind:, message:, data: {}
+    @report.pass!(
+      describe_key: self.describe.key, 
+      spec_key: self.key,
+      kind: kind,
+      message: message,
+      data: data
+    )
+  end
+
+  def fail! kind:, message:, data: {}
+    @report.fail!(
+      describe_key: self.describe.key, 
+      spec_key: self.key,
+      kind: kind,
+      message: message,
+      data: data
+    )
   end
 end
