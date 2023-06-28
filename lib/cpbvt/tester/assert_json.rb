@@ -1,5 +1,8 @@
 class Cpbvt::Tester::AssertJson
   def initialize(describe_key:, spec_key:, report:,data:, keys:)
+    unless data.is_a?(Hash)
+      raise "expected Hash but got #{data.class.to_s}"
+    end
     @json_path = []
     @describe_key = describe_key
     @spec_key = spec_key
@@ -37,6 +40,32 @@ class Cpbvt::Tester::AssertJson
       self.pass!(kind: kind, data: data_payload, message: 'value was equal found to be false')
     else
       self.fail!(kind: kind, data: data_payload, message: 'value was not found to be false')
+    end
+    return self
+  end
+
+  def expects_start_with value
+    kind =  "assert_json:expects_start_with"
+    data_payload = {
+      expecfted_start_with: value
+    }
+    if @value.start_with?(value)
+      self.pass!(kind: kind, data: data_payload, message: 'value was found to start with')
+    else
+      self.fail!(kind: kind, data: data_payload, message: 'value did not start with')
+    end
+    return self
+  end
+
+  def expects_end_with value
+    kind =  "assert_json:expects_end_with"
+    data_payload = {
+      expecfted_end_with: value
+    }
+    if @value.end_with?(value)
+      self.pass!(kind: kind, data: data_payload, message: 'value was found to end with')
+    else
+      self.fail!(kind: kind, data: data_payload, message: 'value did not end with')
     end
     return self
   end

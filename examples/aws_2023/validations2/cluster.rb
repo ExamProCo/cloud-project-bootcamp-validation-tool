@@ -55,7 +55,7 @@ Cpbvt::Tester::Runner.describe :cluster do
     cluster_name = t.specific_params.cluster_name
     tasks = assert_load("ecs-describe-tasks",'tasks').returns(:all)
 
-    assert_json(tasks).expects_not_nil
+    assert_not_nil(tasks)
 
     container = nil
     tasks.each do |task|

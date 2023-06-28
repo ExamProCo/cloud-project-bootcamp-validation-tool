@@ -206,7 +206,11 @@ task :validate2 do
         end
         message = assert['message']
 
-        data = assert['data'].map { |key, value| "#{key}=#{value}" }.join(' ')
+        data = nil
+        if assert.key('data')
+          data = assert['data'].map { |key, value| "#{key}=#{value}" }.join(' ')
+        end
+
         puts "#{kind} #{message} #{data}"
 
         if assert.key?('results')

@@ -1,5 +1,5 @@
 class Cpbvt::Tester::AssertFind
-  def initialize(describe_key:, spec_key:, report:, data:, context:)
+  def initialize(describe_key:, spec_key:, report:, data: {}, context:)
     unless data.is_a?(Array)
       raise "expected Array but got #{data.class.to_s}"
     end
@@ -103,9 +103,16 @@ class Cpbvt::Tester::AssertFind
     return self
   end
 
-  def expects_eq data, key, expected_value
-    kind =  "assert_find[#{self.iter_index}]:expects_eq"
-    provided_value = data[key]
+  def expects_eq data, *args 
+    expected_value = args.pop
+    key = nil
+    key = args.first if args.count > 0
+    kind = "assert_find[#{self.iter_index}]:expects_eq"
+    if key.nil?
+      provided_value = data
+    else
+      provided_value = data[key]
+    end
     data_payload = {
       key: key,
       provided_value: provided_value,

@@ -52,81 +52,97 @@ class Cpbvt::Tester::Spec
     return obj
   end
 
-  def assert_eq data, key, expected_value
-    provided_value = data[key]
-    if provided_value == expected_value
-      self.pass!(
-        kind: 'spec:assert_eq', 
-        message: 'value was equal to', 
-        data: { 
-          provided_value: provided_value,
-          expected_value: expected_value
-        }
-      )
+  def assert_start_with data, *args
+    expected_value = args.pop
+    key = nil
+    key = args.first if args.length > 0
+    kind = 'spec:start_with'
+
+    provided_value = key ? data[key] : data
+
+    payload_data = {
+      provided_value: provided_value,
+      expected_value: expected_value
+    }
+    if provided_value.start_with?(expected_value)
+      self.pass!(kind: kind, message: 'value was equal to', data: payload_data)
     else
-      self.fail!(
-        kind: 'spec:assert_eq',
-        message: 'value was not equal to', 
-        data: { 
-          provided_value: provided_value,
-          expected_value: expected_value
-        }
-      )
+      self.fail!(kind: kind, message: 'value was not equal to', data: payload_data)
     end
     return self
   end
 
-  def assert_include? data, key=nil, expected_value
-    if key
-      provided_value = data[key]
-    else
-      provided_value = data
-    end
+  def assert_end_with data, *args
+    expected_value = args.pop
+    key = nil
+    key = args.first if args.length > 0
+    kind = 'spec:end_with'
 
-    if provided_value.include?(expected_value)
-      self.pass!(
-        kind: 'spec:assert_include?', 
-        message: 'value was included', 
-        data: { 
-          provided_value: provided_value,
-          expected_value: expected_value
-        }
-      )
+    provided_value = key ? data[key] : data
+
+    payload_data = {
+      provided_value: provided_value,
+      expected_value: expected_value
+    }
+    if provided_value.end_with?(expected_value)
+      self.pass!(kind: kind, message: 'value was equal to', data: payload_data)
     else
-      self.fail!(
-        kind: 'spec:assert_include?',
-        message: 'value was not included', 
-        data: { 
-          provided_value: provided_value,
-          expected_value: expected_value
-        }
-      )
+      self.fail!(kind: kind, message: 'value was not equal to', data: payload_data)
+    end
+    return self
+  end
+
+  def assert_eq data, *args
+    expected_value = args.pop
+    key = nil
+    key = args.first if args.length > 0
+    kind = 'spec:assert_eq'
+
+    provided_value = key ? data[key] : data
+
+    payload_data = {
+      provided_value: provided_value,
+      expected_value: expected_value
+    }
+    if provided_value == expected_value
+      self.pass!(kind: kind, message: 'value was equal to', data: payload_data)
+    else
+      self.fail!(kind: kind, message: 'value was not equal to', data: payload_data)
+    end
+    return self
+  end
+
+  def assert_include? data, *args
+    expected_value = args.pop
+    key = nil
+    key = args.first if args.length > 0
+
+    kind = 'spec:assert_include?'
+    provided_value = key ? data[key] : data
+
+    payload_data = {
+      provided_value: provided_value,
+      expected_value: expected_value
+    }
+    if provided_value.include?(expected_value)
+      self.pass!(kind: kind, message: 'value was included', data: payload_data)
+    else
+      self.fail!(kind: kind, message: 'value was not included', data: payload_data)
     end
     return self
   end
 
   def assert_not_nil data, label: nil
+    kind =
     if label.nil?
-      kind = "assert_not_nil"
+      "assert_not_nil"
     else
-      kind = "assert_not_nil:#{label}"
+      "assert_not_nil:#{label}"
     end
     unless data.nil?
-      @report.pass!(
-        describe_key: self.describe.key,
-        spec_key: self.key,
-        kind: kind,
-        message: "Found that it not nil as expected",
-        data: {}
-      )
+      self.pass!(kind: kind, message: "Found that it not nil as expected", data: {})
     else
-      @report.fail!(
-        describe_key: self.describe.key,
-        spec_key: self.key,
-        kind: kind,
-        message: "It was found to be nil",
-        data: {}
-      )
+      self.fail!(kind: kind, message: "It was found to be nil", data: {})
     end
   end
 
