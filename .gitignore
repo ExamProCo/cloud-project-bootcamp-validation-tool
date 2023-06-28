@@ -21,6 +21,7 @@ output/**/**/**/**/**/*
 output/**/*.json
 /output/**/*.json
 examples/output/**/*.json
+examples/output/**/*.yaml
 output/**/*.yaml
 /output/**/*.yaml
 

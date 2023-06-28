@@ -1,4 +1,6 @@
+require 'fileutils'
 require 'yaml'
+
 class Cpbvt::Payloads::Aws::Policy
   include Cpbvt::Payloads::Aws::Policies::Acm
   include Cpbvt::Payloads::Aws::Policies::Apigatewayv2
@@ -58,6 +60,10 @@ class Cpbvt::Payloads::Aws::Policy
       "user-#{general_params.user_uuid}",
       "cross-account-role.yaml"
     )
+
+    dirpath = File.dirname output_path
+    FileUtils.mkdir_p(dirpath)
+
     File.open(output_path, 'w') do |f|
       f.write(cfn_template.to_yaml)
     end

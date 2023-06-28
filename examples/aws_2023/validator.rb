@@ -27,15 +27,15 @@ class Aws2023::Validator
     state.manifest = manifest
     state.specific_params = specific_params
 
-    #self.networking_validations state
-    #self.cluster_validations state
-    #self.cicd_validations state
-    #self.iac_validations state
-    #self.static_website_hosting_validations state
-    #self.db_validations state
-    #self.ddb_validations state
+    self.networking_validations state
+    self.cluster_validations state
+    self.cicd_validations state
+    self.iac_validations state
+    self.static_website_hosting_validations state
+    self.db_validations state
+    self.ddb_validations state
     self.serverless_validations state
-    #self.authenication_validations state
+    self.authenication_validations state
 
     pp state.results
   end # def self.run
