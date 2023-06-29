@@ -3,6 +3,7 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
+
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/lambda/get-function.html
 def lambda_get_function(function_name:)
 <<~COMMAND

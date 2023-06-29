@@ -8,7 +8,7 @@ def cognito_idp_describe_user_pool(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "cognito-idp:DescribeUserPool",
-    "Resource" => "arn:aws:cognito-idp:#{region}:#{aws_account_id}:userpool/user-pool-id"
+    "Resource" => "arn:aws:cognito-idp:#{region}:#{aws_account_id}:userpool/*"
 }
 end
 
@@ -36,7 +36,7 @@ def cognito_idp_list_users(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "cognito-idp:ListUsers",
-    "Resource" => "arn:aws:cognito-idp:#{region}:#{aws_account_id}:userpool/user-pool-id"
+    "Resource" => "arn:aws:cognito-idp:#{region}:#{aws_account_id}:userpool/*"
   }
 end
 
@@ -45,7 +45,7 @@ def cognito_idp_describe_user_pool_client(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "cognito-idp:DescribeUserPoolClient",
-    "Resource" => "arn:aws:cognito-idp:#{region}:#{aws_account_id}:userpool/user-pool-id/client/client-id"
+    "Resource" => "arn:aws:cognito-idp:#{region}:#{aws_account_id}:userpool/*/client/*"
   }
 end
   

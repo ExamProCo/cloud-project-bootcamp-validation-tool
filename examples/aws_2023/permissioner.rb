@@ -39,7 +39,7 @@ class Aws2023::Permissioner
     self.add primary_region, :rds_describe_db_instances, general_params
     self.add primary_region, :rds_describe_db_subnet_groups, general_params
     self.add primary_region, :rds_describe_db_snapshots, general_params
-    self.add primary_region, :route53_list_hosted_zones, general_params
+    self.add 'global', :route53_list_hosted_zones, general_params
     self.add primary_region, :servicediscovery_list_services, general_params
     self.add primary_region, :servicediscovery_list_namespaces, general_params
     self.add 'us-east-1', :acm_list_certificates, general_params
@@ -57,10 +57,15 @@ class Aws2023::Permissioner
     self.add 'global', :cloudfront_list_invalidations, general_params, {aliases: aliases}
 
     bucket_names = [
+      specific_params.raw_assets_bucket_name,
       specific_params.naked_domain_name,
       "www.#{specific_params.naked_domain_name}",
       "assets.#{specific_params.naked_domain_name}"
     ]
+
+    # we need this to see lambda get policy data in bucket notification configuration
+    self.add 'global', :lambda_get_policy, general_params
+
     self.add 'global', :s3api_get_bucket_notification_configuration, general_params,{bucket_names: bucket_names}
     self.add 'global', :s3api_get_bucket_policy, general_params, {bucket_names: bucket_names}
     self.add 'global', :s3api_get_bucket_cors, general_params, {bucket_names: bucket_names}
@@ -85,8 +90,10 @@ class Aws2023::Permissioner
     self.add primary_region, :elbv2_describe_load_balancer_attributes, general_params
     self.add primary_region, :elbv2_describe_target_group_attributes, general_params
     self.add primary_region, :lambda_get_function, general_params
-    self.add primary_region, :route53_get_hosted_zone, general_params
-    self.add primary_region, :route53_list_resource_record_sets, general_params
+    self.add 'global', :route53_get_hosted_zone, general_params
+    self.add 'global', :route53_list_resource_record_sets, general_params
+
+    
 
     Cpbvt::Payloads::Aws::Policy.generate! general_params
   end
