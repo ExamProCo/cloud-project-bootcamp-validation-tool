@@ -1,3 +1,5 @@
+require 'open3'
+
 class Cpbvt::Payloads::Aws::Command
   include Cpbvt::Payloads::Aws::Commands::Acm
   include Cpbvt::Payloads::Aws::Commands::Apigatewayv2
@@ -22,11 +24,13 @@ class Cpbvt::Payloads::Aws::Command
 command = <<~COMMAND
 aws sts assume-role \
 --role-arn "arn:aws:iam::#{target_aws_account_id}:role/CrossAccountRole" \
---role-session-name "crossAccountAccess"
+--role-session-name "crossAccountAccess" \
+--external-id TEST123 \
+--query Credentials.SessionToken
 COMMAND
 puts "[Executing] #{command}"
-result = system(command)
-binding.pry
-puts result
+stdout_str, exit_code = Open3.capture2(command)#, :stdin_data=>post_content)
+result = stdout_str.strip.gsub('"','')
+return result
   end
 end

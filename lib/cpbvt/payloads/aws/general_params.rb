@@ -12,9 +12,13 @@ class Cpbvt::Payloads::Aws::GeneralParams
                 :output_path,
                 :aws_access_key_id,
                 :aws_secret_access_key,
+                :session_token,
                 :payloads_bucket,
                 :target_aws_account_id,
                 :source_aws_account_id
+
+  # we aren't validating the session_token since
+  # will pul it after validation
 
   validates :project_scope, presence: true
   validates :user_uuid , presence: true
