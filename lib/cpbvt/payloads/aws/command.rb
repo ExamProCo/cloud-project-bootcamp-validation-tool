@@ -17,4 +17,16 @@ class Cpbvt::Payloads::Aws::Command
   include Cpbvt::Payloads::Aws::Commands::Route53
   include Cpbvt::Payloads::Aws::Commands::S3api
   include Cpbvt::Payloads::Aws::Commands::Servicediscovery
+
+  def self.session_token target_aws_account_id
+command = <<~COMMAND
+aws sts assume-role \
+--role-arn "arn:aws:iam::#{target_aws_account_id}:role/CrossAccountRole" \
+--role-session-name "crossAccountAccess"
+COMMAND
+puts "[Executing] #{command}"
+result = system(command)
+binding.pry
+puts result
+  end
 end

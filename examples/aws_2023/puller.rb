@@ -20,6 +20,8 @@ class Aws2023::Puller
       payloads_bucket: general_params.payloads_bucket
     )
 
+    Cpbvt::Payloads::Aws::Command.session_token general_params.target_aws_account_id
+
     primary_region = general_params.user_region
     Async do |task|
       cluster_name = specific_params.cluster_name

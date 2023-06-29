@@ -62,7 +62,6 @@ class Cpbvt::Payloads::Aws::Policy
 
     @@permissions.each_with_index do |permission,index|
       json = permission.to_json
-      puts current_count + json.size
       if (current_count + json.size) > max_count || @@permissions.size-1 == index
         if @@permissions.size-1 == index
           permissions_chunk.push permission
