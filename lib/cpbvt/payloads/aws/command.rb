@@ -25,12 +25,12 @@ command = <<~COMMAND
 aws sts assume-role \
 --role-arn "arn:aws:iam::#{target_aws_account_id}:role/CrossAccountRole" \
 --role-session-name "crossAccountAccess" \
---external-id TEST123 \
---query Credentials.SessionToken
+--external-id TEST123
 COMMAND
 puts "[Executing] #{command}"
 stdout_str, exit_code = Open3.capture2(command)#, :stdin_data=>post_content)
-result = stdout_str.strip.gsub('"','')
+payload = JSON.parse(stdout_str)
+result = payload['Credentials']
 return result
   end
 end

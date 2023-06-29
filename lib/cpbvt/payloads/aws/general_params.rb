@@ -12,7 +12,9 @@ class Cpbvt::Payloads::Aws::GeneralParams
                 :output_path,
                 :aws_access_key_id,
                 :aws_secret_access_key,
-                :session_token,
+                :tmp_aws_access_key_id,
+                :tmp_aws_secret_access_key,
+                :tmp_aws_session_token,
                 :payloads_bucket,
                 :target_aws_account_id,
                 :source_aws_account_id
@@ -71,7 +73,10 @@ class Cpbvt::Payloads::Aws::GeneralParams
       aws_secret_access_key: @aws_secret_access_key,
       payloads_bucket: @payloads_bucket,
       target_aws_account_id: @target_aws_account_id,
-      source_aws_account_id: @source_aws_account_id
+      source_aws_account_id: @source_aws_account_id,
+      tmp_aws_access_key_id: @tmp_aws_access_key_id,
+      tmp_aws_secret_access_key: @tmp_aws_secret_access_key,
+      tmp_aws_session_token: @tmp_aws_session_token
     }
   end
 end

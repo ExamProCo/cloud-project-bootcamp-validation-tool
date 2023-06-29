@@ -20,8 +20,10 @@ class Aws2023::Puller
       payloads_bucket: general_params.payloads_bucket
     )
 
-    session_token = Cpbvt::Payloads::Aws::Command.session_token general_params.target_aws_account_id
-    general_params.session_token = session_token
+    creds = Cpbvt::Payloads::Aws::Command.session_token general_params.target_aws_account_id
+    general_params.tmp_aws_access_key_id = creds['AccessKeyId']
+    general_params.tmp_aws_secret_access_key = creds['SecretAccessKey']
+    general_params.tmp_aws_session_token = creds['SessionToken']
 
     primary_region = general_params.user_region
     Async do |task|

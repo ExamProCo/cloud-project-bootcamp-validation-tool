@@ -34,8 +34,14 @@ module Cpbvt::Payloads::Aws::Runner
     command = command.strip.gsub("\n", " ")
     command = "#{command} --region #{general_params.user_region}" unless general_params.user_region == 'global'
     command = "#{command} --output json > #{output_file}"
-    Cpbvt::Payloads::Aws::Runner.execute general_params.session_token, command
 
+    general_params.tmp_aws_access_key_id
+    Cpbvt::Payloads::Aws::Runner.execute(
+      general_params.tmp_aws_access_key_id, 
+      general_params.tmp_aws_secret_access_key, 
+      general_params.tmp_aws_session_token, 
+      command
+    )
     # upload json file to s3
     #Cpbvt::Uploader.run(
     #  file_path: output_file, 
@@ -202,11 +208,20 @@ module Cpbvt::Payloads::Aws::Runner
     return value
   end
 
-  def self.execute session_token, command
+  def self.execute key, secret, session_token, command
+    if key.nil? || secret.nil? || session_token.nil?
+      raise 'creds are nil'
+    end
     # print the command so we know what is running
     puts "[Executing] #{command}"
     # run the command which will download the json
-    system({"AWS_SESSION_TOKEN" => session_token}, command)
+
+    env_vars = {
+      "AWS_ACCESS_KEY_ID" => key,
+      "AWS_SECRET_ACCESS_KEY" => secret,
+      "AWS_SESSION_TOKEN" => session_token
+    }
+    system(env_vars, command)
   end
 
   # Create Ostruct and validate general params

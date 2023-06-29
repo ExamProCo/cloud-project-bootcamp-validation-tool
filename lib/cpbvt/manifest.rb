@@ -115,7 +115,12 @@ class Cpbvt::Manifest
     return false unless @payloads.key?(key)
     output_file = @payloads[key][:output_file]
     json_data = File.read(output_file)
-    hash = JSON.parse(json_data)
+    hash =
+    if json_data == ''
+      {}
+    else
+      JSON.parse(json_data)
+    end
     return hash
   end
 
@@ -128,7 +133,12 @@ class Cpbvt::Manifest
     end
     output_file = @payloads[key][:output_file]
     json_data = File.read(output_file)
-    hash = JSON.parse(json_data)
+    hash =
+    if json_data == ''
+      {}
+    else
+      JSON.parse(json_data)
+    end
     return hash
   end
 
