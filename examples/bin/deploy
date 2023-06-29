@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+set -e # stop the execution of the script if it fails
+
+CFN_PATH="/workspace/cloud-project-bootcamp-validation-tool/examples/output/aws-bootcamp-2023/$USER_UUID/cross-account-role.yaml"
+
+STACK_NAME="CPBVT-AWS2023"
+
+aws cloudformation deploy \
+  --stack-name $STACK_NAME \
+  --template-file "$CFN_PATH" \
+  --no-execute-changeset \
+  --parameter-overrides SourceAccountId=$SOURCE_AWS_ACCOUNT_ID ExternalId=$EXTERNAL_ID \
+  --capabilities CAPABILITY_NAMED_IAM

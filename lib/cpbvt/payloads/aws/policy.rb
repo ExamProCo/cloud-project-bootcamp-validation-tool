@@ -52,7 +52,42 @@ class Cpbvt::Payloads::Aws::Policy
       'cross-account-role-template.yaml'
     )
     cfn_template = YAML.load_file(path)
-    cfn_template['Resources']['CrossAccountRole']['Properties']['Policies'][0]['PolicyDocument']['Statement'] = @@permissions
+
+    # Policy exceeding the 6144 characters limit can't be saved. 
+    max_count = 4000
+    current_count = 0
+    i = 0
+
+    permissions_chunk = []
+
+    @@permissions.each_with_index do |permission,index|
+      json = permission.to_json
+      puts current_count + json.size
+      if (current_count + json.size) > max_count || @@permissions.size-1 == index
+        if @@permissions.size-1 == index
+          permissions_chunk.push permission
+        end
+        #add another
+        policy_template = {
+          "PolicyName" => "BootcampPolicy#{i}",
+          "PolicyDocument" => {
+            "Version" => "2012-10-17",
+            "Statement" => []
+          }
+        }
+        cfn_template['Resources']['CrossAccountRole']['Properties']['Policies'].push(policy_template)
+        cfn_template['Resources']['CrossAccountRole']['Properties']['Policies'][i]['PolicyDocument']['Statement'] = permissions_chunk
+
+        i += 1
+        current_count = 0
+        permissions_chunk = []
+      else
+        #add to existing
+        current_count += json.size
+        permissions_chunk.push permission
+      end
+    end
+
 
     output_path = File.join(
       general_params.output_path,

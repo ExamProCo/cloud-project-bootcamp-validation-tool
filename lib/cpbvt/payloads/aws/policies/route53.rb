@@ -37,7 +37,7 @@ def route53_list_resource_record_sets(aws_account_id:,region:)
         "route53:ListResourceRecordSets",
         "route53:ListHostedZones"
     ],
-    "Resource": "*"
+    "Resource" => "*"
   }
 end
 

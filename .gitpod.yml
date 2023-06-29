@@ -1,4 +1,9 @@
 tasks:
+  - name: ruby
+    init: |
+      bundle install
+      cd examples
+      bundle install
   - name: aws-cli
     init: |
       cd /workspace

@@ -36,7 +36,7 @@ def s3api_get_bucket_notification_configuration(aws_account_id:,bucket_names: []
   resources = "*" if resources.empty?
   {
     "Effect" => "Allow",
-    "Action" => "s3:GetBucketNotificationConfiguration",
+    "Action" => "s3:GetBucketNotification",
     "Resource" => resources
 }
 end
@@ -105,7 +105,7 @@ def s3api_get_public_access_block(aws_account_id:,bucket_names: [])
   resources = "*" if resources.empty?
   {
     "Effect" => "Allow",
-    "Action" => "s3:GetPublicAccessBlock",
+    "Action" => "s3:GetBucketPublicAccessBlock",
     "Resource" => resources
 }
 end
