@@ -200,6 +200,7 @@ task :validate2 do
       else
         "\e[31m#{spec_key}\e[0m"
       end
+      next if spec['status'] == 'pass'
       puts ""
       puts "#{describe_key.capitalize}.#{vspec_key} ========="
       puts ""
@@ -213,7 +214,7 @@ task :validate2 do
         message = assert['message']
 
         data = nil
-        if assert.key('data')
+        if assert.key?('data')
           data = assert['data'].map { |key, value| "#{key}=#{value}" }.join(' ')
         end
 
