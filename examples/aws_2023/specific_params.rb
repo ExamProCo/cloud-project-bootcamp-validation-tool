@@ -7,7 +7,8 @@ class Aws2023::SpecificParams::Puller
                 :backend_family,
                 :raw_assets_bucket_name
 
-  validates :naked_domain_name, presence: true, format: { with: /\A[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?\z/ix }
+  #formatting failed with drummer-test-app.online
+  validates :naked_domain_name, presence: true#, format: { with: /\A[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?\z/ix }
   validates :cluster_name, presence: true
   validates :backend_family, presence: true
   validates :raw_assets_bucket_name, presence: true
@@ -36,7 +37,7 @@ class Aws2023::SpecificParams::Validator
                 :apigateway_api_id,
                 :raw_assets_bucket_name
 
-  validates :naked_domain_name, presence: true, format: { with: /\A[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?\z/ix }
+  validates :naked_domain_name, presence: true#, format: { with: /\A[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?\z/ix }
   validates :github_full_repo_name, presence: true
   validates :cluster_name, presence: true
   validates :backend_family, presence: true

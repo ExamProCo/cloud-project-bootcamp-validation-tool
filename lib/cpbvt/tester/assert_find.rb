@@ -103,6 +103,30 @@ class Cpbvt::Tester::AssertFind
     return self
   end
 
+  def expects_gt data, *args 
+    expected_value = args.pop
+    key = nil
+    key = args.first if args.count > 0
+    kind = "assert_find[#{self.iter_index}]:expects_gt"
+    if key.nil?
+      provided_value = data
+    else
+      provided_value = data[key]
+    end
+    data_payload = {
+      key: key,
+      provided_value: provided_value,
+      expected_value: expected_value
+    }
+    if provided_value > expected_value
+      self.iter_pass!(kind: kind, data: data_payload, message: 'value was greater than')
+    else
+      self.iter_fail!(kind: kind, data: data_payload, message: 'value was not greater than')
+    end
+    return self
+  end
+
+
   def expects_eq data, *args 
     expected_value = args.pop
     key = nil

@@ -4,6 +4,7 @@ PATH
     cloud_project_bootcamp_validation_tool (0.1.0)
       activemodel
       aws-sdk-s3
+      open3
       pry
       ruby-openai
 
@@ -47,6 +48,7 @@ GEM
     method_source (1.0.0)
     minitest (5.18.0)
     multipart-post (2.3.0)
+    open3 (0.1.2)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)

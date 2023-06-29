@@ -105,6 +105,8 @@ Cpbvt::Tester::Runner.describe :serverless do
       assert.expects_eq(item,assets_domain_name)
     end.returns(:all)
 
+    assert_not_nil(distribution)
+
     domain = assert_json(distribution,'Origins','Items').returns(:first)
     domain_name = assert_json(domain,'DomainName').returns(:all)
 

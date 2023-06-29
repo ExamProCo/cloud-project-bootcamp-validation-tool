@@ -111,16 +111,18 @@ Cpbvt::Tester::Runner.describe :cluster do
     assert_find(rules) do |assert,rule|
       assert.expects_eq(rule,'FromPort', 80)
       assert.expects_eq(rule,'ToPort', 80)
-      range = rule['IpRanges'].first
-      assert.expects_eq(range,'CidrIp','0.0.0.0/0')
+      assert.expects_any?(rule,'IpRanges',label: "CidrIp=0.0.0.0/0") do |range|
+        range['CidrIp'] == '0.0.0.0/0'
+      end
     end
 
     https_sg_rule =
     assert_find(rules) do |assert,rule|
       assert.expects_eq(rule,'FromPort', 443)
       assert.expects_eq(rule,'ToPort', 443)
-      range = rule['IpRanges'].first
-      assert.expects_eq(range,'CidrIp','0.0.0.0/0')
+      assert.expects_any?(rule,'IpRanges',label: "CidrIp=0.0.0.0/0") do |range|
+        range['CidrIp'] == '0.0.0.0/0'
+      end
     end
 
     assert_not_nil(http_sg_rule)
@@ -166,7 +168,8 @@ Cpbvt::Tester::Runner.describe :cluster do
   spec :should_have_target_group do |t|
     backend_tg_arn = t.dynamic_params.backend_tg_arn
 
-    tg_id = backend_tg_arn.split("/").last
+    tg_id = false
+    tg_id = backend_tg_arn.split("/").last if backend_tg_arn
 
     tg = assert_load('elbv2-describe-target-groups','TargetGroups').find('TargetGroupArn',backend_tg_arn).returns(:all)
     tg_health_data = assert_load("elbv2-describe-target-health__#{tg_id}").returns(:all)
