@@ -222,4 +222,16 @@ class Cpbvt::Tester::Spec
       data: data
     )
   end
+
+  def passed!
+    @report.passed!(
+      describe_key: self.describe.key, 
+      spec_key: self.key)
+  end
+
+  def failed!
+    @report.failed!(
+      describe_key: self.describe.key, 
+      spec_key: self.key)
+  end
 end

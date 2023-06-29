@@ -194,10 +194,16 @@ task :validate2 do
 
   results.each do |describe_key,group|
     group.each do |spec_key,spec|
+      vspec_key =
+      if spec['status'] == 'pass'
+        "\e[32m#{spec_key}\e[0m" 
+      else
+        "\e[31m#{spec_key}\e[0m"
+      end
       puts ""
-      puts "#{describe_key.capitalize}.#{spec_key} ========="
+      puts "#{describe_key.capitalize}.#{vspec_key} ========="
       puts ""
-      spec.each do |assert|
+      spec['asserts'].each do |assert|
         kind =
         if assert['status'] == 'pass'
           "\e[32m#{assert['kind']}\e[0m" 

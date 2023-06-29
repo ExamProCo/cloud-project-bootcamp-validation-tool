@@ -29,7 +29,9 @@ class Cpbvt::Tester::Runner
       describe_instance.specs.each do |spec_key,spec_instance|
         begin
           spec_instance.evaluate! report, manifest, general_params, specific_params, dynamic_params
+          spec_instance.passed!
         rescue Cpbvt::Tester::AssertFail => e
+          spec_instance.failed!
           # just skip to the next one...
           next
         end

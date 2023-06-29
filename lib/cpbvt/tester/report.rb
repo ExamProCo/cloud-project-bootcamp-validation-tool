@@ -25,11 +25,11 @@ class Cpbvt::Tester::Report
 
   def add! describe_key, spec_key
     @specs[describe_key] ||= {}
-    @specs[describe_key][spec_key] ||= []
+    @specs[describe_key][spec_key] ||= {status: nil, asserts: []}
   end
 
   def pass! describe_key:, spec_key:, kind:, message:, data: {}
-    @specs[describe_key][spec_key].push({
+    @specs[describe_key][spec_key][:asserts].push({
       kind: kind,
       status: 'pass',
       message: message,
@@ -38,7 +38,7 @@ class Cpbvt::Tester::Report
   end
 
   def fail! describe_key:, spec_key:, kind:, message:, data: {}
-    @specs[describe_key][spec_key].push({
+    @specs[describe_key][spec_key][:asserts].push({
       kind: kind,
       status: 'fail',
       message: message,
@@ -53,17 +53,25 @@ class Cpbvt::Tester::Report
     )
   end
 
+  def passed! describe_key:, spec_key:
+    @specs[describe_key][spec_key][:status] = 'pass'
+  end
+
+  def failed! describe_key:, spec_key:
+    @specs[describe_key][spec_key][:status] = 'fail'
+  end
+
   # only for iter
   def iter_index describe_key, spec_key
-    @specs[describe_key][spec_key].last[:results].size-1
+    @specs[describe_key][spec_key][:asserts].last[:results].size-1
   end
 
   def iter_add!(describe_key:,spec_key:)
-    @specs[describe_key][spec_key].last[:results].push []
+    @specs[describe_key][spec_key][:asserts].last[:results].push []
   end
 
   def iter_start!(describe_key:, spec_key:, kind:)
-    @specs[describe_key][spec_key].push({
+    @specs[describe_key][spec_key][:asserts].push({
       kind: kind,
       status: 'unknown',
       message: nil,
@@ -73,13 +81,13 @@ class Cpbvt::Tester::Report
   end
 
   def iter_end!(describe_key:, spec_key:,status:,data:{})
-    spec = @specs[describe_key][spec_key].last
+    spec = @specs[describe_key][spec_key][:asserts].last
     spec[:status] = status
     spec[:data] = data
   end
 
   def iter_pass! describe_key:, spec_key:, kind:, message:, data: {}
-    spec = @specs[describe_key][spec_key].last
+    spec = @specs[describe_key][spec_key][:asserts].last
     spec[:results].last.push({
       kind: kind,
       status: 'pass',
@@ -89,7 +97,7 @@ class Cpbvt::Tester::Report
   end
 
   def iter_fail! describe_key:, spec_key:, kind:, message:, data: {}
-    spec = @specs[describe_key][spec_key].last
+    spec = @specs[describe_key][spec_key][:asserts].last
     spec[:results].last.push({
       kind: kind,
       status: 'fail',
@@ -100,7 +108,7 @@ class Cpbvt::Tester::Report
   end
 
   def iter_last describe_key, spec_key
-    spec = @specs[describe_key][spec_key].last[:results].last
+    spec = @specs[describe_key][spec_key][:asserts].last[:results].last
   end
 
   def to_json
