@@ -1,239 +1,149 @@
-class Aws2023::Validations::Serverless
+Cpbvt::Tester::Runner.describe :serverless do
+  spec :should_have_key_upload_route do |t|
+    api_id = t.specific_params.apigateway_api_id
+    bucket_name = t.specific_params.raw_assets_bucket_name
 
-  def self.should_have_key_upload_route(manifest:,specific_params:)
-    api_id = specific_params.apigateway_api_id
+    route = assert_load("apigatewayv2-get-routes__#{api_id}",'Items').find('RouteKey',"POST /avatars/key_upload").returns(:all)
 
-    data = manifest.get_output("apigatewayv2-get-routes__#{api_id}")['Items']
+    target_arn = assert_json(route,'Target').returns(:all)
+      
+    integration_id = target_arn.split('/').last
 
-    route = 
-    data.find do |t|
-      t['RouteKey'] == "POST /avatars/key_upload"
-    end
+    integration = assert_load("apigatewayv2-get-integrations__#{api_id}",'Items')
+      .find('IntegrationId',integration_id).returns(:all)
 
-    integration_id = route['Target'].split('/').last
-
-    integration_data = manifest.get_output("apigatewayv2-get-integrations__#{api_id}")['Items']
-    integration = integration_data.find{|t| t['IntegrationId'] == integration_id }
-
-    lambda_arn = integration['IntegrationUri']
+    lambda_arn = assert_json(integration,'IntegrationUri').returns(:all)
     lambda_name = lambda_arn.split(':').last
 
-    lambda_data = manifest.get_output("lambda-get-function__#{lambda_name}")['Configuration']
+    lambda_config = assert_load("lambda-get-function__#{lambda_name}",'Configuration').returns(:all)
 
-    bucket_name = specific_params.raw_assets_bucket_name
+    assert_json(lambda_config,'Runtime').expects_match('ruby')
+    assert_json(lambda_config,'CodeSize').expects_gt(0)
+    assert_json(integration,'ConnectionType').expects_eq('INTERNET')
+    assert_json(integration,'IntegrationMethod').expects_eq('POST')
+    assert_json(integration,'IntegrationType').expects_eq('AWS_PROXY')
+    assert_json(route,'AuthorizationType').expects_eq('CUSTOM')
+    assert_json(lambda_config,'Environment','Variables','UPLOADS_BUCKET_NAME').expects_eq(bucket_name)
 
-    checks = {
-      runtime: !!lambda_data['Runtime'].match('ruby'),
-      codesize: lambda_data['CodeSize'] > 0,
-      connecetion_type: integration['ConnectionType'] == 'INTERNET',
-      post: integration['IntegrationMethod'] == 'POST',
-      integration_type: integration['IntegrationType'] == 'AWS_PROXY',
-      authorization_type: route['AuthorizationType'] == 'CUSTOM',
-      env_var_bucket: lambda_data['Environment']['Variables']['UPLOADS_BUCKET_NAME'] == bucket_name
-    }
-    found = checks.values.all?
-
-    if found
-      score = 10
-      message = "Found API Gateway route ruby lambda with custom authorization for POST /avatars/key_upload"
-    else
-      score = 0
-      message = "Failed to find API Gateway route ruby lambda with custom authorization for POST /avatars/key_upload"
-    end
-
-    return {
-      result: {
-        score: score,
-        message: message,
-        checks: checks
-      }
-    }
+    set_pass_message "Found API Gateway route ruby lambda with custom authorization for POST /avatars/key_upload"
+    set_fail_message "Failed to find API Gateway route ruby lambda with custom authorization for POST /avatars/key_upload"
   end
 
-  def self.should_have_proxy_route(manifest:,specific_params:)
+  spec :should_have_proxy_route do |t|
     api_id = specific_params.apigateway_api_id
-    data = manifest.get_output("apigatewayv2-get-routes__#{api_id}")['Items']
 
-    route = 
-    data.find do |t|
-      t['RouteKey'] == "OPTIONS /{proxy+}"
-    end
+    route = assert_load("apigatewayv2-get-routes__#{api_id}",'Items').find('RouteKey',"OPTIONS /{proxy+}").returns(:all)
 
-    integration_id = route['Target'].split('/').last
+    target_arn = assert_json(route,'Target').returns(:all)
+      
+    integration_id = target_arn.split('/').last
 
-    integration_data = manifest.get_output("apigatewayv2-get-integrations__#{api_id}")['Items']
-    integration = integration_data.find{|t| t['IntegrationId'] == integration_id }
+    integration = assert_load("apigatewayv2-get-integrations__#{api_id}",'Items')
+      .find('IntegrationId',integration_id).returns(:all)
 
-    lambda_arn = integration['IntegrationUri']
+    lambda_arn = assert_json(integration,'IntegrationUri').returns(:all)
     lambda_name = lambda_arn.split(':').last
-    lambda_data = manifest.get_output("lambda-get-function__#{lambda_name}")['Configuration']
+
+    lambda_config = assert_load("lambda-get-function__#{lambda_name}",'Configuration').returns(:all)
     
-    checks = {
-      authorization_type: route['AuthorizationType'] == 'None',
-      code_size: lambda_data['CodeSize'] > 0,
-      connection_type: integration['ConnectionType'] == 'INTERNET',
-      integration_method: integration['IntegrationMethod'] == 'POST',
-      integration_Type: integration['IntegrationType'] == 'AWS_PROXY',
-      authorization_type: route['AuthorizationType'] == 'NONE'
-    }
-    found = checks.values.all?
+    assert_json(route,'AuthorizationType').expects_eq('NONE')
+    assert_json(lambda_config,'CodeSize').expects_gt(0)
+    assert_json(integration,'ConnectionType').expects_eq('INTERNET')
+    assert_json(integration,'IntegrationMethod').expects_eq('POST')
+    assert_json(integration,'IntegrationType').expects_eq('AWS_PROXY')
+    assert_json(route,'AuthorizationType').expects_eq('NONE')
 
-    if found
-      score = 10
-      message = "Found API Gateway route OPTIONS /{proxy+"
-    else
-      score = 0
-      message = "Failed to find API Gateway route OPTIONS /{proxy+"
-    end
-
-    return {
-      result: {
-        score: score,
-        message: message,
-        checks: checks
-      }
-    }
+    set_pass_message "Found API Gateway route OPTIONS /{proxy+"
+    set_fail_message "Failed to find API Gateway route OPTIONS /{proxy+"
   end
 
-  def self.should_have_s3_bucket_with_event_notification(manifest:,specific_params:)
+  spec :should_have_s3_bucket_with_event_notification do |t|
     bucket_name = specific_params.raw_assets_bucket_name
+    naked_domain_name = t.specific_params.naked_domain_name
 
-    data = manifest.get_output!("s3api-get-bucket-notification-configuration__#{bucket_name}")
+    event = assert_load("s3api-get-bucket-notification-configuration__#{bucket_name}",'LambdaFunctionConfigurations').returns(:first)
 
-    event = data['LambdaFunctionConfigurations'].first
-
-    lambda_arn = event['LambdaFunctionArn']
+    lambda_arn = assert_json(event,'LambdaFunctionArn').returns(:all)
     lambda_name = lambda_arn.split(':').last
-    lambda_data = manifest.get_output("lambda-get-function__#{lambda_name}")['Configuration']
+    lambda_config = assert_load("lambda-get-function__#{lambda_name}",'Configuration').returns(:all)
 
-    dest_bucket = lambda_data['Environment']['Variables']['DEST_BUCKET_NAME']
+    dest_bucket = assert_json(lambda_config,'Environment','Variables','DEST_BUCKET_NAME').returns(:all)
 
-    checks = {
-      runtime: !!lambda_data['Runtime'].match(/nodejs/),
-      env_var_bucket: dest_bucket == "assets.#{specific_params.naked_domain_name}",
-      codesize: lambda_data['CodeSize'] > 0,
-      put_event: event['Events'].first['s3:ObjectCreated:Put']
-    }
-    found = checks.values.all?
+    assert_json(lambda_config,'Runtime').expects_match(/nodejs/)
+    assert_eq(dest_bucket,"assets.#{naked_domain_name}")
+    assert_json(lambda_config,'CodeSize').expects_gt(0)
+    
+    event = assert_json(event,'Events').returns(:first)
+    assert_eq(event,'s3:ObjectCreated:Put')
 
-    if found
-      score = 10
-      message = "Found raw assets bucket that has an event notification on object put to assets.#{specific_params.naked_domain_name}" 
-    else
-      score = 0
-      message = "Failed to raw assets bucket that has an event notification on object put to assets.#{specific_params.naked_domain_name}" 
-    end
-
-    return {
-      result: {
-        score: score,
-        message: message,
-        checks: checks
-      }
-    }
+    set_fail_message "Found raw assets bucket that has an event notification on object put to assets.#{naked_domain_name}"
+    set_pass_message "Failed to raw assets bucket that has an event notification on object put to assets.#{naked_domain_name}"
   end
 
-  def self.should_block_public_access_for_assets_bucket(manifest:,specific_params:)
-    naked_domain_name = specific_params.naked_domain_name
+  spec :should_block_public_access_for_assets_bucket do |t|
+    naked_domain_name = t.specific_params.naked_domain_name
 
-    access = manifest.get_output!("s3api-get-public-access-block__assets.#{naked_domain_name}")
+    access = assert_load("s3api-get-public-access-block__assets.#{naked_domain_name}",'PublicAccessBlockConfiguration').returns(:all)
 
-    found =
-    access['PublicAccessBlockConfiguration']['BlockPublicPolicy'] == true &&
-    access['PublicAccessBlockConfiguration']['RestrictPublicBuckets'] == true
+    assert_json(access,'BlockPublicPolicy').expects_true
+    assert_json(access,'RestrictPublicBuckets').expects_true
 
-    if found
-      {result: {score: 10, message: "Found s3 static website for assets.#{naked_domain_name} to disallow bucket policies"}}
-    else
-      {result: {score: 0, message: "Failed to find ss3 static website for assets.#{naked_domain_name} to disallow bucket policies"}}
-    end
+    set_pass_message "Found s3 static website for assets.#{naked_domain_name} to disallow bucket policies"
+    set_fail_message "Failed to find ss3 static website for assets.#{naked_domain_name} to disallow bucket policies"
   end
 
-  def self.should_have_a_cloudfront_distrubition_to_assets(manifest:,specific_params:)
+  spec :should_have_a_cloudfront_distrubition_to_assets do |t|
     assets_domain_name = "assets.#{specific_params.naked_domain_name}"
 
-    data = manifest.get_output!('cloudfront-list-distributions')
+    items = assert_load('cloudfront-list-distributions','DistributionList').returns('Items')
 
     distribution =
-    data['DistributionList']['Items'].find do |distribution|
-      distribution['Aliases']['Quantity'] == 1 &&
-      distribution['Aliases']['Items'].first == assets_domain_name
-    end
+    assert_find(items) do |assert,distribution|
+      aliases = distribution['Aliases']
+      assert.expects_eq(aliases,'Quantity',1)
+      item = aliases['Items'].first
+      assert.expects_eq(item,assets_domain_name)
+    end.returns(:all)
 
-    domain_name = distribution['Origins']['Items'].first['DomainName']
-    checks = {
-      status: distribution['Status'] == 'Deployed',
-      qauntity: distribution['Origins']['Quantity'] == 1,
-      domain_name_starts: domain_name.start_with?("#{assets_domain_name}.s3"),
-      domain_name_ends: domain_name.end_with?(".amazonaws.com")
-    }
-    found = checks.values.all?
+    assert_not_nil(distribution)
 
-    dist_id = distribution['Id']
-    dist_domain_name = distribution['DomainName']
+    domain = assert_json(distribution,'Origins','Items').returns(:first)
+    domain_name = assert_json(domain,'DomainName').returns(:all)
 
-    if found
-      score = 10
-      message = "Found CloudFront distrubution with origin to S3 bucket: #{assets_domain_name}.s3.amazonaws.com"
-    else
-      score = 0
-      message = "Failed to find CloudFront distrubution with origin to S3 bucket: #{assets_domain_name}.s3.amazonaws.com"
-    end
+    assert_json(distribution,'Status').expects_eq('Deployed')
+    assert_json(distribution,'Origins','Quantity').expects_eq(1)
+    assert_start_with(domain_name,"#{assets_domain_name}.s3")
+    assert_end_with(domain_name,".amazonaws.com")
 
-    return {
-        result: {
-          score: score,
-          message: message,
-          checks: checks
-        },
-        assets_distribution_id: dist_id,
-        assets_distribution_domain_name: dist_domain_name
-      }
+    dist_id = assert_json(distribution,'Id').returns(:all)
+    dist_domain_name = assert_json(distribution,'DomainName').returns(:all)
+
+    set_state_value :assets_distribution_id, dist_id
+    set_state_value :assets_distribution_domain_name, dist_domain_name
+
+    set_pass_message "Found CloudFront distrubution with origin to S3 bucket: #{assets_domain_name}.s3.amazonaws.com"
+    set_fail_message "Failed to find CloudFront distrubution with origin to S3 bucket: #{assets_domain_name}.s3.amazonaws.com"
   end
 
-  def self.should_have_route53_to_distribution_for_assets(manifest:,specific_params:,assets_distribution_domain_name:)
-    naked_domain_name = specific_params.naked_domain_name
-    assets_domain_name = "assets.#{specific_params.naked_domain_name}"
+  spec :should_have_route53_to_distribution_for_assets do |t|
+    naked_domain_name = t.specific_params.naked_domain_name
+    assets_domain_name = "assets.#{t.specific_params.naked_domain_name}"
+    dist_domain_name = t.dynamic_params.assets_distribution_domain_name
+    zone_arn = assert_load('route53-list-hosted-zones','HostedZones').find('Name',"#{naked_domain_name}.").returns('Id')
 
-    data = manifest.get_output!('route53-list-hosted-zones')
+    zone_id = zone_arn.split("/").last
 
-    zone =
-    data['HostedZones'].find do |zone|
-      zone['Name'] == "#{naked_domain_name}."
-    end
-
-    zone_id = zone['Id'].split("/").last
-
-    zone_data = manifest.get_output!("route53-list-resource-record-sets__#{zone_id}")
+    record_sets = assert_load("route53-list-resource-record-sets__#{zone_id}",'ResourceRecordSets').returns(:all)
 
     record =
-    zone_data['ResourceRecordSets'].find do |record|
-      record['Name'] == "#{assets_domain_name}." &&
-      record['Type'] == "A"
-    end
+    assert_find(record_sets) do |assert,record|
+      assert.expects_eq(record,'Name',"#{assets_domain_name}.")
+      assert.expects_eq(record,'Type',"A")
+    end.returns(:all)
 
-    checks = {
-      dnsname:  record['AliasTarget']['DNSName'] == "#{assets_distribution_domain_name}."
-    }
-    found = checks.values.all?
+    assert_json(record,'AliasTarget','DNSName').expects_eq("#{dist_domain_name}.")
 
-    if found
-      score = 10
-      message =  "Found route53 assets domain and pointing to the cloudfront distribution for assets"
-    else
-      score = 0
-      message =  "Failed to find a route53 assets domain and pointing to the cloudfront distribution for assets"
-    end
-
-    return {
-      result: {
-        score: score,
-        message: message,
-        checks: checks
-      }
-    }
-  end  
-
-  # check for a file?
-  # check for an ssl certificate?
+    set_fail_message "Found route53 assets domain and pointing to the cloudfront distribution for assets"
+    set_pass_message "Failed to find a route53 assets domain and pointing to the cloudfront distribution for assets"
+  end
 end

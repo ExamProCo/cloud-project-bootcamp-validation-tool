@@ -1,179 +1,169 @@
-class Aws2023::Validations::StaticWebsiteHosting
+Cpbvt::Tester::Runner.describe :static_website_hosting do
+  spec :should_unblock_public_access do |t|
+    naked_domain_name = t.specific_params.naked_domain_name
 
-  def self.should_unblock_public_access(manifest:,specific_params:)
-    naked_domain_name = specific_params.naked_domain_name
+    access = assert_load("s3api-get-public-access-block__#{naked_domain_name}",'PublicAccessBlockConfiguration').returns(:all)
 
-    access = manifest.get_output!("s3api-get-public-access-block__#{naked_domain_name}")
+    assert_json(access,'BlockPublicPolicy').expects_false
+    assert_json(access,'RestrictPublicBuckets').expects_false
 
-    found =
-    access['PublicAccessBlockConfiguration']['BlockPublicPolicy'] == false &&
-    access['PublicAccessBlockConfiguration']['RestrictPublicBuckets'] == false
-
-    if found
-      {result: {score: 10, message: "Found s3 static website for #{naked_domain_name} to allow bucket policies"}}
-    else
-      {result: {score: 0, message: "Failed to find ss3 static website for #{naked_domain_name} to allow bucket policies"}}
-    end
+    set_pass_message "Found s3 static website for #{naked_domain_name} to allow bucket policies"
+    set_fail_message "Failed to find ss3 static website for #{naked_domain_name} to allow bucket policies"
   end
 
-  def self.should_have_bucket_policy(manifest:,specific_params:)
+  spec :should_have_bucket_policy do |t|
     naked_domain_name = specific_params.naked_domain_name
 
-    data = manifest.get_output!("s3api-get-bucket-policy__#{naked_domain_name}")
-    policy = JSON.parse(data['Policy'])
+    policy_json = assert_load("s3api-get-bucket-policy__#{naked_domain_name}",'Policy').returns(:all)
+    policy = JSON.parse(policy_json)
 
-    found =
-    policy['Statement'].find do |statement|
-      statement['Effect'] == 'Allow' &&
-      statement['Action'] == 's3:GetObject' &&
-      statement['Resource'] == "arn:aws:s3:::#{naked_domain_name}/*"
+    statements = assert_json(policy,'Statement').returns(:all)
+
+    get_object_allow = 
+    assert_find(statements) do |assert,statement|
+      assert.expects_eq(statement,'Effect','Allow')
+      assert.expects_eq(statement,'Action','s3:GetObject')
+      assert.expects_eq(statement,'Resource',"arn:aws:s3:::#{naked_domain_name}/*")
     end
 
-    if found
-      {result: {score: 10, message: "Found valid bucket policy for #{naked_domain_name}"}}
-    else
-      {result: {score: 0, message: "Failed to find valid bucket policy for #{naked_domain_name}"}}
-    end
+    assert_not_nil(get_object_allow)
+
+    set_pass_message "Found valid bucket policy for #{naked_domain_name}"
+    set_fail_message "Failed to find valid bucket policy for #{naked_domain_name}"
   end
 
-  def self.should_have_a_naked_domain_bucket_static_website_hosting(manifest:,specific_params:)
-    naked_domain_name = specific_params.naked_domain_name
-    data = manifest.get_output!('s3api-list-buckets')
-    data['Buckets'].find{|t| t['Name'] == naked_domain_name}
+  spec :should_have_a_naked_domain_bucket_static_website_hosting do |t|
+    naked_domain_name = t.specific_params.naked_domain_name
+    bucket = assert_load('s3api-list-buckets','Buckets').find('Name',naked_domain_name).returns(:all)
+    
+    assert_not_nil(bucket)
 
-    hosting = manifest.get_output!("s3api-get-bucket-website__#{naked_domain_name}")
+    hosting = assert_load("s3api-get-bucket-website__#{naked_domain_name}").returns(:all)
 
-    found =
-    hosting['IndexDocument']['Suffix'] = 'index.html'
+    assert_json(hosting,'IndexDocument','Suffix').expects_eq('index.html')
 
-    if found
-      {result: {score: 10, message: "Found s3 static website hosting serviing index.html for #{naked_domain_name}"}}
-    else
-      {result: {score: 0, message: "Failed to find s3 static website hosting serviing index.html for #{naked_domain_name}"}}
-    end
+    set_pass_message "Found s3 static website hosting serviing index.html for #{naked_domain_name}"
+    set_fail_message "Failed to find s3 static website hosting serviing index.html for #{naked_domain_name}"
   end
 
-  def self.should_have_a_www_bucket_with_redirect(manifest:,specific_params:)
-    naked_domain_name = specific_params.naked_domain_name
-    www_domain_name = "www.#{specific_params.naked_domain_name}"
-    data = manifest.get_output!('s3api-list-buckets')
-    data['Buckets'].find{|t| t['Name'] == naked_domain_name}
+  spec :should_have_a_www_bucket_with_redirect do |t|
+    naked_domain_name = t.specific_params.naked_domain_name
+    www_domain_name = "www.#{t.specific_params.naked_domain_name}"
+    bucket = assert_load('s3api-list-buckets','Buckets').find('Name',naked_domain_name).returns(:all)
+    www_bucket = assert_load('s3api-list-buckets','Buckets').find('Name',www_domain_name).returns(:all)
 
-    hosting = manifest.get_output!("s3api-get-bucket-website__#{www_domain_name}")
+    assert_not_nil(bucket)
+    assert_not_nil(www_bucket)
 
-    found =
-    hosting['RedirectAllRequestsTo']['HostName'] = naked_domain_name
+    hosting = assert_load("s3api-get-bucket-website__#{www_domain_name}").returns(:all)
 
-    if found
-      {result: {score: 10, message: "Found s3 static website hosting for #{www_domain_name} redirecting to #{naked_domain_name}"}}
-    else
-      {result: {score: 0, message: "Failed to find s3 static website hosting for #{www_domain_name} redirecting to #{naked_domain_name}"}}
-    end
+    assert_json(hosting,'RedirectAllRequestsTo','HostName').expects_eq(naked_domain_name)
+
+    set_pass_message "Found s3 static website hosting for #{www_domain_name} redirecting to #{naked_domain_name}"
+    set_fail_message "Failed to find s3 static website hosting for #{www_domain_name} redirecting to #{naked_domain_name}"
   end
 
-  def self.should_have_a_cloudfront_distrubition_to_static_website(manifest:,specific_params:)
-    naked_domain_name = specific_params.naked_domain_name
-    www_domain_name = "www.#{specific_params.naked_domain_name}"
+  spec :should_have_a_cloudfront_distrubition_to_static_website do |t|
+    naked_domain_name = t.specific_params.naked_domain_name
+    www_domain_name = "www.#{t.specific_params.naked_domain_name}"
 
     domains = [naked_domain_name,www_domain_name]
 
-    data = manifest.get_output!('cloudfront-list-distributions')
+    items = assert_load('cloudfront-list-distributions','DistributionList').returns('Items')
 
     distribution =
-    data['DistributionList']['Items'].find do |distribution|
-      distribution['Aliases']['Quantity'] == 2 &&
-      distribution['Aliases']['Items'].all?{|t| domains.include?(t) }
-    end
+    assert_find(items) do |assert,distribution|
+      aliases = distribution['Aliases']
+      assert.expects_eq(aliases,'Quantity',2)
+      all_domains = aliases['Items'].all?{|t| domains.include?(t) }
+      assert.expects_true(all_domains)
+    end.returns(:all)
 
-    found =
-    distribution['Status'] == 'Deployed' &&
-    distribution['Origins']['Quantity'] == 1 &&
-    distribution['Origins']['Items'].first['DomainName'] == "#{naked_domain_name}.s3.amazonaws.com"
+    assert_not_nil(distribution)
 
-    dist_id = distribution['Id']
-    dist_domain_name = distribution['DomainName']
+    assert_json(distribution,'Status').expects_eq('Deployed')
+    assert_json(distribution,'Origins','Quantity').expects_eq(1)
 
-    if found
-      {
-        result: {
-          score: 10, 
-          message: "Found static website CloudFront distrubution with origin to S3 static website bucket for: #{naked_domain_name}.s3.amazonaws.com"
-        },
-        static_website_distribution_id: dist_id,
-        static_website_distribution_domain_name: dist_domain_name
-      }
-    else
-      {result: {score: 0, message: "Failed to find static website CloudFront with origin to S3 static website bucket for: #{naked_domain_name}.s3.amazonaws.com"}}
-    end
+    item = assert_json(distribution,'Origins','Items').returns(:first) 
+    assert_json(item,'DomainName').expects_eq("#{naked_domain_name}.s3.amazonaws.com")
+
+    dist_id = assert_json(distribution,'Id').returns(:all)
+    dist_domain_name = assert_json(distribution,'DomainName').returns(:all)
+
+    set_state_value :static_website_distribution_id, dist_id
+    set_state_value :static_website_distribution_domain_name, dist_domain_name
+
+    set_pass_message "Found static website CloudFront distrubution with origin to S3 static website bucket for: #{naked_domain_name}.s3.amazonaws.com"
+    set_fail_message "Failed to find static website CloudFront with origin to S3 static website bucket for: #{naked_domain_name}.s3.amazonaws.com"
   end
 
-  def self.should_have_ran_invalidation_on_distrubition(manifest:,specific_params:,static_website_distribution_id:)
-    invalidations = manifest.get_output!("cloudfront-list-invalidations__#{static_website_distribution_id}")
+  spec :should_have_ran_invalidation_on_distrubition do |t|
+    dist_id = t.dynamic_params.static_website_distribution_id
+    items = assert_load("cloudfront-list-invalidations__#{dist_id}","InvalidationList").returns('Items')
 
     found =
-    invalidations['InvalidationList']['Items'].any?{|t| t['Status'] == 'Completed' }
+    assert_find(items) do |assert, item|
+      assert.expects_eq(item,'Status','Completed')
+    end.returns(:all)
 
-    if found
-      {result: {score: 10, message: "Found static website CloudFront distrubution to have ran invalidations"}}
-    else
-      {result: {score: 0, message: "Failed to find static website CloudFront distrubution to have ran invalidations"}}
-    end
+    assert_not_nil found
+
+    set_pass_message "Found static website CloudFront distrubution to have ran invalidations"
+    set_fail_message "Failed to find static website CloudFront distrubution to have ran invalidations"
   end
 
-  def self.should_have_support_for_spa(manifest:,specific_params:,static_website_distribution_id:)
-    data = manifest.get_output!('cloudfront-list-distributions')
-    distribution = data['DistributionList']['Items'].find{|t| t['Id'] == static_website_distribution_id}
+  spec :should_have_support_for_spa do |t|
+    dist_id = t.dynamic_params.static_website_distribution_id
 
-    err = distribution['CustomErrorResponses']['Items'].first
+    items = assert_load("cloudfront-list-distributions","DistributionList").returns('Items')
 
-    # ensure that it serves up
-    found =
-    err['ErrorCode'] == 403 &&
-    err['ResponsePagePath'] == "/index.html" &&
-    err['ResponseCode'] == "200"
+    distribution = 
+    assert_find(items) do |assert,item|
+      assert.expects_eq(item,'Id',dist_id)
+    end.returns(:all)
 
-    if found
-      {result: {score: 10, message: "Found static website CloudFront distrubution to support SPA through custom error page"}}
-    else
-      {result: {score: 0, message: "Failed to find static website CloudFront distrubution to support SPA through custom error page"}}
-    end
+    assert_not_nil distribution
+
+    err = assert_json(distribution,'CustomErrorResponses','Items').returns(:first)
+
+    assert_json(err,'ErrorCode').expects_eq(403)
+    assert_json(err,'ResponsePagePath').expects_eq("/index.html")
+    assert_json(err,'ResponseCode').expects_eq("200")
+
+    set_pass_message "Found static website CloudFront distrubution to support SPA through custom error page"
+    set_fail_message "Failed to find static website CloudFront distrubution to support SPA through custom error page"
   end
 
-  def self.should_have_route53_to_distribution(manifest:,specific_params:,static_website_distribution_domain_name:)
-    naked_domain_name = specific_params.naked_domain_name
-    www_domain_name = "www.#{specific_params.naked_domain_name}"
+  spec :should_have_route53_to_distribution do |t|
+    naked_domain_name = t.specific_params.naked_domain_name
+    www_domain_name = "www.#{t.specific_params.naked_domain_name}"
+    dist_domain_name = t.dynamic_params.static_website_distribution_domain_name
 
-    data = manifest.get_output!('route53-list-hosted-zones')
+    zone_arn = assert_load('route53-list-hosted-zones','HostedZones').find('Name',"#{naked_domain_name}.").returns('Id')
 
-    zone =
-    data['HostedZones'].find do |zone|
-      zone['Name'] == "#{naked_domain_name}."
-    end
+    zone_id = zone_arn.split("/").last
 
-    zone_id = zone['Id'].split("/").last
-
-    zone_data = manifest.get_output!("route53-list-resource-record-sets__#{zone_id}")
+    record_sets = assert_load("route53-list-resource-record-sets__#{zone_id}").returns('ResourceRecordSets')
 
     naked_record =
-    zone_data['ResourceRecordSets'].find do |record|
-      record['Name'] == "#{naked_domain_name}." &&
-      record['Type'] == "A"
-    end
+    assert_find(record_sets) do |assert,record|
+      assert.expects_eq(record,'Name',"#{naked_domain_name}.")
+      assert.expects_eq(record,'Type',"A")
+    end.returns(:all)
 
     www_record =
-    zone_data['ResourceRecordSets'].find do |record|
-      record['Name'] == "#{www_domain_name}." &&
-      record['Type'] == "A"
-    end
+    assert_find(record_sets) do |assert,record|
+      assert.expects_eq(record,'Name',"#{www_domain_name}.")
+      assert.expects_eq(record,'Type',"A")
+    end.returns(:all)
 
-    found =
-    naked_record['AliasTarget']['DNSName'] == "#{static_website_distribution_domain_name}." &&
-    www_record['AliasTarget']['DNSName'] == "#{static_website_distribution_domain_name}."
+    assert_not_nil(naked_record)
+    assert_not_nil(www_record)
 
-    if found
-      {result: {score: 10, message: "Found route53 naked domain and www pointing to the cloudfront distribution for static website"}}
-    else
-      {result: {score: 0, message: "Failed to find route53 naked domain and www pointing to the cloudfront distribution for static websit"}}
-    end
+    assert_json(naked_record,'AliasTarget','DNSName').expects_eq("#{dist_domain_name}.")
+    assert_json(www_record,'AliasTarget','DNSName').expects_eq("#{dist_domain_name}.")
+
+    set_pass_message "Found route53 naked domain and www pointing to the cloudfront distribution for static website"
+    set_fail_message "Failed to find route53 naked domain and www pointing to the cloudfront distribution for static website"
   end
 end

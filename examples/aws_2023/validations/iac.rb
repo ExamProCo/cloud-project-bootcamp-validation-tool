@@ -1,16 +1,22 @@
-class Aws2023::Validations::Iac
-  def self.should_have_stack(manifest:,specific_params:,stack_name:)
-    data = manifest.get_output!('cloudformation-list-stacks')
-    stack = data['StackSummaries'].find{|t| t['StackName'] == stack_name}
-    if stack
-      if %w{CREATE_COMPLETE UPDATE_COMPLETE}.include?(stack['StackStatus'])
-        {result: {score: 10, message: "Found Cloudformation stack named #{name} with status UPDATE_COMPLETE or CREATE_COMPLETE"}}
-      else
-        {result: {score: 3, message: "Did not find Cloudformation stack named #{name} with status UPDATE_COMPLETE or CREATE_COMPLETE"}}
-      end
-    else
-      {result: {score: 0, message: "Did not find Cloudformation stack named #{name}"}}
+Cpbvt::Tester::Runner.describe :iac do
+  stacks = %w(
+    CrdMachineUser
+    CrdSrvBackendFlask
+    CrdSyncRole
+    CrdFrontend
+    CrdCicd
+    CrdDb
+    CrdDdb
+    CrdCluster
+    CrdNet
+    ThumbingServerlessCdkStack
+    CDKToolkit
+  )
+  stacks.each do |stack_name|
+    spec "should_have_stack_#{stack_name.downcase}".to_sym do |t|
+      status = assert_load('cloudformation-list-stacks','StackSummaries').find('StackName',stack_name).returns('StackStatus')
+      statuses = %w{CREATE_COMPLETE UPDATE_COMPLETE}
+      assert_include?(statuses,nil,status)
     end
   end
-
 end

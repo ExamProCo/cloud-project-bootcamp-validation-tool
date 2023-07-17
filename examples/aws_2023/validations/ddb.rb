@@ -1,93 +1,75 @@
-class Aws2023::Validations::Ddb
-  def self.should_have_ddb_table(manifest:,specific_params:)
-    resource = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
-      manifest,
-      'CrdDdb',
-      "AWS::DynamoDB::Table"
-    )
-    table_name = resource['PhysicalResourceId']
-    data = manifest.get_output!("dynamodb-describe-table__#{table_name}")['Table']
+Cpbvt::Tester::Runner.describe :ddb do
+  spec :should_have_ddb_table do 
+    table_name = assert_cfn_resource('CrdDdb',"AWS::DynamoDB::Table").returns('PhysicalResourceId')
+    table = assert_load("dynamodb-describe-table__#{table_name}",'Table').returns(:all)
+
+    key_schema = assert_json(table,'KeySchema').returns(:all)
 
     pk =
-    data['KeySchema'].find do |t|
-      t['AttributeName'] == 'pk' && t['KeyType'] == 'HASH'
-    end
+    assert_find(key_schema) do |assert,item|
+      assert.expects_eq(item,'AttributeName','pk')
+      assert.expects_eq(item,'KeyType','HASH')
+    end.returns(:all)
 
     sk =
-    data['KeySchema'].find do |t|
-      t['AttributeName'] == 'sk' && t['KeyType'] == 'RANGE'
-    end
+    assert_find(key_schema) do |assert,item|
+      assert.expects_eq(item,'AttributeName','sk')
+      assert.expects_eq(item,'KeyType','RANGE')
+    end.returns(:all)
 
-    found =
-    pk &&
-    sk &&
-    data['TableStatus'] == 'ACTIVE' &&
-    data['TableSizeBytes'] > 0 &&
-    data['ItemCount'] > 0
+    assert_not_nil(pk)
+    assert_not_nil(sk)
 
-    if found
-      {result: {score: 10, message: "Found dynamodb table with data in it "}}
-    else
-      {result: {score: 0, message: "Failed to find dynamodb table with data in it"}}
-    end
+    assert_json(table,'TableStatus').expects_eq('ACTIVE')
+    assert_json(table,'TableSizeBytes').expects_gt(0)
+    assert_json(table,'ItemCount').expects_gt(0)
+
+    set_pass_message "Found dynamodb table with data in it"
+    set_fail_message "Failed to find dynamodb table with data in it"
   end
 
-  def self.should_have_gsi(manifest:,specific_params:)
-    resource = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
-      manifest,
-      'CrdDdb',
-      "AWS::DynamoDB::Table"
-    )
-    table_name = resource['PhysicalResourceId']
-    data = manifest.get_output!("dynamodb-describe-table__#{table_name}")['Table']
+  spec :should_have_gsi do
+    table_name = assert_cfn_resource('CrdDdb',"AWS::DynamoDB::Table").returns('PhysicalResourceId')
+    table = assert_load("dynamodb-describe-table__#{table_name}",'Table').returns(:all)
 
-    gsi = data['GlobalSecondaryIndexes'].first
+    gsi = assert_json(table,'GlobalSecondaryIndexes').returns(:first)
+    key_schema = assert_json(gsi,'KeySchema').returns(:all)
 
     pk =
-    gsi['KeySchema'].find do |t|
-      t['AttributeName'] == 'message_group_uuid' && t['KeyType'] == 'HASH'
-    end
+    assert_find(key_schema) do |assert,item|
+      assert.expects_eq(item,'AttributeName','message_group_uuid')
+      assert.expects_eq(item,'KeyType','HASH')
+    end.returns(:all)
 
     sk =
-    gsi['KeySchema'].find do |t|
-      t['AttributeName'] == 'sk' && t['KeyType'] == 'RANGE'
-    end
+    assert_find(key_schema) do |assert,item|
+      assert.expects_eq(item,'AttributeName','sk')
+      assert.expects_eq(item,'KeyType','RANGE')
+    end.returns(:all)
 
-    found =
-    pk &&
-    sk &&
-    gsi['IndexStatus'] == 'ACTIVE' &&
-    gsi['IndexSizeBytes'] > 0 &&
-    gsi['ItemCount'] > 0
+    assert_not_nil(pk)
+    assert_not_nil(sk)
 
-    if found
-      {result: {score: 10, message: "Found dynamodb table GSI with data in it "}}
-    else
-      {result: {score: 0, message: "Failed to find dynamodb table GSI with data in it"}}
-    end
+    assert_json(gsi,'IndexStatus').expects_eq('ACTIVE')
+    assert_json(gsi,'TableSizeBytes').expects_gt(0)
+    assert_json(gsi,'ItemCount').expects_gt(0)
+
+    set_pass_message "Found dynamodb table GSI with data in it"
+    set_fail_message "Failed to find dynamodb table GSI with data in it"
   end
 
-  def self.should_have_ddb_stream(manifest:,specific_params:)
-    resource = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
-      manifest,
-      'CrdDdb',
-      "AWS::DynamoDB::Table"
-    )
-    table_name = resource['PhysicalResourceId']
-    data = manifest.get_output!("dynamodb-describe-table__#{table_name}")['Table']
+  spec :should_have_ddb_stream do
+    table_name = assert_cfn_resource('CrdDdb',"AWS::DynamoDB::Table").returns('PhysicalResourceId')
+    table = assert_load("dynamodb-describe-table__#{table_name}",'Table').returns(:all)
 
-    label = data['LatestStreamLabel']
+    label = assert_json(table,'LatestStreamLabel').returns(:all)
 
-    stream_data = manifest.get_output!("dynamodbstreams-describe-stream__#{label}")
+    desc = assert_load("dynamodbstreams-describe-stream__#{label}").returns('StreamDescription')
 
-    found =
-    stream_data['StreamDescription']['StreamStatus'] == 'ENABLED' &&
-    stream_data['StreamDescription']['StreamViewType'] == 'NEW_IMAGE'
+    assert_json(desc,'StreamStatus').expects_eq('ENABLED')
+    assert_json(desc,'StreamViewType').expects_eq('NEW_IMAGE')
 
-    if found
-      {result: {score: 10, message: "Found dynamodb stream with NEW_IMAGE"}}
-    else
-      {result: {score: 0, message: "Failed to find dynamodb stream with NEW_IMAGE"}}
-    end
+    set_pass_message "Found dynamodb stream with NEW_IMAGE"
+    set_fail_message "Failed to find dynamodb stream with NEW_IMAGE"
   end
 end

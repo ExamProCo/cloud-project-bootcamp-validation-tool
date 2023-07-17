@@ -1,53 +1,39 @@
-class Aws2023::Validations::Db
-  def self.should_have_public_rds_instance(manifest:,specific_params:,vpc_id:)
-    resource_cluster = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
-      manifest,
-      'CrdDb',
-      "AWS::RDS::DBInstance"
-    )
-    db_id = resource_cluster['PhysicalResourceId']
+Cpbvt::Tester::Runner.describe :db do
+  spec :should_have_public_rds_instance do |t|
+    vpc_id = t.dynamic_params.vpc_id
 
-    data = manifest.get_output!('rds-describe-db-instances')
+    db_id = assert_cfn_resource('CrdDb',"AWS::RDS::DBInstance").returns('PhysicalResourceId')
+    db = assert_load('rds-describe-db-instances','DBInstances').find('DBInstanceIdentifier',db_id).returns(:all)
 
-    db =
-    data['DBInstances'].find do |t|
-      t['DBInstanceIdentifier'] == db_id
-    end
+    assert_json(db,'PubliclyAccessible').expects_true
+    assert_json(db,'Engine').expects_eq('postgres')
+    assert_json(db,'DBSubnetGroup','VpcId').expects_eq(vpc_id)
 
-    found =
-    db['PubliclyAccessible'] = true &&
-    db['Engine'] = 'postgres' &&
-    db['DBSubnetGroup']['VpcId'] == vpc_id
-
-    if found
-      {result: {score: 10, message: "Found the primary database running an RDS instance of postgres"}}
-    else
-      {result: {score: 10, message: "Failed to find the primary database running an RDS instance of postgres"}}
-    end
+    set_pass_message "Found the primary database running an RDS instance of postgres"
+    set_fail_message "Failed to find the primary database running an RDS instance of postgres"
   end
 
-  def self.should_have_db_sg(manifest:,specific_params:,serv_sg_id:)
-    resource_cluster = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
-      manifest,
-      'CrdDb',
-      "AWS::EC2::SecurityGroup"
-    )
-    sg_id = resource_cluster['PhysicalResourceId']
+  spec :should_have_db_sg do |t|
+    serv_sg_id = t.dynamic_params.serv_sg_id
 
-    sg_data = manifest.get_output!('ec2-describe-security-groups')
-    sg = sg_data['SecurityGroups'].find{|t| t['GroupId'] == sg_id}
+    sg_id = assert_cfn_resource('CrdDb',"AWS::EC2::SecurityGroup").returns('PhysicalResourceId')
+
+    sg = assert_load('ec2-describe-security-groups','SecurityGroups').find('GroupId',sg_id).returns(:all)
+
+    rules = assert_json(sg,'IpPermissions').returns(:all)
 
     serv_sg_rule =
-    sg['IpPermissions'].find do |rule|
-      rule['FromPort'] == 5432 &&
-      rule['ToPort'] == 5432 &&
-      rule['UserIdGroupPairs'].any?{|t|t['GroupId'] == serv_sg_id}
-    end
+    assert_find(rules) do |assert,rule|
+      assert.expects_eq(rule,'FromPort',5432)
+      assert.expects_eq(rule,'ToPort',5432)
+      assert.expects_any?(rule,'UserIdGroupPairs') do |pair|
+        pair['GroupId'] == serv_sg_id
+      end
+    end.returns(:all)
 
-    if serv_sg_rule
-      {result: {score: 10, message: "Found a Security Group for the RDS Instance with ingress allowed on port 4567 for the backend-service SG"}} 
-    else
-      {result: {score: 0, message: "Failed to find a Security Group for the RDS Instance with ingress allowed on port 4567 for the backend-service SG"}} 
-    end
+    assert_not_nil(serv_sg_rule)
+
+    set_pass_message "Found a Security Group for the RDS Instance with ingress allowed on port 4567 for the backend-service SG"
+    set_fail_message "Failed to find a Security Group for the RDS Instance with ingress allowed on port 4567 for the backend-service SG"
   end
 end

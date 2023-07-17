@@ -18,7 +18,6 @@ require_relative 'aws_2023/permissioner.rb'
 require_relative 'aws_2023/puller.rb'
 require_relative 'aws_2023/state.rb'
 require_relative 'aws_2023/validator.rb'
-require_relative 'aws_2023/validator2.rb'
 # --- require aws_2023/validations/*
 validations_path = File.join(File.dirname(__FILE__),'aws_2023','validations','*.rb')
 Dir.glob(validations_path,&method(:require))
@@ -87,50 +86,6 @@ task :pull do
 end
 
 task :validate do
-  glob_path = File.join(
-    "/workspace",
-    "cloud-project-bootcamp-validation-tool",
-    "examples",
-    "output",
-    "aws-bootcamp-2023",
-    "user-#{ENV['USER_UUID']}",
-    "/*/")
-  run_uuids = Dir.glob(glob_path).map{|t| t.split('/').last.sub("run-","") }
-  run_uuid = run_uuids.last
-
-  general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
-    project_scope: "aws-bootcamp-2023",
-    run_uuid: run_uuid,
-    user_uuid: ENV['USER_UUID'],
-    user_region: ENV['USER_AWS_REGION'],
-    output_path: ENV['OUTPUT_PATH'],
-    region: ENV['AWS_REGION'],
-    aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-    aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    payloads_bucket: ENV['PAYLOADS_BUCKET'],
-    target_aws_account_id: ENV['TARGET_AWS_ACCOUNT_ID'],
-    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
-  )
-
-  puts "validating for: aws_2023 =="
-  puts run_uuid
-
-  specific_params = Aws2023::SpecificParams::Validator.new(
-    naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
-    github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
-    cluster_name: ENV['CLUSTER_NAME'],
-    backend_family: ENV['BACKEND_FAMILY'],
-    cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
-    apigateway_api_id: ENV['APIGATEWAY_API_ID'],
-    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME']
-  )
-  Aws2023::Validator.run(
-    general_params: general_params,
-    specific_params: specific_params
-  )
-end
-
-task :validate2 do
   glob_path = File.join(
     "/workspace",
     "cloud-project-bootcamp-validation-tool",

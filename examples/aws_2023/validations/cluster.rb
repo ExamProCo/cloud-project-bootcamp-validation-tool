@@ -1,287 +1,227 @@
-class Aws2023::Validations::Cluster
-  def self.should_have_a_cluster(manifest:,specific_params:)
-    resource_cluster = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
-      manifest,
-      'CrdCluster',
-      "AWS::ECS::Cluster"
-    )
-    cluster_name = resource_cluster['PhysicalResourceId']
+Cpbvt::Tester::Runner.describe :cluster do
+  spec :should_have_a_cluster do |t|
+    cluster_name = assert_cfn_resource('CrdCluster',"AWS::ECS::Cluster").returns('PhysicalResourceId')
 
-    clusters = manifest.get_output!("ecs-describe-clusters__#{cluster_name}")
-    cluster = clusters['clusters'].first
+    cluster = assert_load("ecs-describe-clusters__#{cluster_name}",'clusters').returns(:first)
 
-    found =
-    cluster['status'] == 'ACTIVE' &&
-    cluster['capacityProviders'].include?('FARGATE')
+    assert_eq(cluster,'status','ACTIVE')
+    assert_include?(cluster,'capacityProviders','FARGATE')
 
-    if found
-      {result: {score: 10, message: "Found a cluster: #{cluster_name} that is ACTIVE for FARGATE"}}
-    else
-      {result: {score: 0, message: "Failed to find a cluster that is ACTIVE for FARGATE"}}
-    end
+    set_pass_message "Found a cluster: #{cluster_name} that is ACTIVE for FARGATE"
+    set_fail_message "Failed to find a cluster that is ACTIVE for FARGATE"
   end
 
-  def self.should_have_a_task_definition(manifest:,specific_params:)
-    data = manifest.get_output!('ecs-list-task-definitions')
-    found =
-    data['taskDefinitionArns'].any? do |arn|
-      arn.match(specific_params.backend_family)
-    end
+  spec :should_have_a_task_definition do |t|
+    family = t.specific_params.backend_family
+    task_def_arns = assert_load('ecs-list-task-definitions','taskDefinitionArns').returns(:all)
 
-    if found
-      {result: {score: 10, message: "Found a task defintition with a family: #{specific_params.backend_family}"}}
-    else
-      {result: {score: 0, message: "Failed to find a task defintition with a family: #{specific_params.backend_family}"}}
-    end
+    arn =
+    assert_find(task_def_arns) do |assert, arn| 
+      assert.expects_match(arn,family)
+    end.returns(:all)
+
+    assert_not_nil arn
+
+    set_pass_message "Found a task defintition with a family: #{family}"
+    set_fail_message "Failed to find a task defintition with a family: #{family}"
   end
 
-  def self.should_have_an_ecr_repo(manifest:,specific_params:)
-    data = manifest.get_output!('ecr-describe-repositories')
-    repo = data['repositories'].find{|t| t['repositoryName'] == specific_params.backend_family}
+  spec :should_have_an_ecr_repo do |t|
+    family = t.specific_params.backend_family
+    data = assert_load('ecr-describe-repositories','repositories').find('repositoryName',family).returns(:all)
+
     # [TODO] Check if images are present in the container repo
 
-    if repo
-      {result: {score: 10, message: "Found a task defintition with a family: #{specific_params.backend_family}"}}
-    else
-      {result: {score: 0, message: "Failed to find a task defintition with a family: #{specific_params.backend_family}"}}
-    end
+    set_pass_message "Found a task defintition with a family: #{family}"
+    set_fail_message "Failed to find a task defintition with a family: #{family}"
   end
 
-  def self.should_have_a_service(manifest:,specific_params:)
-    cluster_name = specific_params.cluster_name
-    data = manifest.get_output!("ecs-describe-services__#{cluster_name}")
-    backend_service = data['services'].find{|t|t['serviceName'] == specific_params.backend_family}
+  spec :should_have_a_service do |t|
+    cluster_name = t.specific_params.cluster_name
+    family = t.specific_params.backend_family
 
-    found = backend_service['status'] == 'ACTIVE'
+    backend_service = assert_load("ecs-describe-services__#{cluster_name}",'services')
+      .find('serviceName', family)
+      .returns(:all)
 
-    if found
-      {result: {score: 10, message: "Found a fargate service a #{specific_params.backend_family}"}}
-    else
-      {result: {score: 0, message: "Failed to find a fargate service a #{specific_params.backend_family}"}}
-    end
+    assert_json(backend_service,'status').expects_eq('ACTIVE')
+
+    set_pass_message "Found a fargate service a #{family}"
+    set_fail_message "Failed to find a fargate service a #{family}"
   end
 
-  def self.should_have_a_running_task(manifest:,specific_params:)
-    cluster_name = specific_params.cluster_name
-    data = manifest.get_output!("ecs-describe-tasks")
+  spec :should_have_a_running_task do |t|
+    family = t.specific_params.backend_family
+    cluster_name = t.specific_params.cluster_name
+    tasks = assert_load("ecs-describe-tasks",'tasks').returns(:all)
+
+    assert_not_nil(tasks)
 
     container = nil
-    data['tasks'].each do |task|
+    tasks.each do |task|
       if task['clusterArn'].match(cluster_name)
         container = task['containers'].find do |container|
-          container['name'] == specific_params.backend_family
+          container['name'] == family
         end
-        if container
-          break
-        end
+        break if container
       end
     end
 
-    healthy = container['healthStatus'] == 'HEALTHY'
+    assert_json(container,'healthStatus').expects_eq('HEALTHY')
 
-    if healthy
-      {result: {score: 10, message: "Found an ECS task for: #{specific_params.backend_family} running in the expected cluster and service that is HEALTHY"}}
-    else
-      {result: {score: 0, message: "Failed to find an ECS task for: #{specific_params.backend_family} running in the expected cluster and service that is HEALTHY"}}
-    end
+    set_pass_message "Found an ECS task for: #{family} running in the expected cluster and service that is HEALTHY"
+    set_fail_message "Failed to find an ECS task for: #{family} running in the expected cluster and service that is HEALTHY"
   end
 
-  def self.should_have_an_alb(manifest:,specific_params:)
-    cluster_name = specific_params.cluster_name
-    service_name = specific_params.backend_family
-    data = manifest.get_output!("ecs-describe-services__#{cluster_name}")
-    backend_service = data['services'].find{|t|t['serviceName'] == service_name}
+  spec :should_have_an_alb do |t|
+    cluster_name = t.specific_params.cluster_name
+    family = t.specific_params.backend_family
 
-    if backend_service.key?('loadBalancers')
-      found = backend_service['loadBalancers'].first['containerPort'] = 4567
-      if found 
-        backend_tg_arn = backend_service['loadBalancers'].first['targetGroupArn']
-        {
-          result: {
-            score: 10, 
-            message: "Found attached load balancer for the fargate service: #{service_name}"
-          }, 
-          backend_tg_arn: backend_tg_arn
-        }
-      else
-        {result: {score: 5, message: "Failed to find an attached load balancer for the fargate service: #{service_name} for port 4567"}}
-      end
-    else
-      {result: {score: 0, message: "Failed to find an attached load balancer for the fargate service: #{service_name}"}}
-    end
+    backend_service = assert_load("ecs-describe-services__#{cluster_name}",'services')
+      .find('serviceName', family)
+      .returns(:all)
+
+    alb = assert_json(backend_service,'loadBalancers').returns(:first)
+
+    backend_tg_arn = false
+
+    assert_json(alb,'containerPort').expects_eq(4567)
+
+    backend_tg_arn = assert_json(alb,'targetGroupArn').returns(:all)
+
+    set_pass_message "Found attached load balancer for the fargate service: #{family}"
+    set_fail_message "Failed to find an attached load balancer for the fargate service: #{family} for port 4567"
+
+    set_state_value :backend_tg_arn, backend_tg_arn
   end
 
-  def self.should_have_alb_sg(manifest:,specific_params:)
-    resource_alb = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
-      manifest,
-      'CrdCluster',
-      "AWS::ElasticLoadBalancingV2::LoadBalancer"
-    )
-    alb_arn = resource_alb['PhysicalResourceId']
+  spec :should_have_alb_sg do |t|
+    alb_arn = assert_cfn_resource('CrdCluster',"AWS::ElasticLoadBalancingV2::LoadBalancer").returns('PhysicalResourceId')
 
-    data = manifest.get_output!('elbv2-describe-load-balancers')
+    alb = assert_load('elbv2-describe-load-balancers','LoadBalancers').find('LoadBalancerArn',alb_arn).returns(:all)
 
-    alb =
-    data['LoadBalancers'].find do |lb|
-      lb['LoadBalancerArn'] == alb_arn
-    end
+    sg_id = false
+    sg_id = assert_json(alb,'SecurityGroups').returns(:first)
 
-    sg_id = alb['SecurityGroups'].first
+    sg = assert_load('ec2-describe-security-groups','SecurityGroups').find('GroupId',sg_id).returns(:all)
 
-    sg_data = manifest.get_output!('ec2-describe-security-groups')
-
-    sg = sg_data['SecurityGroups'].find{|t| t['GroupId'] == sg_id}
+    rules = assert_json(sg,'IpPermissions').returns(:all)
 
     http_sg_rule =
-    sg['IpPermissions'].find do |rule|
-      rule['FromPort'] == 80 &&
-      rule['ToPort'] == 80 &&
-      rule['IpRanges'].first['CidrIp'] == '0.0.0.0/0'
+    assert_find(rules) do |assert,rule|
+      assert.expects_eq(rule,'FromPort', 80)
+      assert.expects_eq(rule,'ToPort', 80)
+      assert.expects_any?(rule,'IpRanges',label: "CidrIp=0.0.0.0/0") do |range|
+        range['CidrIp'] == '0.0.0.0/0'
+      end
     end
 
     https_sg_rule =
-    sg['IpPermissions'].find do |rule|
-      rule['FromPort'] == 443 &&
-      rule['ToPort'] == 443 &&
-      rule['IpRanges'].first['CidrIp'] == '0.0.0.0/0'
+    assert_find(rules) do |assert,rule|
+      assert.expects_eq(rule,'FromPort', 443)
+      assert.expects_eq(rule,'ToPort', 443)
+      assert.expects_any?(rule,'IpRanges',label: "CidrIp=0.0.0.0/0") do |range|
+        range['CidrIp'] == '0.0.0.0/0'
+      end
     end
 
-    if https_sg_rule && http_sg_rule
-      {result: {score: 10, message: "Found a Security Group for the ALB with ingress to internet for 80 and 443"}, alb_sg_id: sg_id }
-    else
-      {result: {score: 0, message: "Failed to find a Security Group for the ALB without ingress to internet for 80 and 443"}}
-    end
+    assert_not_nil(http_sg_rule)
+    assert_not_nil(https_sg_rule)
 
+    set_state_value :alb_sg_id, sg_id
+
+    set_pass_message "Found a Security Group for the ALB with ingress to internet for 80 and 443"
+    set_fail_message "Failed to find a Security Group for the ALB without ingress to internet for 80 and 443"
   end
 
-  def self.should_have_service_sg(manifest:,specific_params:,alb_sg_id:)
-    cluster_name = specific_params.cluster_name
-    service_name = specific_params.backend_family
-    data = manifest.get_output!("ecs-describe-services__#{cluster_name}")
-    backend_service = data['services'].find{|t|t['serviceName'] == service_name}
+  spec :should_have_service_sg do |t|
+    cluster_name = t.specific_params.cluster_name
+    family = t.specific_params.backend_family
+    alb_sg_id = t.dynamic_params.alb_sg_id
 
-    sg_id = backend_service['networkConfiguration']['awsvpcConfiguration']['securityGroups'].first
-    
-    sg_data = manifest.get_output!('ec2-describe-security-groups')
+    backend_service = assert_load("ecs-describe-services__#{cluster_name}",'services')
+      .find('serviceName', family)
+      .returns(:all)
 
-    sg = sg_data['SecurityGroups'].find{|t| t['GroupId'] == sg_id}
+    sg_id = assert_json(backend_service,'networkConfiguration','awsvpcConfiguration','securityGroups').returns(:first)
+
+    sg = assert_load('ec2-describe-security-groups','SecurityGroups').find('GroupId',sg_id).returns(:all)
+
+    rules = assert_json(sg,'IpPermissions').returns(:all)
 
     alb_sg_rule =
-    sg['IpPermissions'].find do |rule|
-      rule['FromPort'] == 4567 &&
-      rule['ToPort'] == 4567 &&
-      rule['UserIdGroupPairs'].first['GroupId'] == alb_sg_id
+    assert_find(rules) do |assert,rule|
+      assert.expects_eq(rule,'FromPort', 4567)
+      assert.expects_eq(rule,'ToPort', 4567)
+      pair = rule['UserIdGroupPairs'].first
+      assert.expects_eq(pair,'GroupIp',alb_sg_id)
     end
 
-    if alb_sg_rule
-      {result: {score: 10, message: "Found a Security Group for the the backend service with ingress to the ALB SG on port 4567"}, serv_sg_id: sg_id }
-    else
-      {result: {score: 0, message: "Failed to find a Security Group for the the backend service with ingress to the ALB SG on port 4567"}}
-    end
+    assert_not_nil(alb_sg_rule)
+
+    set_state_value :serv_sg_id, sg_id
+
+    set_pass_message "Found a Security Group for the the backend service with ingress to the ALB SG on port 4567"
+    set_fail_message "Failed to find a Security Group for the the backend service with ingress to the ALB SG on port 4567"
   end
 
-  def self.should_have_target_group(manifest:,specific_params:,backend_tg_arn:)
-    tg_id = backend_tg_arn.split("/").last
-    data = manifest.get_output!('elbv2-describe-target-groups')
-    tg = data['TargetGroups'].find{|t| t['TargetGroupArn'] == backend_tg_arn }
+  spec :should_have_target_group do |t|
+    backend_tg_arn = t.dynamic_params.backend_tg_arn
 
-    tg_health_data = manifest.get_output("elbv2-describe-target-health__#{tg_id}")
+    tg_id = false
+    tg_id = backend_tg_arn.split("/").last if backend_tg_arn
 
-    found_tg =
-    tg['Port'] == 4567 &&
-    tg['HealthCheckPort'] == 4567.to_s &&
-    tg['HealthCheckEnabled'] == true &&
-    tg['HealthCheckPath'] == "/api/health-check"
+    tg = assert_load('elbv2-describe-target-groups','TargetGroups').find('TargetGroupArn',backend_tg_arn).returns(:all)
+    tg_health_data = assert_load("elbv2-describe-target-health__#{tg_id}").returns(:all)
 
+    assert_json(tg,'Port').expects_eq(4567)
+    assert_json(tg,'HealthCheckPort').expects_eq(4567.to_s)
+    assert_json(tg,'HealthCheckEnabled').expects_true
+    assert_json(tg,'HealthCheckPath').expects_eq('/api/health-check')
 
-    desc = tg_health_data['TargetHealthDescriptions'].first
+    desc = assert_json(tg_health_data,'TargetHealthDescriptions').returns(:first)
 
-    found_tg_healthcheck = 
-    desc['Target']['Port'] == 4567 &&
-    desc['HealthCheckPort'] == 4567.to_s &&
-    desc['TargetHealth']["State"] == 'healthy'
+    assert_json(desc,'Target','Port').expects_eq(4567)
+    assert_json(desc,'HealthCheckPort').expects_eq(4567.to_s)
+    assert_json(desc,'TargetHealth','State').expects_eq('healthy')
 
-    if found_tg && found_tg_healthcheck 
-      {result: {score: 10, message: "Found Target Group with healthy target to backend-flask on port 4567"}}
-    else
-      {result: {score: 0, message: "Failed to find Target Group with healthy target to backend-flask on port 4567"}}
-    end
+    set_pass_message "Found Target Group with healthy target to backend-flask on port 4567"
+    set_fail_message "Failed to find Target Group with healthy target to backend-flask on port 4567"
   end
 
-  def self.should_have_cloudmap_namespace(manifest:,specific_params:)
-    data = manifest.get_output!('servicediscovery-list-namespaces')
-    found = 
-    data['Namespaces'].find do |service|
-      service['Name'] == 'cruddur'
-    end
+  spec :should_have_cloudmap_namespace do |t|
+    namespace = assert_load('servicediscovery-list-namespaces','Namespaces').find('Name','cruddur').returns(:all)
 
-    if found 
-      {result: {score: 10, message: "Found a CloudMap Namespace named cruddur"}}
-    else
-      {result: {score: 0, message: "Failed to find a CloudMap Namespace named cruddur"}}
-    end
+    assert_not_nil(namespace)
+
+    set_pass_message "Found a CloudMap Namespace named cruddur"
+    set_fail_message "Failed to find a CloudMap Namespace named cruddur"
   end
 
-  def self.should_have_cloudmap_service(manifest:,specific_params:)
-    service_name = specific_params.backend_family
-    data = manifest.get_output!('servicediscovery-list-services')
+  spec :should_have_route53_to_alb do |t|
+    naked_domain_name = t.specific_params.naked_domain_name
 
-    found = 
-    data['Services'].find do |service|
-      service['Name'] == service_name
-    end
+    alb_arn = assert_cfn_resource('CrdCluster',"AWS::ElasticLoadBalancingV2::LoadBalancer").returns('PhysicalResourceId')
 
-    if found 
-      {result: {score: 10, message: "Found a CloudMap Service named #{service_name}"}}
-    else
-      {result: {score: 0, message: "Failed to find a CloudMap Service named #{service_name}"}}
-    end
-  end
+    alb = assert_load('elbv2-describe-load-balancers','LoadBalancers').find('LoadBalancerArn',alb_arn).returns(:all)
 
-  def self.should_have_route53_to_alb(manifest:,specific_params:)
-    naked_domain_name = specific_params.naked_domain_name
-
-
-    resource_alb = Cpbvt::Payloads::Aws::Extractor.cloudformation_list_stacks__by_stack_resource_type(
-      manifest,
-      'CrdCluster',
-      "AWS::ElasticLoadBalancingV2::LoadBalancer"
-    )
-    alb_arn = resource_alb['PhysicalResourceId']
-
-    data = manifest.get_output!('elbv2-describe-load-balancers')
-
-    alb =
-    data['LoadBalancers'].find do |lb|
-      lb['LoadBalancerArn'] == alb_arn
-    end
     alb_domain_name = "dualstack.#{alb['DNSName'].downcase}"
 
-    data = manifest.get_output!('route53-list-hosted-zones')
+    zone_arn = assert_load('route53-list-hosted-zones','HostedZones').find('Name',"#{naked_domain_name}.").returns('Id')
 
-    zone =
-    data['HostedZones'].find do |zone|
-      zone['Name'] == "#{naked_domain_name}."
-    end
+    zone_id = zone_arn.split("/").last
 
-    zone_id = zone['Id'].split("/").last
-
-    zone_data = manifest.get_output!("route53-list-resource-record-sets__#{zone_id}")
+    record_sets = assert_load("route53-list-resource-record-sets__#{zone_id}").returns('ResourceRecordSets')
 
     record =
-    zone_data['ResourceRecordSets'].find do |record|
-      record['Name'] == "api.#{naked_domain_name}." &&
-      record['Type'] == "A"
-    end
+    assert_find(record_sets) do |assert,record|
+      assert.expects_eq(record,'Name',"api.#{naked_domain_name}.")
+      assert.expects_eq(record,'Type',"A")
+    end.returns(:all)
 
-    found = record['AliasTarget']['DNSName'] == "#{alb_domain_name}."
+    assert_json(record,'AliasTarget','DNSName').expects_eq("#{alb_domain_name}.")
 
-    if found
-      {result: {score: 10, message: "Found route53 pointing to domain name for the api"}}
-    else
-      {result: {score: 0, message: "Failed to find route53 pointing to domain name for the api"}}
-    end
+    set_pass_message "Found route53 pointing to domain name for the api"
+    set_fail_message "Failed to find route53 pointing to domain name for the api"
   end
-
-  # check for an ssl certificate?
 end
