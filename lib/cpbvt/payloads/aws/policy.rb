@@ -49,7 +49,7 @@ class Cpbvt::Payloads::Aws::Policy
   def self.generate! general_params
     path = File.join(
       File.dirname(File.expand_path(__FILE__)),
-      "#{general_params.run_uuid}-cross-account.yaml"
+      "#{general-params.run_uuid}-cross-account-role-template.yaml"
     )
     cfn_template = YAML.load_file(path)
 
@@ -92,7 +92,7 @@ class Cpbvt::Payloads::Aws::Policy
       general_params.output_path,
       general_params.project_scope,
       "user-#{general_params.user_uuid}",
-      "cross-account-role.yaml"
+      "#{general_params.run_uuid}-cross-account.yaml"
     )
 
     dirpath = File.dirname output_path
