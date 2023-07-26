@@ -49,7 +49,7 @@ class Cpbvt::Payloads::Aws::Policy
   def self.generate! general_params
     path = File.join(
       File.dirname(File.expand_path(__FILE__)),
-      "#{general-params.run_uuid}-cross-account-role-template.yaml"
+        "cross-account-role-template.yaml"
     )
     cfn_template = YAML.load_file(path)
 
@@ -86,6 +86,9 @@ class Cpbvt::Payloads::Aws::Policy
         permissions_chunk.push permission
       end
     end
+    
+    cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Principal']['AWS'] = "arn:aws:iam::#{general_params.source_aws_account_id}:root"
+    cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Condition']['StringEquals']['sts:ExternalId'] = general_params.user_uuid
 
 
     output_path = File.join(
@@ -101,5 +104,18 @@ class Cpbvt::Payloads::Aws::Policy
     File.open(output_path, 'w') do |f|
       f.write(cfn_template.to_yaml)
     end
+
+    # upload to s3
+    
+    s3 = Aws::S3::Resource.new({
+     credentials: Aws::Credentials.new(
+       ENV['VALIDATOR_AWS_ACCESS_KEY_ID'],
+       ENV['VALIDATOR_AWS_SECRET_ACCESS_KEY']
+    )})
+
+    obj = s3.bucket(ENV['VALIDATOR_PAYLOADS_BUCKET']).object("templates/#{general_params.project_scope}/user-#{general_params.user_uuid}/#{general_params.run_uuid}-cross-account.yaml")
+    obj.upload_file output_path
+    obj.presigned_url :get, expires_in: 60 * 60
+
   end
 end
