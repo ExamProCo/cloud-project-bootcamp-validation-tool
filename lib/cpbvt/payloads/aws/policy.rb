@@ -105,17 +105,5 @@ class Cpbvt::Payloads::Aws::Policy
       f.write(cfn_template.to_yaml)
     end
 
-    # upload to s3
-    
-    s3 = Aws::S3::Resource.new({
-     credentials: Aws::Credentials.new(
-       ENV['VALIDATOR_AWS_ACCESS_KEY_ID'],
-       ENV['VALIDATOR_AWS_SECRET_ACCESS_KEY']
-    )})
-
-    obj = s3.bucket(ENV['VALIDATOR_PAYLOADS_BUCKET']).object("templates/#{general_params.project_scope}/user-#{general_params.user_uuid}/#{general_params.run_uuid}-cross-account.yaml")
-    obj.upload_file output_path
-    obj.presigned_url :get, expires_in: 60 * 60
-
   end
 end
