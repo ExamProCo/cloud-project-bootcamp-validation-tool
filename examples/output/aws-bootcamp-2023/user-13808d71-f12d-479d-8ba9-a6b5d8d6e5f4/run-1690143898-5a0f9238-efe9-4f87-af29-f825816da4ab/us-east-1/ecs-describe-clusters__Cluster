@@ -1,0 +1,73 @@
+{
+    "clusters": [
+        {
+            "clusterArn": "arn:aws:ecs:us-east-1:198101904822:cluster/CrdClusterFargateCluster",
+            "clusterName": "CrdClusterFargateCluster",
+            "status": "ACTIVE",
+            "registeredContainerInstancesCount": 0,
+            "runningTasksCount": 1,
+            "pendingTasksCount": 0,
+            "activeServicesCount": 1,
+            "statistics": [],
+            "tags": [],
+            "settings": [],
+            "capacityProviders": [
+                "FARGATE"
+            ],
+            "defaultCapacityProviderStrategy": [],
+            "serviceConnectDefaults": {
+                "namespace": "arn:aws:servicediscovery:us-east-1:198101904822:namespace/ns-7cypcnd5r7mxgaiw"
+            }
+        }
+    ],
+    "failures": [
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/CrdClusterFargateCluster.json",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/Services",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/provider",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/Registered",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/monitoring",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/Cluster",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/instances",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/Tasks",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/CloudWatch",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/Capacity",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/container",
+            "reason": "MISSING"
+        },
+        {
+            "arn": "arn:aws:ecs:us-east-1:198101904822:cluster/strategy",
+            "reason": "MISSING"
+        }
+    ]
+}
