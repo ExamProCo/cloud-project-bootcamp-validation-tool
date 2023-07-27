@@ -18,7 +18,7 @@ Resources:
           - Effect: Allow
             Principal:
               AWS: 
-                Fn::Sub: "arn:aws:iam::${SourceAccountId}:root"
+                Fn::Sub: "arn:aws:iam::${SourceAccountId}:user/cloud-project-validation-tool"
             Action: sts:AssumeRole
             Condition:
               StringEquals:
