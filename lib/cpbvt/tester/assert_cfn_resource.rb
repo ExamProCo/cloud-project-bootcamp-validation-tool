@@ -31,7 +31,7 @@ class Cpbvt::Tester::AssertCfnResource
           expected_value: stack_name
       })
     else
-      values = data.map{|t| t['StackName'] }
+      values = cfn_stacks['StackSummaries'].map{|t| t['StackName'] }
       self.fail!(
         kind: 'assert_cfn_resource:find', 
         message: 'failed to find value to match key',
@@ -65,7 +65,7 @@ class Cpbvt::Tester::AssertCfnResource
           expected_value: resource_type
       })
     else
-      values = data.map{|t| t['ResourceType'] }
+      values = cicd_stack_resources['StackResourceSummaries'].map{|t| t['ResourceType'] }
       self.fail!(
         kind: 'assert_cfn_resource:find', 
         message: 'failed to find value to match key',

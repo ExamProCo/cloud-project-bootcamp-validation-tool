@@ -36,6 +36,7 @@ Cpbvt::Tester::Runner.describe :serverless do
 
     target_arn = assert_json(route,'Target').returns(:all)
       
+    assert_not_nil(target_arn)
     integration_id = target_arn.split('/').last
 
     integration = assert_load("apigatewayv2-get-integrations__#{api_id}",'Items')
@@ -64,6 +65,7 @@ Cpbvt::Tester::Runner.describe :serverless do
     event = assert_load("s3api-get-bucket-notification-configuration__#{bucket_name}",'LambdaFunctionConfigurations').returns(:first)
 
     lambda_arn = assert_json(event,'LambdaFunctionArn').returns(:all)
+    assert_not_nil(lambda_arn)
     lambda_name = lambda_arn.split(':').last
     lambda_config = assert_load("lambda-get-function__#{lambda_name}",'Configuration').returns(:all)
 
@@ -131,6 +133,7 @@ Cpbvt::Tester::Runner.describe :serverless do
     dist_domain_name = t.dynamic_params.assets_distribution_domain_name
     zone_arn = assert_load('route53-list-hosted-zones','HostedZones').find('Name',"#{naked_domain_name}.").returns('Id')
 
+    assert_not_nil(zone_arn)
     zone_id = zone_arn.split("/").last
 
     record_sets = assert_load("route53-list-resource-record-sets__#{zone_id}",'ResourceRecordSets').returns(:all)

@@ -67,6 +67,7 @@ Cpbvt::Tester::Runner.describe :cluster do
       end
     end
 
+    assert_not_nil(container)
     assert_json(container,'healthStatus').expects_eq('HEALTHY')
 
     set_pass_message "Found an ECS task for: #{family} running in the expected cluster and service that is HEALTHY"
@@ -148,6 +149,8 @@ Cpbvt::Tester::Runner.describe :cluster do
     sg = assert_load('ec2-describe-security-groups','SecurityGroups').find('GroupId',sg_id).returns(:all)
 
     rules = assert_json(sg,'IpPermissions').returns(:all)
+
+    assert_not_nil(rules)
 
     alb_sg_rule =
     assert_find(rules) do |assert,rule|
