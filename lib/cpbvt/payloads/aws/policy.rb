@@ -105,5 +105,31 @@ class Cpbvt::Payloads::Aws::Policy
       f.write(cfn_template.to_yaml)
     end
 
+    Cpbvt::Uploader.run(
+      file_path: output_path,
+      object_key: Cpbvt::Uploader.object_key(
+        user_uuid: general_params.user_uuid,
+        project_scope: general_params.project_scope,
+        run_uuid: general_params.run_uuid,
+        region: 'global',
+        filename: File.basename(output_path)
+      ),
+      aws_region: general_params.user_region,
+      aws_access_key_id: general_params.aws_access_key_id,
+      aws_secret_access_key: general_params.aws_secret_access_key,
+      payloads_bucket: general_params.payloads_bucket
+    )
+
+    Cpbvt::Uploader.presigned_url(
+      key: Cpbvt::Uploader.object_key(
+        user_uuid: general_params.user_uuid,
+        project_scope: general_params.project_scope,
+        run_uuid: general_params.run_uuid,
+        region: 'global',
+        filename: File.basename(output_path)
+      ),
+      payloads_bucket: general_params.payloads_bucket
+    )
+
   end
 end
