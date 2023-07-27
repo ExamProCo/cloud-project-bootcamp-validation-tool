@@ -20,12 +20,12 @@ class Cpbvt::Payloads::Aws::Command
   include Cpbvt::Payloads::Aws::Commands::S3api
   include Cpbvt::Payloads::Aws::Commands::Servicediscovery
 
-  def self.session_token target_aws_account_id
+  def self.session_token target_aws_account_id, external_id
 command = <<~COMMAND
 aws sts assume-role \
 --role-arn "arn:aws:iam::#{target_aws_account_id}:role/CrossAccountRole" \
 --role-session-name "crossAccountAccess" \
---external-id #{ENV['EXTERNAL_ID']}
+--external-id #{external_id}
 COMMAND
 puts "[Executing] #{command}"
 stdout_str, exit_code = Open3.capture2(command)#, :stdin_data=>post_content)
