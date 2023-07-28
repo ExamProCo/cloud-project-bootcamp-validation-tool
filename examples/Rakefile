@@ -9,8 +9,6 @@ require 'fileutils'
 module Aws2023
   module Validations
   end
-  module SpecificParams
-  end
 end
 require_relative 'aws_2023/dynamic_params.rb'
 require_relative 'aws_2023/specific_params.rb'
@@ -43,11 +41,26 @@ task :permit do
     source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
   )
 
-  specific_params = Aws2023::SpecificParams::Puller.new(
+  specific_params = Aws2023::SpecificParams.new(
     naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
+    github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
     cluster_name: ENV['CLUSTER_NAME'],
     backend_family: ENV['BACKEND_FAMILY'],
-    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME']
+    ecr_repo_name: ENV['ECR_REPO_NAME'],
+    ecs_service_name: ENV['ECS_SERVICE_NAME'],
+    cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
+    apigateway_api_id: ENV['APIGATEWAY_API_ID'],
+    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME'],
+    cfn_stack_name_machineuser: ENV['CFN_STACK_NAME_MACHINEUSER'],
+    cfn_stack_name_backend: ENV['CFN_STACK_NAME_BACKEND'],
+    cfn_stack_name_sync: ENV['CFN_STACK_NAME_SYNC'],
+    cfn_stack_name_frontend: ENV['CFN_STACK_NAME_FRONTEND'],
+    cfn_stack_name_cicd: ENV['CFN_STACK_NAME_CICD'],
+    cfn_stack_name_db: ENV['CFN_STACK_NAME_DB'],
+    cfn_stack_name_ddb: ENV['CFN_STACK_NAME_DDB'],
+    cfn_stack_name_cluster: ENV['CFN_STACK_NAME_CLUSTER'],
+    cfn_stack_name_networking: ENV['CFN_STACK_NAME_NETWORKING'],
+    cfn_stack_name_cdk: ENV['CFN_STACK_NAME_CDK']
   )
 
   Aws2023::Permissioner.run(
@@ -72,11 +85,26 @@ task :pull do
     source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
   )
 
-  specific_params = Aws2023::SpecificParams::Puller.new(
+  specific_params = Aws2023::SpecificParams.new(
     naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
+    github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
     cluster_name: ENV['CLUSTER_NAME'],
     backend_family: ENV['BACKEND_FAMILY'],
-    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME']
+    ecr_repo_name: ENV['ECR_REPO_NAME'],
+    ecs_service_name: ENV['ECS_SERVICE_NAME'],
+    cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
+    apigateway_api_id: ENV['APIGATEWAY_API_ID'],
+    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME'],
+    cfn_stack_name_machineuser: ENV['CFN_STACK_NAME_MACHINEUSER'],
+    cfn_stack_name_backend: ENV['CFN_STACK_NAME_BACKEND'],
+    cfn_stack_name_sync: ENV['CFN_STACK_NAME_SYNC'],
+    cfn_stack_name_frontend: ENV['CFN_STACK_NAME_FRONTEND'],
+    cfn_stack_name_cicd: ENV['CFN_STACK_NAME_CICD'],
+    cfn_stack_name_db: ENV['CFN_STACK_NAME_DB'],
+    cfn_stack_name_ddb: ENV['CFN_STACK_NAME_DDB'],
+    cfn_stack_name_cluster: ENV['CFN_STACK_NAME_CLUSTER'],
+    cfn_stack_name_networking: ENV['CFN_STACK_NAME_NETWORKING'],
+    cfn_stack_name_cdk: ENV['CFN_STACK_NAME_CDK']
   )
 
   Aws2023::Puller.run(
@@ -116,14 +144,26 @@ task :validate do
 
   dynamic_params = Aws2023::DynamicParams.new
 
-  specific_params = Aws2023::SpecificParams::Validator.new(
+  specific_params = Aws2023::SpecificParams.new(
     naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
     github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
     cluster_name: ENV['CLUSTER_NAME'],
     backend_family: ENV['BACKEND_FAMILY'],
+    ecr_repo_name: ENV['ECR_REPO_NAME'],
+    ecs_service_name: ENV['ECS_SERVICE_NAME'],
     cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
     apigateway_api_id: ENV['APIGATEWAY_API_ID'],
-    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME']
+    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME'],
+    cfn_stack_name_machineuser: ENV['CFN_STACK_NAME_MACHINEUSER'],
+    cfn_stack_name_backend: ENV['CFN_STACK_NAME_BACKEND'],
+    cfn_stack_name_sync: ENV['CFN_STACK_NAME_SYNC'],
+    cfn_stack_name_frontend: ENV['CFN_STACK_NAME_FRONTEND'],
+    cfn_stack_name_cicd: ENV['CFN_STACK_NAME_CICD'],
+    cfn_stack_name_db: ENV['CFN_STACK_NAME_DB'],
+    cfn_stack_name_ddb: ENV['CFN_STACK_NAME_DDB'],
+    cfn_stack_name_cluster: ENV['CFN_STACK_NAME_CLUSTER'],
+    cfn_stack_name_networking: ENV['CFN_STACK_NAME_NETWORKING'],
+    cfn_stack_name_cdk: ENV['CFN_STACK_NAME_CDK']
   )
 
   validations_path =  "/workspace/cloud-project-bootcamp-validation-tool/examples/aws_2023/validations2"

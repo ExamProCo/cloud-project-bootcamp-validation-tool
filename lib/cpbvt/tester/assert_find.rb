@@ -132,11 +132,22 @@ class Cpbvt::Tester::AssertFind
     key = nil
     key = args.first if args.count > 0
     kind = "assert_find[#{self.iter_index}]:expects_eq"
+
+    provided_value =
     if key.nil?
-      provided_value = data
+      data
     else
-      provided_value = data[key]
+      if data.nil?
+        nil
+      else
+        if data.key?(key)
+          data[key]
+        else
+          nil
+        end
+      end
     end
+
     data_payload = {
       key: key,
       provided_value: provided_value,

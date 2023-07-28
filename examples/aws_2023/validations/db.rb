@@ -2,7 +2,7 @@ Cpbvt::Tester::Runner.describe :db do
   spec :should_have_public_rds_instance do |t|
     vpc_id = t.dynamic_params.vpc_id
 
-    db_id = assert_cfn_resource('CrdDb',"AWS::RDS::DBInstance").returns('PhysicalResourceId')
+    db_id = assert_cfn_resource(t.specific_params.cfn_stack_name_db,"AWS::RDS::DBInstance").returns('PhysicalResourceId')
     db = assert_load('rds-describe-db-instances','DBInstances').find('DBInstanceIdentifier',db_id).returns(:all)
 
     assert_json(db,'PubliclyAccessible').expects_true
@@ -16,7 +16,7 @@ Cpbvt::Tester::Runner.describe :db do
   spec :should_have_db_sg do |t|
     serv_sg_id = t.dynamic_params.serv_sg_id
 
-    sg_id = assert_cfn_resource('CrdDb',"AWS::EC2::SecurityGroup").returns('PhysicalResourceId')
+    sg_id = assert_cfn_resource(t.specific_params.cfn_stack_name_db,"AWS::EC2::SecurityGroup").returns('PhysicalResourceId')
 
     sg = assert_load('ec2-describe-security-groups','SecurityGroups').find('GroupId',sg_id).returns(:all)
 
