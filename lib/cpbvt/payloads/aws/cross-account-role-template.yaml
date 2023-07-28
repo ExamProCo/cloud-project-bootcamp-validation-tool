@@ -4,6 +4,7 @@ Parameters:
     Description: The ID of the source AWS account.
     AllowedPattern: '[0-9]{12}'
     ConstraintDescription: Must be a valid AWS account ID.
+    Default: 387543059434
   ExternalId:
     Type: String
     Description: An external ID that must be provided when assuming the cross-account role.
