@@ -144,6 +144,7 @@ Cpbvt::Tester::Runner.describe :serverless do
       assert.expects_eq(record,'Type',"A")
     end.returns(:all)
 
+    assert_not_nil(record)
     assert_json(record,'AliasTarget','DNSName').expects_eq("#{dist_domain_name}.")
 
     set_fail_message "Found route53 assets domain and pointing to the cloudfront distribution for assets"

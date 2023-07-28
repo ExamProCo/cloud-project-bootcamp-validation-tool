@@ -13,7 +13,7 @@ class Aws2023::Permissioner
     primary_region = general_params.user_region
     self.add primary_region, :ecs_describe_clusters, general_params
     self.add primary_region, :ecs_list_services, general_params
-    self.add primary_region, :ecs_describe_services, general_params, {cluster_name: specific_params.cluster_name, services: [specific_params.backend_family]}
+    self.add primary_region, :ecs_describe_services, general_params, {cluster_name: specific_params.cluster_name, services: [specific_params.ecs_service_name]}
     self.add primary_region, :ecs_list_tasks, general_params, {cluster_name: specific_params.cluster_name, family: specific_params.backend_family}
     self.add primary_region, :acm_list_certificates, general_params
     self.add primary_region, :apigatewayv2_get_apis, general_params

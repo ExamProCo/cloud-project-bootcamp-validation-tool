@@ -1,6 +1,6 @@
 Cpbvt::Tester::Runner.describe :cluster do
   spec :should_have_a_cluster do |t|
-    cluster_name = assert_cfn_resource('CrdCluster',"AWS::ECS::Cluster").returns('PhysicalResourceId')
+    cluster_name = assert_cfn_resource(t.specific_params.cfn_stack_name_cluster,"AWS::ECS::Cluster").returns('PhysicalResourceId')
 
     cluster = assert_load("ecs-describe-clusters__#{cluster_name}",'clusters').returns(:first)
 
@@ -27,31 +27,32 @@ Cpbvt::Tester::Runner.describe :cluster do
   end
 
   spec :should_have_an_ecr_repo do |t|
-    family = t.specific_params.backend_family
-    data = assert_load('ecr-describe-repositories','repositories').find('repositoryName',family).returns(:all)
+    repo_name = t.specific_params.ecr_repo_name
+    data = assert_load('ecr-describe-repositories','repositories').find('repositoryName',repo_name).returns(:all)
 
     # [TODO] Check if images are present in the container repo
 
-    set_pass_message "Found a task defintition with a family: #{family}"
-    set_fail_message "Failed to find a task defintition with a family: #{family}"
+    set_pass_message "Found a task defintition with a family: #{repo_name}"
+    set_fail_message "Failed to find a task defintition with a family: #{repo_name}"
   end
 
   spec :should_have_a_service do |t|
     cluster_name = t.specific_params.cluster_name
-    family = t.specific_params.backend_family
+    ecs_service_name = t.specific_params.ecs_service_name
 
     backend_service = assert_load("ecs-describe-services__#{cluster_name}",'services')
-      .find('serviceName', family)
+      .find('serviceName', ecs_service_name)
       .returns(:all)
 
     assert_json(backend_service,'status').expects_eq('ACTIVE')
 
-    set_pass_message "Found a fargate service a #{family}"
-    set_fail_message "Failed to find a fargate service a #{family}"
+    set_pass_message "Found a fargate service a #{ecs_service_name}"
+    set_fail_message "Failed to find a fargate service a #{ecs_service_name}"
   end
 
   spec :should_have_a_running_task do |t|
-    family = t.specific_params.backend_family
+    # we should expect this name always to be backend-flask
+    container_name = 'backend-flask'
     cluster_name = t.specific_params.cluster_name
     tasks = assert_load("ecs-describe-tasks",'tasks').returns(:all)
 
@@ -61,7 +62,7 @@ Cpbvt::Tester::Runner.describe :cluster do
     tasks.each do |task|
       if task['clusterArn'].match(cluster_name)
         container = task['containers'].find do |container|
-          container['name'] == family
+          container['name'] == container_name
         end
         break if container
       end
@@ -70,16 +71,16 @@ Cpbvt::Tester::Runner.describe :cluster do
     assert_not_nil(container)
     assert_json(container,'healthStatus').expects_eq('HEALTHY')
 
-    set_pass_message "Found an ECS task for: #{family} running in the expected cluster and service that is HEALTHY"
-    set_fail_message "Failed to find an ECS task for: #{family} running in the expected cluster and service that is HEALTHY"
+    set_pass_message "Found an ECS task for: #{container_name} running in the expected cluster and service that is HEALTHY"
+    set_fail_message "Failed to find an ECS task for: #{container_name} running in the expected cluster and service that is HEALTHY"
   end
 
   spec :should_have_an_alb do |t|
     cluster_name = t.specific_params.cluster_name
-    family = t.specific_params.backend_family
+    ecs_service_name = t.specific_params.ecs_service_name
 
     backend_service = assert_load("ecs-describe-services__#{cluster_name}",'services')
-      .find('serviceName', family)
+      .find('serviceName', ecs_service_name)
       .returns(:all)
 
     alb = assert_json(backend_service,'loadBalancers').returns(:first)
@@ -90,14 +91,14 @@ Cpbvt::Tester::Runner.describe :cluster do
 
     backend_tg_arn = assert_json(alb,'targetGroupArn').returns(:all)
 
-    set_pass_message "Found attached load balancer for the fargate service: #{family}"
-    set_fail_message "Failed to find an attached load balancer for the fargate service: #{family} for port 4567"
+    set_pass_message "Found attached load balancer for the fargate service: #{ecs_service_name}"
+    set_fail_message "Failed to find an attached load balancer for the fargate service: #{ecs_service_name} for port 4567"
 
     set_state_value :backend_tg_arn, backend_tg_arn
   end
 
   spec :should_have_alb_sg do |t|
-    alb_arn = assert_cfn_resource('CrdCluster',"AWS::ElasticLoadBalancingV2::LoadBalancer").returns('PhysicalResourceId')
+    alb_arn = assert_cfn_resource(t.specific_params.cfn_stack_name_cluster,"AWS::ElasticLoadBalancingV2::LoadBalancer").returns('PhysicalResourceId')
 
     alb = assert_load('elbv2-describe-load-balancers','LoadBalancers').find('LoadBalancerArn',alb_arn).returns(:all)
 
@@ -137,11 +138,11 @@ Cpbvt::Tester::Runner.describe :cluster do
 
   spec :should_have_service_sg do |t|
     cluster_name = t.specific_params.cluster_name
-    family = t.specific_params.backend_family
+    service_name = t.specific_params.ecs_service_name
     alb_sg_id = t.dynamic_params.alb_sg_id
 
     backend_service = assert_load("ecs-describe-services__#{cluster_name}",'services')
-      .find('serviceName', family)
+      .find('serviceName', service_name)
       .returns(:all)
 
     sg_id = assert_json(backend_service,'networkConfiguration','awsvpcConfiguration','securityGroups').returns(:first)
@@ -204,7 +205,7 @@ Cpbvt::Tester::Runner.describe :cluster do
   spec :should_have_route53_to_alb do |t|
     naked_domain_name = t.specific_params.naked_domain_name
 
-    alb_arn = assert_cfn_resource('CrdCluster',"AWS::ElasticLoadBalancingV2::LoadBalancer").returns('PhysicalResourceId')
+    alb_arn = assert_cfn_resource(t.specific_params.cfn_stack_name_cluster,"AWS::ElasticLoadBalancingV2::LoadBalancer").returns('PhysicalResourceId')
 
     alb = assert_load('elbv2-describe-load-balancers','LoadBalancers').find('LoadBalancerArn',alb_arn).returns(:all)
 

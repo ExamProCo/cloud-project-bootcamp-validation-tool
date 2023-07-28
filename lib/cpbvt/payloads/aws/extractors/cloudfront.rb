@@ -8,9 +8,17 @@ def cloudfront_list_distributions__distribution_id(data,filters={})
     result = true
 
     if filters.key?(:aliases) && filters[:aliases].any?
-      found_aliases = d['Aliases']['Items'] 
-      result = found_aliases.any? do |found_alias| 
-        filters[:aliases].include?(found_alias)
+      if d.key?('Aliases')
+        if d['Aliases'].key?('Items')
+          found_aliases = d['Aliases']['Items'] 
+          result = found_aliases.any? do |found_alias| 
+            filters[:aliases].include?(found_alias)
+          end
+        else
+          false
+        end
+      else
+        false
       end
     end
 
