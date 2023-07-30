@@ -69,7 +69,7 @@ Cpbvt::Tester::Runner.describe :serverless do
     lambda_name = lambda_arn.split(':').last
     lambda_config = assert_load("lambda-get-function__#{lambda_name}",'Configuration').returns(:all)
 
-    dest_bucket = assert_json(lambda_config,'Environment','Variables','DEST_BUCKET_NAME').returns(:all)
+    dest_bucket = assert_json(lambda_config,'Environment','Variables','DESTINATION_BUCKET_NAME').returns(:all)
 
     assert_json(lambda_config,'Runtime').expects_match(/nodejs/)
     assert_eq(dest_bucket,"assets.#{naked_domain_name}")
