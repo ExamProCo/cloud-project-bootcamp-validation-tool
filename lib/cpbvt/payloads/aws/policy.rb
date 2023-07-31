@@ -120,6 +120,8 @@ class Cpbvt::Payloads::Aws::Policy
       payloads_bucket: general_params.payloads_bucket
     )
 
+    File.delete(output_path) if File.exist?(output_path)
+
     Cpbvt::Uploader.presigned_url(
       key: Cpbvt::Uploader.object_key(
         user_uuid: general_params.user_uuid,
