@@ -19,8 +19,10 @@ class Cpbvt::Tester::AssertCfnResource
       self.fail! kind: 'assert_cfn_resource', message: 'access denied', data: {key: 'cloudformation-list-stacks'}
     end # begin
 
-    cicd_stack = cfn_stacks['StackSummaries'].find do |stack|
-      stack['StackName'] == stack_name
+    if cfn_stacks['StackSummaries']
+      cicd_stack = cfn_stacks['StackSummaries'].find do |stack|
+        stack['StackName'] == stack_name
+      end
     end
     if cicd_stack
       self.pass!(
@@ -31,7 +33,11 @@ class Cpbvt::Tester::AssertCfnResource
           expected_value: stack_name
       })
     else
-      values = cfn_stacks['StackSummaries'].map{|t| t['StackName'] }
+      if cfn_stacks['StackSummaries']
+        values = cfn_stacks['StackSummaries'].map{|t| t['StackName'] }
+      else
+        values = []
+      end
       self.fail!(
         kind: 'assert_cfn_resource:find', 
         message: 'failed to find value to match key',

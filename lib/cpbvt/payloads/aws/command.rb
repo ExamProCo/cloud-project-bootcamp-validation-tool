@@ -30,9 +30,15 @@ aws sts assume-role \
 --external-id #{external_id}
 COMMAND
 puts "[Executing] #{command}"
-stdout_str, exit_code = Open3.capture2(command)#, :stdin_data=>post_content)
-payload = JSON.parse(stdout_str)
-result = payload['Credentials']
+
+begin
+  stdout_str, exit_code = Open3.capture2(command)#, :stdin_data=>post_content)
+  payload = JSON.parse(stdout_str)
+  result = payload['Credentials']
+rescue => e
+  puts "[ERROR] #{e.message}"
+  result = e.message
+end
 return result
   end
 end
