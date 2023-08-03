@@ -3,22 +3,20 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-clusters.html
-def ecs_describe_clusters(aws_account_id:,region:)
+def ecs_allow_general_permissions(aws_account_id:,region:)
   {
     "Effect" => "Allow",
-    "Action" => "ecs:DescribeClusters",
-    "Resource" => "*"
-}
-end
-
-def ecs_list_services(aws_account_id:,region:)
-  {
-    "Effect" => "Allow",
-    "Action" => "ecs:ListServices",
+    "Action" => [
+      "ecs:DescribeClusters",
+      "ecs:ListServices",
+      "ecs:DescribeTasks",
+      "ecs:ListTasks",
+      "ecs:ListTaskDefinitions"
+    ],
     "Resource" => "*"
   }
 end
+
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-services.html
 # services is required - a list of services to describe
 def ecs_describe_services(aws_account_id:,region:,cluster_name:,services:[])
@@ -30,33 +28,6 @@ def ecs_describe_services(aws_account_id:,region:,cluster_name:,services:[])
     "Effect" => "Allow",
     "Action" => "ecs:DescribeServices",
     "Resource" => resources
-  }
-end
-
-# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/describe-tasks.html
-def ecs_describe_tasks(aws_account_id:,region:,cluster_name:)
-  {
-    "Effect" => "Allow",
-    "Action" => "ecs:DescribeTasks",
-    "Resource" => "*"
-  }
-end
-
-# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/list-tasks.html
-def ecs_list_tasks(aws_account_id:,region:,cluster_name:, family:)
-  {
-    "Effect" => "Allow",
-    "Action" => "ecs:ListTasks",
-    "Resource" => "*"
-  }
-end
-
-# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/list-task-definitions.html
-def ecs_list_task_definitions(aws_account_id:,region:)
-  {
-    "Effect" => "Allow",
-    "Action" => "ecs:ListTaskDefinitions",
-    "Resource" => "*"
   }
 end
 

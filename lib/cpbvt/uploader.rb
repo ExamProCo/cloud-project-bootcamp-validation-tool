@@ -45,8 +45,7 @@ class Cpbvt::Uploader
   # return a presigned url for uploaded files - required when a user must download templates
   def self.presigned_url key:,
                     payloads_bucket:           
-    obj = S3.resource.bucket(payloads_bucket).object key
-    obj.presigned_url(:get, expires_in: 3600)
+    Aws::S3::Presigner.new.presigned_url(:get_object, bucket: payloads_bucket, key: key)
   end
 
   # create the key to where the json file will be uploaded into the bucket

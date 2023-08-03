@@ -3,15 +3,12 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-# has no region but we just pass it in anyway to make 
-# our code my dry elsewhere
-# We can't use s2 ls because it won't return json
-# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/s3api/list-buckets.html
-def s3api_list_buckets(aws_account_id:)
+def s3api_allow_general_permissions(aws_account_id:)
   {
-    "Sid" => "AllowS3ListBuckets",
     "Effect" => "Allow",
-    "Action" => "s3:ListAllMyBuckets",
+    "Action" => [
+      "s3:ListAllMyBuckets"
+    ],
     "Resource" => "*"
   }
 end

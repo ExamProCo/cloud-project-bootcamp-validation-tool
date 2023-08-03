@@ -90,7 +90,6 @@ class Cpbvt::Payloads::Aws::Policy
     cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Principal']['AWS'] = "arn:aws:iam::#{general_params.source_aws_account_id}:root"
     cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Condition']['StringEquals']['sts:ExternalId'] = general_params.user_uuid
 
-
     output_path = File.join(
       general_params.output_path,
       general_params.project_scope,
@@ -111,7 +110,7 @@ class Cpbvt::Payloads::Aws::Policy
         user_uuid: general_params.user_uuid,
         project_scope: general_params.project_scope,
         run_uuid: general_params.run_uuid,
-        region: 'global',
+        region: ENV['VALIDATOR_AWS_REGION'],
         filename: File.basename(output_path)
       ),
       aws_region: general_params.user_region,
@@ -127,7 +126,7 @@ class Cpbvt::Payloads::Aws::Policy
         user_uuid: general_params.user_uuid,
         project_scope: general_params.project_scope,
         run_uuid: general_params.run_uuid,
-        region: 'global',
+        region: ENV['VALIDATOR_AWS_REGION'],
         filename: File.basename(output_path)
       ),
       payloads_bucket: general_params.payloads_bucket

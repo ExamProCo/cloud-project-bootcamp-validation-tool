@@ -3,10 +3,12 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def cloudformation_list_stacks(aws_account_id:,region:)
+def cloudformation_allow_general_permissions(aws_account_id:,region:)
   {
     "Effect" => "Allow",
-    "Action" => "cloudformation:ListStacks",
+    "Action" => [
+      "cloudformation:ListStacks"
+    ],
     "Resource" => "*"
   }
 end

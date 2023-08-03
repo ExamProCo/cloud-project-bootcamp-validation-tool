@@ -2,9 +2,7 @@ module Cpbvt::Payloads::Aws::Policies::Ecr
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
-
-# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecr/describe-repositories.html
-def ecr_describe_repositories(aws_account_id:,region:)
+def ecr_allow_general_permissions(aws_account_id:,region:)
   {
     "Effect" => "Allow",
     "Action" => "ecr:DescribeRepositories",
