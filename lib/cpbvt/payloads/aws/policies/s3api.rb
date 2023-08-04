@@ -39,17 +39,5 @@ def s3api_allow_scoped_permissions(aws_account_id:,bucket_names: [])
   }
 end
 
-def s3api_get_head_object(aws_account_id:,bucket: '*', key: '*')
-  {
-    "Effect" => "Allow",
-    "Action" => [
-        "s3:GetObject",
-        "s3:HeadObject",
-        "s3:GetObjectAcl"
-    ],
-    "Resource" => "arn:aws:s3:::#{bucket}/#{key}"
-  }
-end
-
 # ------
 end; end
