@@ -52,7 +52,7 @@ Cpbvt::Tester::Runner.describe :ddb do
     assert_not_nil(sk)
 
     assert_json(gsi,'IndexStatus').expects_eq('ACTIVE')
-    assert_json(gsi,'TableSizeBytes').expects_gt(0)
+    assert_json(gsi,'IndexSizeBytes').expects_gt(0)
     assert_json(gsi,'ItemCount').expects_gt(0)
 
     set_pass_message "Found dynamodb table GSI with data in it"
