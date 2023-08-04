@@ -25,6 +25,9 @@ class Cpbvt::Manifest
     path = self.output_path
     zipfile_name = self.archive_path
     if Dir[File.join(path,'*')].any?
+      if File.exist?(zipfile_name)
+        File.delete(zipfile_name)
+      end
       Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
         files = Dir.glob(File.join(path,'**','*'))
         basepath = File.join(@output_path, @project_scope, "user-#{@user_uuid}","/").to_s

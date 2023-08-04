@@ -1,12 +1,3 @@
-Parameters:
-  SourceAccountId:
-    Type: String
-    Description: The ID of the source AWS account.
-    AllowedPattern: '[0-9]{12}'
-    ConstraintDescription: Must be a valid AWS account ID.
-  ExternalId:
-    Type: String
-    Description: An external ID that must be provided when assuming the cross-account role.
 Resources:
   CrossAccountRole:
     Type: AWS::IAM::Role
@@ -18,7 +9,7 @@ Resources:
           - Effect: Allow
             Principal:
               AWS: 
-                Fn::Sub: "arn:aws:iam::${SourceAccountId}:root"
+                Fn::Sub: "arn:aws:iam::${SourceAccountId}:user/cloud-project-validation-tool"
             Action: sts:AssumeRole
             Condition:
               StringEquals:

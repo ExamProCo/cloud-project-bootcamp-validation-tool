@@ -20,17 +20,25 @@ class Cpbvt::Payloads::Aws::Command
   include Cpbvt::Payloads::Aws::Commands::S3api
   include Cpbvt::Payloads::Aws::Commands::Servicediscovery
 
-  def self.session_token target_aws_account_id
+  def self.session_token target_aws_account_id, external_id
+    # the aws credentials are different for the server/validators
 command = <<~COMMAND
+AWS_ACCESS_KEY_ID=#{ENV['VALIDATOR_AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['VALIDATOR_AWS_SECRET_ACCESS_KEY']} \
 aws sts assume-role \
---role-arn "arn:aws:iam::#{target_aws_account_id}:role/CrossAccountRole" \
+--role-arn "arn:aws:iam::#{target_aws_account_id}:role/Validator-#{external_id}" \
 --role-session-name "crossAccountAccess" \
---external-id #{ENV['EXTERNAL_ID']}
+--external-id #{external_id}
 COMMAND
 puts "[Executing] #{command}"
-stdout_str, exit_code = Open3.capture2(command)#, :stdin_data=>post_content)
-payload = JSON.parse(stdout_str)
-result = payload['Credentials']
+
+begin
+  stdout_str, exit_code = Open3.capture2(command)#, :stdin_data=>post_content)
+  payload = JSON.parse(stdout_str)
+  result = payload['Credentials']
+rescue => e
+  puts "[ERROR] #{e.message}"
+  result = e.message
+end
 return result
   end
 end

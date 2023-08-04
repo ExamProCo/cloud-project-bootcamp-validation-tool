@@ -2,6 +2,16 @@ module Cpbvt::Payloads::Aws::Policies::Apigatewayv2
 def self.included base; base.extend ClassMethods; end
 module ClassMethods
 
+def apigatewayv2_allow_general_permissions(aws_account_id:,region:)
+  {
+    "Effect" => "Allow",
+    "Action" => [
+      "apigateway:GET"
+    ],
+    "Resource" => "*"
+  }
+end
+
 # https://docs.aws.amazon.com/cli/latest/reference/apigatewayv2/get-authorizers.html
 def apigatewayv2_get_authorizers(aws_account_id:,region:,api_id:nil)
   {
@@ -20,14 +30,6 @@ def apigatewayv2_get_integrations(aws_account_id:,region:,api_id:nil)
   }
 end
 
-# https://docs.aws.amazon.com/cli/latest/reference/apigatewayv2/get-apis.html
-def apigatewayv2_get_apis(aws_account_id:,region:)
-  {
-    "Effect" => "Allow",
-    "Action" => "apigateway:GET",
-    "Resource" => "*"
-  }
-end
 
 # ------
 end; end

@@ -49,7 +49,7 @@ class Cpbvt::Payloads::Aws::Policy
   def self.generate! general_params
     path = File.join(
       File.dirname(File.expand_path(__FILE__)),
-      "#{general-params.run_uuid}-cross-account-role-template.yaml"
+        "cross-account-role-template.yaml"
     )
     cfn_template = YAML.load_file(path)
 
@@ -68,7 +68,7 @@ class Cpbvt::Payloads::Aws::Policy
         end
         #add another
         policy_template = {
-          "PolicyName" => "BootcampPolicy#{i}",
+          "PolicyName" => "BootcampPolicy-#{general_params.run_uuid}-#{i}",
           "PolicyDocument" => {
             "Version" => "2012-10-17",
             "Statement" => []
@@ -86,7 +86,10 @@ class Cpbvt::Payloads::Aws::Policy
         permissions_chunk.push permission
       end
     end
-
+    
+    cfn_template['Resources']['CrossAccountRole']['Properties']['RoleName'] = "Validator-#{general_params.run_uuid}"
+    cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Principal']['AWS'] = "arn:aws:iam::#{general_params.source_aws_account_id}:user/cloud-project-validation-tool"
+    cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Condition']['StringEquals']['sts:ExternalId'] = general_params.run_uuid
 
     output_path = File.join(
       general_params.output_path,
@@ -101,5 +104,34 @@ class Cpbvt::Payloads::Aws::Policy
     File.open(output_path, 'w') do |f|
       f.write(cfn_template.to_yaml)
     end
+
+    Cpbvt::Uploader.run(
+      file_path: output_path,
+      object_key: Cpbvt::Uploader.object_key(
+        user_uuid: general_params.user_uuid,
+        project_scope: general_params.project_scope,
+        run_uuid: general_params.run_uuid,
+        region: ENV['VALIDATOR_AWS_REGION'],
+        filename: File.basename(output_path)
+      ),
+      aws_region: general_params.user_region,
+      aws_access_key_id: general_params.aws_access_key_id,
+      aws_secret_access_key: general_params.aws_secret_access_key,
+      payloads_bucket: general_params.payloads_bucket
+    )
+
+    File.delete(output_path) if File.exist?(output_path)
+
+    Cpbvt::Uploader.presigned_url(
+      key: Cpbvt::Uploader.object_key(
+        user_uuid: general_params.user_uuid,
+        project_scope: general_params.project_scope,
+        run_uuid: general_params.run_uuid,
+        region: ENV['VALIDATOR_AWS_REGION'],
+        filename: File.basename(output_path)
+      ),
+      payloads_bucket: general_params.payloads_bucket
+    )
+
   end
 end

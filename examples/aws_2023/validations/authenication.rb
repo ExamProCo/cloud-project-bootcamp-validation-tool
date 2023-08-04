@@ -1,4 +1,4 @@
-Cpbvt::Tester::Runner.describe :authenication do
+Cpbvt::Tester::Runner.describe :authentication do
   spec :should_have_cognito_user_pool do |t|
     name = t.specific_params.cognito_user_pool_name
     pool_id = assert_load('cognito-idp-list-user-pools','UserPools').find('Name',name).returns('Id')

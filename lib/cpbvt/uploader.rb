@@ -13,7 +13,6 @@ class Cpbvt::Uploader
                aws_secret_access_key:,
                payloads_bucket:)
     Aws.config.update({
-      region: aws_region,
       credentials: Aws::Credentials.new(
         aws_access_key_id,
         aws_secret_access_key
@@ -42,6 +41,12 @@ class Cpbvt::Uploader
       puts "Error uploading file: #{e.message}"
     end
   end # self.run
+
+  # return a presigned url for uploaded files - required when a user must download templates
+  def self.presigned_url key:,
+                    payloads_bucket:           
+    Aws::S3::Presigner.new.presigned_url(:get_object, bucket: payloads_bucket, key: key)
+  end
 
   # create the key to where the json file will be uploaded into the bucket
   def self.object_key user_uuid:,

@@ -183,7 +183,7 @@ task :validate do
       :db,
       :ddb,
       :serverless,
-      :authenication
+      :authentication
     ]
   )
 
