@@ -89,7 +89,7 @@ class Cpbvt::Payloads::Aws::Policy
     
     cfn_template['Resources']['CrossAccountRole']['Properties']['RoleName'] = "Validator-#{general_params.run_uuid}"
     cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Principal']['AWS'] = "arn:aws:iam::#{general_params.source_aws_account_id}:user/cloud-project-validation-tool"
-    cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Condition']['StringEquals']['sts:ExternalId'] = general_params.user_uuid
+    cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Condition']['StringEquals']['sts:ExternalId'] = general_params.run_uuid
 
     output_path = File.join(
       general_params.output_path,
