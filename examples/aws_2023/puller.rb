@@ -20,7 +20,7 @@ class Aws2023::Puller
       payloads_bucket: general_params.payloads_bucket
     )
 
-    creds = Cpbvt::Payloads::Aws::Command.session_token general_params.target_aws_account_id
+    creds = Cpbvt::Payloads::Aws::Command.session_token general_params.target_aws_account_id, general_params.run_uuid
     general_params.tmp_aws_access_key_id = creds['AccessKeyId']
     general_params.tmp_aws_secret_access_key = creds['SecretAccessKey']
     general_params.tmp_aws_session_token = creds['SessionToken']

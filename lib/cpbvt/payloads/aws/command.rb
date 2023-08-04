@@ -25,7 +25,7 @@ class Cpbvt::Payloads::Aws::Command
 command = <<~COMMAND
 AWS_ACCESS_KEY_ID=#{ENV['VALIDATOR_AWS_ACCESS_KEY_ID']} AWS_SECRET_ACCESS_KEY=#{ENV['VALIDATOR_AWS_SECRET_ACCESS_KEY']} \
 aws sts assume-role \
---role-arn "arn:aws:iam::#{target_aws_account_id}:role/CrossAccountRole-#{external_id}" \
+--role-arn "arn:aws:iam::#{target_aws_account_id}:role/Validator-#{external_id}" \
 --role-session-name "crossAccountAccess" \
 --external-id #{external_id}
 COMMAND
