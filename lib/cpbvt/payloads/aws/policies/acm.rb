@@ -3,7 +3,7 @@ def self.included base; base.extend ClassMethods; end
 module ClassMethods
 # ------
 
-def acm_allow_general_permissions(aws_account_id:,region:)
+def acm_allow_general_permissions(aws_account_id:)
   {
     "Effect" => "Allow",
     "Action" => [

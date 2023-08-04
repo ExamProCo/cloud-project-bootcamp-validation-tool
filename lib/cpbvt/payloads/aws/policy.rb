@@ -54,7 +54,7 @@ class Cpbvt::Payloads::Aws::Policy
     cfn_template = YAML.load_file(path)
 
     # Policy exceeding the 6144 characters limit can't be saved. 
-    max_count = 4000
+    max_count = 6000
     current_count = 0
     i = 0
 

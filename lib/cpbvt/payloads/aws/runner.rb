@@ -163,23 +163,24 @@ module Cpbvt::Payloads::Aws::Runner
       data,
       extractor_filters
     )
+    unless iter_data.nil?
+      iter_data.each do |extractor_attrs|
+        # we don't want to pass the iter_id to the command
+        # but we do want to use it to identify this specific record
+        iter_id = extractor_attrs.delete(:iter_id)
 
-    iter_data.each do |extractor_attrs|
-      # we don't want to pass the iter_id to the command
-      # but we do want to use it to identify this specific record
-      iter_id = extractor_attrs.delete(:iter_id)
-
-      # add in the identifier into the filename
-      filename = general_params[:filename].sub(".json","__#{iter_id}.json")
-      
-      # run the command as per usual
-      result = Cpbvt::Payloads::Aws::Runner.run(
-        command,
-        general_params.merge({filename: filename}),
-        extractor_attrs
-      )
-      results.push result
-    end # iter_data.each 
+        # add in the identifier into the filename
+        filename = general_params[:filename].sub(".json","__#{iter_id}.json")
+        
+        # run the command as per usual
+        result = Cpbvt::Payloads::Aws::Runner.run(
+          command,
+          general_params.merge({filename: filename}),
+          extractor_attrs
+        )
+        results.push result
+      end # iter_data.each 
+    end
     return results
   end # def self.iter_run!
 

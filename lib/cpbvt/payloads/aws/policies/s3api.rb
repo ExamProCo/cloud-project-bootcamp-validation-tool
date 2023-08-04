@@ -15,7 +15,13 @@ end
 
 def s3api_allow_scoped_permissions(aws_account_id:,bucket_names: [])
   resources = bucket_names.map{|b|"arn:aws:s3:::#{b}/*"}
-  resources = "*" if resources.empty?
+  if resources.empty?
+    resources = "*" 
+  else
+    bucket_names.each do |bucket|
+      resources.push "arn:aws:s3:::#{bucket}"
+    end
+  end
   {
     "Effect" => "Allow",
     "Action" => [
@@ -30,6 +36,18 @@ def s3api_allow_scoped_permissions(aws_account_id:,bucket_names: [])
       "s3:GetBucketPublicAccessBlock"
     ],
     "Resource" => resources
+  }
+end
+
+def s3api_get_head_object(aws_account_id:,bucket: '*', key: '*')
+  {
+    "Effect" => "Allow",
+    "Action" => [
+        "s3:GetObject",
+        "s3:HeadObject",
+        "s3:GetObjectAcl"
+    ],
+    "Resource" => "arn:aws:s3:::#{bucket}/#{key}"
   }
 end
 

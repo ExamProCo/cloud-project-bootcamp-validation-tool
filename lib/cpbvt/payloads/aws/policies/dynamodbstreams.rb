@@ -8,7 +8,10 @@ def dynamodbstreams_allow_general_permissions(aws_account_id:,region:)
     "Effect" => "Allow",
     "Action" => [
       "dynamodb:ListTables",
-      "dynamodb:DescribeTable"
+      "dynamodb:DescribeTable",
+      "dynamodb:ListStreams",
+      "dynamodb:DescribeStream"
+
     ],
     "Resource" => "*"
   }
