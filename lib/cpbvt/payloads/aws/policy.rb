@@ -105,6 +105,13 @@ class Cpbvt::Payloads::Aws::Policy
       f.write(cfn_template.to_yaml)
     end
 
+    object_key = Cpbvt::Uploader.object_key(
+      user_uuid: general_params.user_uuid,
+      project_scope: general_params.project_scope,
+      run_uuid: general_params.run_uuid,
+      region: ENV['VALIDATOR_AWS_REGION'],
+      filename: File.basename(output_path)
+    )
     Cpbvt::Uploader.run(
       file_path: output_path,
       object_key: Cpbvt::Uploader.object_key(
@@ -122,16 +129,6 @@ class Cpbvt::Payloads::Aws::Policy
 
     File.delete(output_path) if File.exist?(output_path)
 
-    Cpbvt::Uploader.presigned_url(
-      key: Cpbvt::Uploader.object_key(
-        user_uuid: general_params.user_uuid,
-        project_scope: general_params.project_scope,
-        run_uuid: general_params.run_uuid,
-        region: ENV['VALIDATOR_AWS_REGION'],
-        filename: File.basename(output_path)
-      ),
-      payloads_bucket: general_params.payloads_bucket
-    )
-
+    return object_key
   end
 end
