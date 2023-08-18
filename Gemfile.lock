@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    cloud_project_bootcamp_validation_tool (1.0.3)
+    cloud_project_bootcamp_validation_tool (1.1.0)
       activemodel
       aws-sdk-s3
       open3
@@ -60,6 +60,7 @@ GEM
       concurrent-ruby (~> 1.0)
 
 PLATFORMS
+  arm64-darwin-21
   x86_64-linux
 
 DEPENDENCIES
