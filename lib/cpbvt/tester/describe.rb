@@ -13,12 +13,14 @@ class Cpbvt::Tester::Describe
     instance_eval &context
   end
 
-  def spec key, &block
+  def spec key, opts={}, &block
     key = key.to_sym
     # test is a revserved word which is why we say test_instances
+    condition = opts[:condition] if opts.key?(:condition)
     spec_instance = Cpbvt::Tester::Spec.new(
       describe: self,
       key: key,
+      condition: condition,
       context: block
     )
     raise "spec key already in use: #{key}" if @specs.key?(key)

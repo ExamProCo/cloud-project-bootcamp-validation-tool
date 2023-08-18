@@ -5,18 +5,25 @@ class Cpbvt::Tester::Spec
                 :fail_msg,
                 :status,
                 :report,
+                :condition,
                 :manifest,
                 :specific_params,
                 :general_params,
                 :dynamic_params
+
+  ## condition can be:
+  # optional - it doesn't matter if you fail this spec
+  # critical (default) if you fail this spec then you fail
 
   # status can be:
   # ready - ready to run 
   # pass - has ran and graded as passed
   # fail - has ran and graded as failed
   # skipped - never ran
-  def initialize describe:, key:, context:
+  def initialize describe:, key:, condition:, context:
     @describe = describe
+    @condition = condition
+    @condition ||= 'normal'
     @key = key.to_sym
     @status = :ready # ready to run
     @context = context
@@ -37,7 +44,11 @@ class Cpbvt::Tester::Spec
     @specific_params = specific_params
     @dynamic_params = dynamic_params
     @self_before_instance_eval = eval "self", @context.binding
+    #begin
     instance_eval &@context
+    #rescue => e
+      #binding.pry
+    #end
   end
 
   def assert_cfn_resource stack_name, resource_type

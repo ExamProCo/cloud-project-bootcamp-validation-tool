@@ -73,7 +73,7 @@ class Cpbvt::Tester::AssertCfnResource
     else
       values = cicd_stack_resources['StackResourceSummaries'].map{|t| t['ResourceType'] }
       self.fail!(
-        kind: 'assert_cfn_resource:find', 
+        kind: 'assert_cfn_resource:find',
         message: 'failed to find value to match key',
         data: {
           key: 'ResourceType',
@@ -87,23 +87,23 @@ class Cpbvt::Tester::AssertCfnResource
     data = @data
     if key == :all || key.nil?
       self.pass! kind: 'asset_cfn_resource:returns', message: 'return all data'
-      return data 
+      return data
     end
     if data.key?(key)
-      self.pass! kind: 'asset_cfn_resource:returns', message: 'return all data with provided key', data: { 
-        provided_key: key 
+      self.pass! kind: 'asset_cfn_resource:returns', message: 'return all data with provided key', data: {
+        provided_key: key
       }
       return data[key]
     else
       self.fail! kind: 'asset_cfn_resource:returns', message: 'failed to return data with provided key since key does not exist', data: {
-        provided_key: key 
+        provided_key: key
       }
     end
   end
 
   def pass! kind:, message:, data: {}
     @report.pass!(
-      describe_key: @describe_key, 
+      describe_key: @describe_key,
       spec_key: @spec_key,
       kind: kind,
       message: message,
@@ -113,7 +113,7 @@ class Cpbvt::Tester::AssertCfnResource
 
   def fail! kind:, message:, data: {}
     @report.fail!(
-      describe_key: @describe_key, 
+      describe_key: @describe_key,
       spec_key: @spec_key,
       kind: kind,
       message: message,

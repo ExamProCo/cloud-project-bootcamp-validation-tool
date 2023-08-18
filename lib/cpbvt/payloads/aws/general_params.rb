@@ -7,6 +7,7 @@ class Cpbvt::Payloads::Aws::GeneralParams
   attr_accessor :project_scope,
                 :user_uuid,
                 :run_uuid,
+                :external_id,
                 :region,
                 :user_region,
                 :output_path,
@@ -24,6 +25,7 @@ class Cpbvt::Payloads::Aws::GeneralParams
 
   validates :project_scope, presence: true
   validates :user_uuid , presence: true
+  validates :external_id, presence: true
   validates :run_uuid, presence: true
   validates :region, presence: true
   validates :user_region, presence: true
@@ -38,6 +40,7 @@ class Cpbvt::Payloads::Aws::GeneralParams
     project_scope:,
     user_uuid:,
     run_uuid:,
+    external_id:,
     region:,
     user_region:,
     output_path:,
@@ -48,6 +51,7 @@ class Cpbvt::Payloads::Aws::GeneralParams
     source_aws_account_id:
   )
     @project_scope = project_scope
+    @external_id = external_id
     @run_uuid = run_uuid
     @user_uuid = user_uuid
     @region = region
@@ -64,6 +68,7 @@ class Cpbvt::Payloads::Aws::GeneralParams
   def to_h
     {
       project_scope: @project_scope,
+      external_id: @external_id,
       run_uuid: @run_uuid,
       user_uuid: @user_uuid,
       region: @region,

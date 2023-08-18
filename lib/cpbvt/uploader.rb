@@ -44,7 +44,7 @@ class Cpbvt::Uploader
 
   # return a presigned url for uploaded files - required when a user must download templates
   def self.presigned_url key:,
-                    payloads_bucket:           
+                    payloads_bucket:
     Aws::S3::Presigner.new.presigned_url(:get_object, bucket: payloads_bucket, key: key)
   end
 

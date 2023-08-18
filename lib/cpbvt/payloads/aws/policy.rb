@@ -53,7 +53,7 @@ class Cpbvt::Payloads::Aws::Policy
     )
     cfn_template = YAML.load_file(path)
 
-    # Policy exceeding the 6144 characters limit can't be saved. 
+    # Policy exceeding the 6144 characters limit can't be saved.
     max_count = 6000
     current_count = 0
     i = 0
@@ -86,10 +86,10 @@ class Cpbvt::Payloads::Aws::Policy
         permissions_chunk.push permission
       end
     end
-    
-    cfn_template['Resources']['CrossAccountRole']['Properties']['RoleName'] = "Validator-#{general_params.run_uuid}"
+
+    cfn_template['Resources']['CrossAccountRole']['Properties']['RoleName'] = "Validator-#{general_params.external_id}"
     cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Principal']['AWS'] = "arn:aws:iam::#{general_params.source_aws_account_id}:user/cloud-project-validation-tool"
-    cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Condition']['StringEquals']['sts:ExternalId'] = general_params.run_uuid
+    cfn_template['Resources']['CrossAccountRole']['Properties']['AssumeRolePolicyDocument']['Statement'][0]['Condition']['StringEquals']['sts:ExternalId'] = general_params.external_id
 
     output_path = File.join(
       general_params.output_path,
@@ -109,7 +109,7 @@ class Cpbvt::Payloads::Aws::Policy
       user_uuid: general_params.user_uuid,
       project_scope: general_params.project_scope,
       run_uuid: general_params.run_uuid,
-      region: ENV['VALIDATOR_AWS_REGION'],
+      region: general_params.region,
       filename: File.basename(output_path)
     )
     Cpbvt::Uploader.run(
@@ -118,7 +118,7 @@ class Cpbvt::Payloads::Aws::Policy
         user_uuid: general_params.user_uuid,
         project_scope: general_params.project_scope,
         run_uuid: general_params.run_uuid,
-        region: ENV['VALIDATOR_AWS_REGION'],
+        region: general_params.region,
         filename: File.basename(output_path)
       ),
       aws_region: general_params.user_region,

@@ -37,14 +37,15 @@ module Cpbvt::Payloads::Aws::Runner
 
     general_params.tmp_aws_access_key_id
     Cpbvt::Payloads::Aws::Runner.execute(
-      general_params.tmp_aws_access_key_id, 
-      general_params.tmp_aws_secret_access_key, 
-      general_params.tmp_aws_session_token, 
+      general_params.run_uuid,
+      general_params.tmp_aws_access_key_id,
+      general_params.tmp_aws_secret_access_key,
+      general_params.tmp_aws_session_token,
       command
     )
     # upload json file to s3
     #Cpbvt::Uploader.run(
-    #  file_path: output_file, 
+    #  file_path: output_file,
     #  object_key: object_key,
     #  aws_region: attrs.region,
     #  aws_access_key_id: attrs.aws_access_key_id,
@@ -171,7 +172,7 @@ module Cpbvt::Payloads::Aws::Runner
 
         # add in the identifier into the filename
         filename = general_params[:filename].sub(".json","__#{iter_id}.json")
-        
+
         # run the command as per usual
         result = Cpbvt::Payloads::Aws::Runner.run(
           command,
@@ -179,13 +180,13 @@ module Cpbvt::Payloads::Aws::Runner
           extractor_attrs
         )
         results.push result
-      end # iter_data.each 
+      end # iter_data.each
     end
     return results
   end # def self.iter_run!
 
   # create the path to where the json file will be downloaded
-  def self.output_file(user_uuid:, 
+  def self.output_file(user_uuid:,
                        run_uuid:,
                        project_scope:,
                        region:,
@@ -209,13 +210,15 @@ module Cpbvt::Payloads::Aws::Runner
     return value
   end
 
-  def self.execute key, secret, session_token, command
+  def self.execute run_uuid, key, secret, session_token, command
     if key.nil? || secret.nil? || session_token.nil?
       raise 'creds are nil'
     end
     # print the command so we know what is running
     puts "[Executing] #{command}"
     # run the command which will download the json
+
+    self.broadcast run_uuid, command
 
     env_vars = {
       "AWS_ACCESS_KEY_ID" => key,
@@ -224,6 +227,9 @@ module Cpbvt::Payloads::Aws::Runner
     }
     system(env_vars, command)
   end
-
   # Create Ostruct and validate general params
+
+  def self.broadcast run_uuid, command
+    #OVERRIDE
+  end
 end

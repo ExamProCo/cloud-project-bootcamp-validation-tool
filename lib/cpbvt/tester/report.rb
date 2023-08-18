@@ -24,12 +24,12 @@ class Cpbvt::Tester::Report
   end
 
   def add! describe_key, spec_key
-    @specs[describe_key] ||= {}
-    @specs[describe_key][spec_key] ||= {status: nil, asserts: []}
+    @specs[describe_key] ||= {specs: {}}
+    @specs[describe_key][:specs][spec_key] ||= {status: nil, asserts: [], condition: @condition}
   end
 
   def pass! describe_key:, spec_key:, kind:, message:, data: {}
-    @specs[describe_key][spec_key][:asserts].push({
+    @specs[describe_key][:specs][spec_key][:asserts].push({
       kind: kind,
       status: 'pass',
       message: message,
@@ -38,7 +38,7 @@ class Cpbvt::Tester::Report
   end
 
   def fail! describe_key:, spec_key:, kind:, message:, data: {}
-    @specs[describe_key][spec_key][:asserts].push({
+    @specs[describe_key][:specs][spec_key][:asserts].push({
       kind: kind,
       status: 'fail',
       message: message,
@@ -54,24 +54,24 @@ class Cpbvt::Tester::Report
   end
 
   def passed! describe_key:, spec_key:
-    @specs[describe_key][spec_key][:status] = 'pass'
+    @specs[describe_key][:specs][spec_key][:status] = 'pass'
   end
 
   def failed! describe_key:, spec_key:
-    @specs[describe_key][spec_key][:status] = 'fail'
+    @specs[describe_key][:specs][spec_key][:status] = 'fail'
   end
 
   # only for iter
   def iter_index describe_key, spec_key
-    @specs[describe_key][spec_key][:asserts].last[:results].size-1
+    @specs[describe_key][:specs][spec_key][:asserts].last[:results].size-1
   end
 
   def iter_add!(describe_key:,spec_key:)
-    @specs[describe_key][spec_key][:asserts].last[:results].push []
+    @specs[describe_key][:specs][spec_key][:asserts].last[:results].push []
   end
 
   def iter_start!(describe_key:, spec_key:, kind:)
-    @specs[describe_key][spec_key][:asserts].push({
+    @specs[describe_key][:specs][spec_key][:asserts].push({
       kind: kind,
       status: 'unknown',
       message: nil,
@@ -81,13 +81,13 @@ class Cpbvt::Tester::Report
   end
 
   def iter_end!(describe_key:, spec_key:,status:,data:{})
-    spec = @specs[describe_key][spec_key][:asserts].last
+    spec = @specs[describe_key][:specs][spec_key][:asserts].last
     spec[:status] = status
     spec[:data] = data
   end
 
   def iter_pass! describe_key:, spec_key:, kind:, message:, data: {}
-    spec = @specs[describe_key][spec_key][:asserts].last
+    spec = @specs[describe_key][:specs][spec_key][:asserts].last
     spec[:results].last.push({
       kind: kind,
       status: 'pass',
@@ -97,7 +97,7 @@ class Cpbvt::Tester::Report
   end
 
   def iter_fail! describe_key:, spec_key:, kind:, message:, data: {}
-    spec = @specs[describe_key][spec_key][:asserts].last
+    spec = @specs[describe_key][:specs][spec_key][:asserts].last
     spec[:results].last.push({
       kind: kind,
       status: 'fail',
@@ -108,10 +108,45 @@ class Cpbvt::Tester::Report
   end
 
   def iter_last describe_key, spec_key
-    spec = @specs[describe_key][spec_key][:asserts].last[:results].last
+    spec = @specs[describe_key][:specs][spec_key][:asserts].last[:results].last
   end
 
   def to_json
-    @specs.to_json
+    total_spec_count = 0
+    total_spec_pass_count = 0
+    total_assert_count = 0
+    total_assert_pass_count = 0
+    status = 'pass'
+
+    @specs.each do |group_name,group|
+      group[:spec_pass_count] = 0
+      total_spec_count += group[:specs].count
+      group[:specs].each do |spec_name,spec|
+        total_assert_count += spec[:asserts].count
+        spec[:assert_pass_count] = 0
+        if spec[:status] == 'pass'
+          group[:spec_pass_count] += 1
+          total_spec_pass_count += 1
+        elsif spec[:status] == 'fail' && spec[:condition] != 'optional'
+          status = 'fail'
+        end
+        spec[:asserts].each do |assert_obj|
+          if assert_obj[:status] == 'pass'
+            spec[:assert_pass_count] += 1
+            total_assert_pass_count += 1
+          end
+        end # spec[:asserts]
+      end # group[:specs]
+    end
+
+    report = {
+      status: status,
+      total_spec_count: total_spec_count,
+      total_spec_pass_count: total_spec_pass_count,
+      total_assert_count: total_assert_count,
+      total_assert_pass_count: total_assert_pass_count,
+      describes: @specs
+    }
+    report.to_json
   end
 end

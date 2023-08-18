@@ -37,7 +37,6 @@ class Cpbvt::Tester::Runner
         end
       end
     end
-
     return JSON.parse(report.to_json)
   end
 
