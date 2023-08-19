@@ -23,9 +23,9 @@ class Cpbvt::Tester::Report
     @specs = {}
   end
 
-  def add! describe_key, spec_key
+  def add! describe_key, spec_key, condition
     @specs[describe_key] ||= {specs: {}}
-    @specs[describe_key][:specs][spec_key] ||= {status: nil, asserts: [], condition: @condition}
+    @specs[describe_key][:specs][spec_key] ||= {status: nil, asserts: [], condition: condition}
   end
 
   def pass! describe_key:, spec_key:, kind:, message:, data: {}

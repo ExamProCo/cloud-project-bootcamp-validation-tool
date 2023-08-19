@@ -38,7 +38,7 @@ class Cpbvt::Tester::Spec
       dynamic_params
   )
     @report = report
-    @report.add! self.describe.key, self.key
+    @report.add! self.describe.key, self.key, self.condition
     @manifest = manifest
     @general_params = general_params
     @specific_params = specific_params
