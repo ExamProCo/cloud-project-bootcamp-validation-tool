@@ -178,4 +178,13 @@ class Cpbvt::Manifest
       payloads: @payloads
     }
   end
+
+  # returns results of each payload
+  # this is so we can find in summary
+  # which succeeded or which ones failed
+  def results
+    @payloads.map do |k,v|
+      {id: v[:id], error: v[:error] }
+    end
+  end
 end # class

@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'ostruct'
 require 'time'
+require 'open3'
 
 
 module Cpbvt::Payloads::Aws::Runner
@@ -36,6 +37,10 @@ module Cpbvt::Payloads::Aws::Runner
     command = "#{command} --output json > #{output_file}"
 
     general_params.tmp_aws_access_key_id
+
+    #stdout_str should always result in empty 
+    #string since its writing to a file
+    stdout_str, stderr_str, status =
     Cpbvt::Payloads::Aws::Runner.execute(
       general_params.run_uuid,
       general_params.tmp_aws_access_key_id,
@@ -55,6 +60,12 @@ module Cpbvt::Payloads::Aws::Runner
 
     id = general_params.filename.sub(".json","")
 
+    error = false
+    error = stderr_str.strip if stderr_str != ""
+    if error == false && File.size?(output_file).nil?
+      error = "No data returned"
+    end
+
     ends_at = Time.now.to_f
     return {
       id: id,
@@ -64,6 +75,7 @@ module Cpbvt::Payloads::Aws::Runner
         ends_at:  ends_at,
         duration_in_ms: ((ends_at - starts_at)*1000).to_i
       },
+      error: error,
       command: command,
       output_file: output_file
     }
@@ -225,7 +237,9 @@ module Cpbvt::Payloads::Aws::Runner
       "AWS_SECRET_ACCESS_KEY" => secret,
       "AWS_SESSION_TOKEN" => session_token
     }
-    system(env_vars, command)
+    # capture3 returns the follwoing ---
+    # stdout_str, stderr_str, status
+    Open3.capture3(env_vars, command)
   end
   # Create Ostruct and validate general params
 
