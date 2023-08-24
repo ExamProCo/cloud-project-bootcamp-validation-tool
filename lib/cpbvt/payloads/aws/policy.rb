@@ -20,8 +20,10 @@ class Cpbvt::Payloads::Aws::Policy
   include Cpbvt::Payloads::Aws::Policies::Route53
   include Cpbvt::Payloads::Aws::Policies::S3api
   include Cpbvt::Payloads::Aws::Policies::Servicediscovery
-
-  @@permissions = []
+  
+  def initialize
+    @@permissions = []
+  end
 
   def self.add region, command, general_params, specific_params
     specific_params[:aws_account_id] = general_params.target_aws_account_id
@@ -59,7 +61,6 @@ class Cpbvt::Payloads::Aws::Policy
     i = 0
 
     permissions_chunk = []
-
     @@permissions.each_with_index do |permission,index|
       json = permission.to_json
       if (current_count + json.size) > max_count || @@permissions.size-1 == index
@@ -114,19 +115,12 @@ class Cpbvt::Payloads::Aws::Policy
     )
     Cpbvt::Uploader.run(
       file_path: output_path,
-      object_key: Cpbvt::Uploader.object_key(
-        user_uuid: general_params.user_uuid,
-        project_scope: general_params.project_scope,
-        run_uuid: general_params.run_uuid,
-        region: general_params.region,
-        filename: File.basename(output_path)
-      ),
+      object_key: object_key,
       aws_region: general_params.user_region,
       aws_access_key_id: general_params.aws_access_key_id,
       aws_secret_access_key: general_params.aws_secret_access_key,
       payloads_bucket: general_params.payloads_bucket
     )
-
     File.delete(output_path) if File.exist?(output_path)
 
     return object_key
