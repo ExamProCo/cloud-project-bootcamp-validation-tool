@@ -1,7 +1,7 @@
 require 'aws-sdk-s3'
 
 class Cpbvt::Downloader
-  def self.run(file_path:
+  def self.run(file_path:,
                object_key:,
                aws_region:,
                aws_access_key_id:,
