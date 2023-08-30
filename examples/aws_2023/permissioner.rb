@@ -1,5 +1,7 @@
 class Aws2023::Permissioner
   def self.run(general_params:,specific_params:)
+    Cpbvt::Payloads::Aws::Policy.new
+    
     unless general_params.valid?
       puts general_params.errors.full_messages
       raise "failed to pass general params validation"
