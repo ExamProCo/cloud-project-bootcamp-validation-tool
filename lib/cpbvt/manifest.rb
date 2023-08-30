@@ -42,6 +42,10 @@ class Cpbvt::Manifest
 
   # Pull S3 if the local files don't exist
   def pull!
+    # if the manifest doesn't exist lets assume nothing is here.
+    path = self.output_file
+    unless File.exist?(path)
+    end
   end
 
   # Load a manifest file
@@ -89,6 +93,14 @@ class Cpbvt::Manifest
     File.join(
       @output_path, 
       @project_scope, 
+      "user-#{@user_uuid}",
+      "run-#{@run_uuid}.zip"
+    )
+  end
+
+  def archive_object_key
+    File.join(
+      @project_scope,
       "user-#{@user_uuid}",
       "run-#{@run_uuid}.zip"
     )

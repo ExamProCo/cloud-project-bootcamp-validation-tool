@@ -1,6 +1,7 @@
 require_relative 'cpbvt/module_defs'
 require_relative 'cpbvt/version'
 require_relative 'cpbvt/uploader'
+require_relative 'cpbvt/downloader'
 require_relative 'cpbvt/manifest'
 # --- require cpbvt/payloads/aws/extractors/*
 aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','aws','extractors','*.rb')

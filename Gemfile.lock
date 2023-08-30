@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    cloud_project_bootcamp_validation_tool (1.2.0)
+    cloud_project_bootcamp_validation_tool (1.2.1)
       activemodel
       aws-sdk-s3
       open3
