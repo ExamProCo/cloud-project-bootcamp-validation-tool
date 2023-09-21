@@ -30,7 +30,6 @@ module Cpbvt::Payloads::Aws::Runner
     #  region: general_params.user_region, 
     #  filename: general_params.filename
     #)
-
     command = Cpbvt::Payloads::Aws::Command.send(command, **specific_params)
     command = command.strip.gsub("\n", " ")
     command = "#{command} --region #{general_params.user_region}" unless general_params.user_region == 'global'

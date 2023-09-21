@@ -26,6 +26,9 @@ class Cpbvt::Tester::Runner
     load_order ||= @@describe.keys
     load_order.each do |describe_key|
       describe_instance = @@describes[describe_key]
+      if describe_instance.nil?
+        raise "Failed to find the describe block based on the describe key: #{describe_key}: describe_keys: #{@@describes.keys.join(',')} load_order: #{load_order.join(',')}"
+      end
       describe_instance.specs.each do |spec_key,spec_instance|
         begin
           spec_instance.evaluate! report, manifest, general_params, specific_params, dynamic_params

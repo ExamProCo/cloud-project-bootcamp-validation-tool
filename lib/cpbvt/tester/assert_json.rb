@@ -47,7 +47,7 @@ class Cpbvt::Tester::AssertJson
   def expects_start_with value
     kind =  "assert_json:expects_start_with"
     data_payload = {
-      expecfted_start_with: value
+      expected_start_with: value
     }
     if @value.start_with?(value)
       self.pass!(kind: kind, data: data_payload, message: 'value was found to start with')
@@ -60,7 +60,7 @@ class Cpbvt::Tester::AssertJson
   def expects_end_with value
     kind =  "assert_json:expects_end_with"
     data_payload = {
-      expecfted_end_with: value
+      expected_end_with: value
     }
     if @value.end_with?(value)
       self.pass!(kind: kind, data: data_payload, message: 'value was found to end with')

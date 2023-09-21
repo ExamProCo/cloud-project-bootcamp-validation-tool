@@ -183,8 +183,19 @@ class Cpbvt::Tester::AssertFind
     return self
   end
 
-  def expects_false data, key
-    value = data[key]
+  def expects_false data, key=nil
+    if key
+      value = data[key]
+      data_payload = {
+        key: key,
+        provided_value: value
+      }
+    else
+      value = data
+      data_payload = {
+        provided_value: value
+      }
+    end
     kind =  "assert_find[#{self.iter_index}]:expects_false"
     data_payload = {
       key: key,
@@ -194,6 +205,54 @@ class Cpbvt::Tester::AssertFind
       self.iter_pass!(kind: kind, data: data_payload, message: 'value was equal found to be false')
     else
       self.iter_fail!(kind: kind, data: data_payload, message: 'value was not found to be false')
+    end
+    return self
+  end
+
+  def expects_start_with data, key=nil
+    kind =  "assert_find:expects_start_with"
+    if key
+      value = data[key]
+      data_payload = {
+        key: key,
+        expected_start_with: value
+      }
+    else
+      value = data
+      data_payload = {
+        expected_start_with: value
+      }
+    end
+    if value.start_with?(value)
+      self.iter_pass!(kind: kind, data: data_payload, message: 'value was found to start with')
+    else
+      self.iter_fail!(kind: kind, data: data_payload, message: 'value did not start with')
+    end
+    return self
+  end
+
+  def expects_end_with data, key=nil
+    kind =  "assert_find:expects_end_with"
+    if key
+      value = data[key]
+      data_payload = {
+        key: key,
+        expected_end_with: value
+      }
+    else
+      value = data
+      data_payload = {
+        expected_end_with: value
+      }
+    end
+    data_payload = {
+      key: key,
+      expected_end_with: value
+    }
+    if value.end_with?(value)
+      self.iter_pass!(kind: kind, data: data_payload, message: 'value was found to end with')
+    else
+      self.iter_fail!(kind: kind, data: data_payload, message: 'value did not end with')
     end
     return self
   end
