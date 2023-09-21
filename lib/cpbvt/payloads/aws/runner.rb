@@ -176,7 +176,7 @@ module Cpbvt::Payloads::Aws::Runner
       iter_data = Cpbvt::Payloads::Aws::Extractor.send(
         "#{data_key}__#{param}",
         data,
-        extractor_filters
+        (extractor_filters || {})
       )
     end
 
