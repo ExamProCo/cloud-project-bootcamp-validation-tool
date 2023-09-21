@@ -12,7 +12,9 @@ def cloudfront_allow_general_permissions(aws_account_id:)
       "cloudfront:ListInvalidations",
       "cloudfront:ListCloudFrontOriginAccessIdentities",
       "cloudfront:GetCloudFrontOriginAccessIdentity",
-      "cloudfront:GetCloudFrontOriginAccessIdentityConfig"
+      "cloudfront:GetCloudFrontOriginAccessIdentityConfig",
+      "cloudfront:GetOriginAccessControl",
+      "cloudfront:ListOriginAccessControls"
     ],
     "Resource" => "*"
   }

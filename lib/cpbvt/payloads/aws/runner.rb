@@ -170,12 +170,16 @@ module Cpbvt::Payloads::Aws::Runner
     # load the local data
     data = manifest.get_output data_key
 
-    # extract the data from the local file that we'll use to iterate
-    iter_data = Cpbvt::Payloads::Aws::Extractor.send(
-      "#{data_key}__#{param}",
-      data,
-      extractor_filters
-    )
+    iter_data = nil
+    unless data.empty?
+      # extract the data from the local file that we'll use to iterate
+      iter_data = Cpbvt::Payloads::Aws::Extractor.send(
+        "#{data_key}__#{param}",
+        data,
+        extractor_filters
+      )
+    end
+
     unless iter_data.nil?
       iter_data.each do |extractor_attrs|
         # we don't want to pass the iter_id to the command

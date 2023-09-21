@@ -50,6 +50,21 @@ aws cloudfront get-cloud-front-origin-access-identity-config \
 --id #{identity_id}
 COMMAND
 end
-  
+
+# https://docs.aws.amazon.com/cli/latest/reference/cloudfront/list-origin-access-controls.html
+def cloudfront_list_origin_access_controls
+<<~COMMAND
+aws cloudfront list-origin-access-controls
+COMMAND
+end
+
+# https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudfront/get-origin-access-control.html
+def cloudfront_get_origin_access_control(control_id:) 
+<<~COMMAND
+aws cloudfront get-origin-access-control \
+--id #{control_id}
+COMMAND
+end
+
 # ------
 end; end

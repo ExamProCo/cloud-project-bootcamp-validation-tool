@@ -31,5 +31,16 @@ def cloudfront_list_distributions__distribution_id(data,filters={})
   end # .filter_map
 end
 
+def cloudfront_list_origin_access_controls__control_id(data,filters={})
+  data['OriginAccessControlList']['Items'].map do |x|
+    id = x['Id']
+    iter_id = x['Id']
+    {
+      iter_id: iter_id,
+      control_id: id
+    }
+  end
+end
+
 # ------
 end; end
