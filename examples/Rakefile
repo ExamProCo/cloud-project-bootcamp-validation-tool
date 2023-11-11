@@ -25,7 +25,60 @@ unless File.exist?('.env')
 end
 Dotenv.load
 
-task :permit do
+task :gcp_pull do
+  puts "pulling for: gcp_example =="
+  general_params = Cpbvt::Payloads::Gcp::GeneralParams.new(
+    project_scope: "gcp-example",
+    run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
+    user_uuid: ENV['USER_UUID'],
+    gcp_project_id: ENV['GCP_PROJECT_ID'],
+    output_path: ENV['OUTPUT_PATH'],
+    aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+    aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+    payloads_bucket: ENV['PAYLOADS_BUCKET'],
+    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
+  )
+
+  specific_params = Gcp::SpecificParams.new(
+    gcp_bucket_name: ENV['GCP_BUCKET_NAME']
+  )
+
+  Gcp::Puller.run(
+    general_params: general_params,
+    specific_params: specific_params
+  )
+end
+
+task :az_pull do
+  puts "pulling for: azure_example =="
+  general_params = Cpbvt::Payloads::Azure::GeneralParams.new(
+    project_scope: "az-example",
+    run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
+    user_uuid: ENV['USER_UUID'],
+    azure_client_id: ENV['AZURE_CLIENT_ID'],
+    azure_tenant_id: ENV['AZURE_TENANT_ID'],
+    azure_client_secret: ENV['AZURE_CLIENT_SECRET'],
+    output_path: ENV['OUTPUT_PATH'],
+    aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+    aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+    payloads_bucket: ENV['PAYLOADS_BUCKET'],
+    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
+  )
+
+  specific_params = Azure::SpecificParams.new(
+    storage_account_name: ENV['AZ_STORAGE_ACCOUNT_NAME'],
+    storage_container_name: ENV['AZ_STORAGE_CONTAINER_NAME'],
+    storage_blob_name: ENV['AZ_STORAGE_BLOB_NAME']
+  )
+
+  Gcp::Puller.run(
+    general_params: general_params,
+    specific_params: specific_params
+  )
+end
+
+
+task :aws_permit do
   puts "gathering permission for: aws_2023 =="
   general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
     project_scope: "aws-bootcamp-2023",
@@ -69,7 +122,7 @@ task :permit do
   )
 end
 
-task :pull do
+task :aws_pull do
   puts "pulling for: aws_2023 =="
   general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
     project_scope: "aws-bootcamp-2023",
@@ -113,7 +166,7 @@ task :pull do
   )
 end
 
-task :validate do
+task :aws_validate do
   glob_path = File.join(
     "/workspace",
     "cloud-project-bootcamp-validation-tool",

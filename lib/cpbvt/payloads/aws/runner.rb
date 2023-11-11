@@ -244,7 +244,6 @@ module Cpbvt::Payloads::Aws::Runner
     # stdout_str, stderr_str, status
     Open3.capture3(env_vars, command)
   end
-  # Create Ostruct and validate general params
 
   def self.broadcast run_uuid, command
     #OVERRIDE

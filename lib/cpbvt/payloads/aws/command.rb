@@ -31,14 +31,14 @@ aws sts assume-role \
 COMMAND
 puts "[Executing] #{command}"
 
-begin
-  stdout_str, exit_code = Open3.capture2(command)#, :stdin_data=>post_content)
-  payload = JSON.parse(stdout_str)
-  result = payload['Credentials']
-rescue => e
-  puts "[ERROR] #{e.message}"
-  result = e.message
-end
-return result
+    begin
+      stdout_str, exit_code = Open3.capture2(command)#, :stdin_data=>post_content)
+      payload = JSON.parse(stdout_str)
+      result = payload['Credentials']
+    rescue => e
+      puts "[ERROR] #{e.message}"
+      result = e.message
+    end
+    return result
   end
 end
