@@ -29,6 +29,8 @@ require 'open3'
 
 # az storage account list
 
+#
+
 env_vars = {
   "AZURE_CLIENT_ID" => ENV["AZURE_CLIENT_ID"],
   "AZURE_TENANT_ID" => ENV["AZURE_TENANT_ID"],
@@ -82,6 +84,16 @@ az storage blob exists  \
 --container-name #{container_name} \
 --name #{blob_name}
 COMMAND
+
+
+stdout_str, stderr_str, status = Open3.capture3(env_vars, login)
+puts "\n Login ========"
+puts "stdout str"
+puts stdout_str
+puts "stderr str"
+puts stderr_str
+puts "status"
+puts status
 
 stdout_str, stderr_str, status = Open3.capture3(env_vars, command_account)
 puts "\n Account ========"
