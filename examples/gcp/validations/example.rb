@@ -4,8 +4,8 @@ Cpbvt::Tester::Runner.describe :example do
     bucket = assert_load("gcloud-storage-buckets-list").find("name",bucket_name).returns(:all)
 
     assert_not_nil(bucket)
-    set_pass_message "Found Google Cloud Storage Bucket name #{bucket_name}"
-    set_fail_message "Failed to find Google Cloud Storage Bucket name #{bucket_name}"
+    set_pass_message "Found Google Cloud Storage Bucket named #{bucket_name}"
+    set_fail_message "Failed to find Google Cloud Storage Bucket named #{bucket_name}"
   end
   
   spec :should_have_bucket_object do |t|
@@ -15,5 +15,7 @@ Cpbvt::Tester::Runner.describe :example do
     object = assert_load("gcloud-storage-objects-describe__#{bucket_name}").returns(:all)
 
     assert_eq(object,'content_type','text/csv')
+    set_pass_message "Found Google Cloud Storage Bucket Object named #{object_name}"
+    set_fail_message "Failed to find Google Cloud Storage Bucket Object named #{object_name}"
   end
 end
