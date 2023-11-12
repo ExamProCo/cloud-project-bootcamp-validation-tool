@@ -1,0 +1,2 @@
+class Gcp::DynamicParams
+end

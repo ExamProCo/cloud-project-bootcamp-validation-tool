@@ -12,6 +12,9 @@ module Azure
 end
 require_relative 'azure/puller.rb'
 require_relative 'azure/specific_params.rb'
+require_relative 'azure/dynamic_params.rb'
+require_relative 'azure/state.rb'
+require_relative 'azure/validator.rb'
 
 module Gcp
   module Validations
@@ -19,6 +22,9 @@ module Gcp
 end
 require_relative 'gcp/puller.rb'
 require_relative 'gcp/specific_params.rb'
+require_relative 'gcp/dynamic_params.rb'
+require_relative 'gcp/state.rb'
+require_relative 'gcp/validator.rb'
 
 module Aws2023
   module Validations
@@ -39,226 +45,14 @@ unless File.exist?('.env')
 end
 Dotenv.load
 
-task :gcp_pull do
-  puts "pulling for: gcp_example =="
-  general_params = Cpbvt::Payloads::Gcp::GeneralParams.new(
-    project_scope: "gcp-example",
-    run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
-    region: ENV['AWS_REGION'],
-    user_uuid: ENV['USER_UUID'],
-    gcp_key_file: ENV['GOOGLE_APPLICATION_CREDENTIALS'],
-    gcp_project_id: ENV['GCP_PROJECT_ID'],
-    output_path: ENV['OUTPUT_PATH'],
-    aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-    aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    payloads_bucket: ENV['PAYLOADS_BUCKET'],
-    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
-  )
+def print_results results
+  puts "status: #{results["status"]}"
+  puts "specs_count: #{results["total_spec_pass_count"]} / #{results["total_spec_count"]}"
+  puts "assert_count: #{results["total_assert_pass_count"]} / #{results["total_assert_count"]}"
 
-  specific_params = Gcp::SpecificParams.new(
-    gcp_bucket_name: ENV['GCP_BUCKET_NAME']
-  )
-
-  Gcp::Puller.run(
-    general_params: general_params,
-    specific_params: specific_params
-  )
-end
-
-task :az_pull do
-  puts "pulling for: azure_example =="
-  general_params = Cpbvt::Payloads::Azure::GeneralParams.new(
-    project_scope: "az-example",
-    run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
-    region: ENV['AWS_REGION'],
-    user_uuid: ENV['USER_UUID'],
-    azure_client_id: ENV['AZURE_CLIENT_ID'],
-    azure_tenant_id: ENV['AZURE_TENANT_ID'],
-    azure_client_secret: ENV['AZURE_CLIENT_SECRET'],
-    output_path: ENV['OUTPUT_PATH'],
-    aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-    aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    payloads_bucket: ENV['PAYLOADS_BUCKET'],
-    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
-  )
-
-  specific_params = Azure::SpecificParams.new(
-    storage_account_name: ENV['AZ_STORAGE_ACCOUNT_NAME'],
-    storage_container_name: ENV['AZ_STORAGE_CONTAINER_NAME'],
-    storage_blob_name: ENV['AZ_STORAGE_BLOB_NAME']
-  )
-
-  Azure::Puller.run(
-    general_params: general_params,
-    specific_params: specific_params
-  )
-end
-
-
-task :aws_permit do
-  puts "gathering permission for: aws_2023 =="
-  general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
-    project_scope: "aws-bootcamp-2023",
-    run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
-    user_uuid: ENV['USER_UUID'],
-    user_region: ENV['USER_AWS_REGION'],
-    output_path: ENV['OUTPUT_PATH'],
-    region: ENV['AWS_REGION'],
-    aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-    aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    payloads_bucket: ENV['PAYLOADS_BUCKET'],
-    target_aws_account_id: ENV['TARGET_AWS_ACCOUNT_ID'],
-    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
-  )
-
-  specific_params = Aws2023::SpecificParams.new(
-    naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
-    github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
-    cluster_name: ENV['CLUSTER_NAME'],
-    backend_family: ENV['BACKEND_FAMILY'],
-    ecr_repo_name: ENV['ECR_REPO_NAME'],
-    ecs_service_name: ENV['ECS_SERVICE_NAME'],
-    cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
-    apigateway_api_id: ENV['APIGATEWAY_API_ID'],
-    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME'],
-    cfn_stack_name_machineuser: ENV['CFN_STACK_NAME_MACHINEUSER'],
-    cfn_stack_name_backend: ENV['CFN_STACK_NAME_BACKEND'],
-    cfn_stack_name_sync: ENV['CFN_STACK_NAME_SYNC'],
-    cfn_stack_name_frontend: ENV['CFN_STACK_NAME_FRONTEND'],
-    cfn_stack_name_cicd: ENV['CFN_STACK_NAME_CICD'],
-    cfn_stack_name_db: ENV['CFN_STACK_NAME_DB'],
-    cfn_stack_name_ddb: ENV['CFN_STACK_NAME_DDB'],
-    cfn_stack_name_cluster: ENV['CFN_STACK_NAME_CLUSTER'],
-    cfn_stack_name_networking: ENV['CFN_STACK_NAME_NETWORKING'],
-    cfn_stack_name_cdk: ENV['CFN_STACK_NAME_CDK']
-  )
-
-  Aws2023::Permissioner.run(
-    general_params: general_params,
-    specific_params: specific_params
-  )
-end
-
-task :aws_pull do
-  puts "pulling for: aws_2023 =="
-  general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
-    project_scope: "aws-bootcamp-2023",
-    run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
-    user_uuid: ENV['USER_UUID'],
-    user_region: ENV['USER_AWS_REGION'],
-    output_path: ENV['OUTPUT_PATH'],
-    region: ENV['AWS_REGION'],
-    aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-    aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    payloads_bucket: ENV['PAYLOADS_BUCKET'],
-    target_aws_account_id: ENV['TARGET_AWS_ACCOUNT_ID'],
-    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
-  )
-
-  specific_params = Aws2023::SpecificParams.new(
-    naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
-    github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
-    cluster_name: ENV['CLUSTER_NAME'],
-    backend_family: ENV['BACKEND_FAMILY'],
-    ecr_repo_name: ENV['ECR_REPO_NAME'],
-    ecs_service_name: ENV['ECS_SERVICE_NAME'],
-    cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
-    apigateway_api_id: ENV['APIGATEWAY_API_ID'],
-    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME'],
-    cfn_stack_name_machineuser: ENV['CFN_STACK_NAME_MACHINEUSER'],
-    cfn_stack_name_backend: ENV['CFN_STACK_NAME_BACKEND'],
-    cfn_stack_name_sync: ENV['CFN_STACK_NAME_SYNC'],
-    cfn_stack_name_frontend: ENV['CFN_STACK_NAME_FRONTEND'],
-    cfn_stack_name_cicd: ENV['CFN_STACK_NAME_CICD'],
-    cfn_stack_name_db: ENV['CFN_STACK_NAME_DB'],
-    cfn_stack_name_ddb: ENV['CFN_STACK_NAME_DDB'],
-    cfn_stack_name_cluster: ENV['CFN_STACK_NAME_CLUSTER'],
-    cfn_stack_name_networking: ENV['CFN_STACK_NAME_NETWORKING'],
-    cfn_stack_name_cdk: ENV['CFN_STACK_NAME_CDK']
-  )
-
-  Aws2023::Puller.run(
-    general_params: general_params,
-    specific_params: specific_params
-  )
-end
-
-task :aws_validate do
-  glob_path = File.join(
-    "/workspace",
-    "cloud-project-bootcamp-validation-tool",
-    "examples",
-    "output",
-    "aws-bootcamp-2023",
-    "user-#{ENV['USER_UUID']}",
-    "/*/")
-  run_uuids = Dir.glob(glob_path).map{|t| t.split('/').last.sub("run-","") }
-  run_uuid = run_uuids.last
-
-  general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
-    project_scope: "aws-bootcamp-2023",
-    run_uuid: run_uuid,
-    user_uuid: ENV['USER_UUID'],
-    user_region: ENV['USER_AWS_REGION'],
-    output_path: ENV['OUTPUT_PATH'],
-    region: ENV['AWS_REGION'],
-    aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-    aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-    payloads_bucket: ENV['PAYLOADS_BUCKET'],
-    target_aws_account_id: ENV['TARGET_AWS_ACCOUNT_ID'],
-    source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
-  )
-
-  puts "validating for: aws_2023 =="
-  puts run_uuid
-
-  dynamic_params = Aws2023::DynamicParams.new
-
-  specific_params = Aws2023::SpecificParams.new(
-    naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
-    github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
-    cluster_name: ENV['CLUSTER_NAME'],
-    backend_family: ENV['BACKEND_FAMILY'],
-    ecr_repo_name: ENV['ECR_REPO_NAME'],
-    ecs_service_name: ENV['ECS_SERVICE_NAME'],
-    cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
-    apigateway_api_id: ENV['APIGATEWAY_API_ID'],
-    raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME'],
-    cfn_stack_name_machineuser: ENV['CFN_STACK_NAME_MACHINEUSER'],
-    cfn_stack_name_backend: ENV['CFN_STACK_NAME_BACKEND'],
-    cfn_stack_name_sync: ENV['CFN_STACK_NAME_SYNC'],
-    cfn_stack_name_frontend: ENV['CFN_STACK_NAME_FRONTEND'],
-    cfn_stack_name_cicd: ENV['CFN_STACK_NAME_CICD'],
-    cfn_stack_name_db: ENV['CFN_STACK_NAME_DB'],
-    cfn_stack_name_ddb: ENV['CFN_STACK_NAME_DDB'],
-    cfn_stack_name_cluster: ENV['CFN_STACK_NAME_CLUSTER'],
-    cfn_stack_name_networking: ENV['CFN_STACK_NAME_NETWORKING'],
-    cfn_stack_name_cdk: ENV['CFN_STACK_NAME_CDK']
-  )
-
-  validations_path =  "/workspace/cloud-project-bootcamp-validation-tool/examples/aws_2023/validations2"
-
-  results =
-  Aws2023::Validator2.run(
-    validations_path: validations_path,
-    dynamic_params: dynamic_params,
-    general_params: general_params,
-    specific_params: specific_params,
-    load_order: [
-      :networking,
-      :cluster,
-      :cicd,
-      :iac,
-      :static_website_hosting,
-      :db,
-      :ddb,
-      :serverless,
-      :authentication
-    ]
-  )
-
-  results.each do |describe_key,group|
-    group.each do |spec_key,spec|
+  results['describes'].each do |describe_key,group|
+    puts "spec_pass_count #{group['spec_pass_count']}"
+    group["specs"].each do |spec_key,spec|
       vspec_key =
       if spec['status'] == 'pass'
         "\e[32m#{spec_key}\e[0m" 
@@ -302,7 +96,335 @@ task :aws_validate do
       end # spec.each
     end # group.each
   end # results.each
-end #task
+end # def print_results
+
+namespace :gcp do
+  task :pull do
+    puts "pulling for: gcp_example =="
+    general_params = Cpbvt::Payloads::Gcp::GeneralParams.new(
+      project_scope: "gcp-example",
+      run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
+      region: ENV['AWS_REGION'],
+      user_uuid: ENV['USER_UUID'],
+      gcp_key_file: ENV['GOOGLE_APPLICATION_CREDENTIALS'],
+      gcp_project_id: ENV['GCP_PROJECT_ID'],
+      output_path: ENV['OUTPUT_PATH'],
+      aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+      payloads_bucket: ENV['PAYLOADS_BUCKET'],
+      source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
+    )
+
+    specific_params = Gcp::SpecificParams.new(
+      gcp_bucket_name: ENV['GCP_BUCKET_NAME']
+    )
+
+    Gcp::Puller.run(
+      general_params: general_params,
+      specific_params: specific_params
+    )
+  end # task :pull do
+
+  task :validate do
+    puts "validating for: gcp_example =="
+    glob_path = File.join(
+      "/workspace",
+      "cloud-project-bootcamp-validation-tool",
+      "examples",
+      "output",
+      "gcp-example",
+      "user-#{ENV['USER_UUID']}",
+      "/*/")
+    run_uuids = Dir.glob(glob_path).map{|t| t.split('/').last.sub("run-","") }
+    run_uuid = run_uuids.last
+
+    general_params = Cpbvt::Payloads::Gcp::GeneralParams.new(
+      project_scope: "gcp-example",
+      run_uuid: run_uuid,
+      region: ENV['AWS_REGION'],
+      user_uuid: ENV['USER_UUID'],
+      gcp_key_file: ENV['GOOGLE_APPLICATION_CREDENTIALS'],
+      gcp_project_id: ENV['GCP_PROJECT_ID'],
+      output_path: ENV['OUTPUT_PATH'],
+      aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+      payloads_bucket: ENV['PAYLOADS_BUCKET'],
+      source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
+    )
+
+    specific_params = Gcp::SpecificParams.new(
+      gcp_bucket_name: ENV['GCP_BUCKET_NAME']
+    )
+
+    validations_path =  "/workspace/cloud-project-bootcamp-validation-tool/examples/gcp/validations"
+
+    dynamic_params = Gcp::DynamicParams.new
+
+    results =
+    Gcp::Validator.run(
+      validations_path: validations_path,
+      general_params: general_params,
+      specific_params: specific_params,
+      dynamic_params: dynamic_params,
+      load_order: [
+        :example
+      ]
+    )
+
+    print_results(results)
+  end # task :validate do
+end
+
+namespace :az do
+  task :pull do
+    puts "pulling for: azure_example =="
+    general_params = Cpbvt::Payloads::Azure::GeneralParams.new(
+      project_scope: "az-example",
+      run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
+      region: ENV['AWS_REGION'],
+      user_uuid: ENV['USER_UUID'],
+      azure_client_id: ENV['AZURE_CLIENT_ID'],
+      azure_tenant_id: ENV['AZURE_TENANT_ID'],
+      azure_client_secret: ENV['AZURE_CLIENT_SECRET'],
+      output_path: ENV['OUTPUT_PATH'],
+      aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+      payloads_bucket: ENV['PAYLOADS_BUCKET'],
+      source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
+    )
+
+    specific_params = Azure::SpecificParams.new(
+      storage_account_name: ENV['AZ_STORAGE_ACCOUNT_NAME'],
+      storage_container_name: ENV['AZ_STORAGE_CONTAINER_NAME'],
+      storage_blob_name: ENV['AZ_STORAGE_BLOB_NAME']
+    )
+
+    Azure::Puller.run(
+      general_params: general_params,
+      specific_params: specific_params
+    )
+  end
+
+  task :validate do
+    glob_path = File.join(
+      "/workspace",
+      "cloud-project-bootcamp-validation-tool",
+      "examples",
+      "output",
+      "az-example",
+      "user-#{ENV['USER_UUID']}",
+      "/*/")
+    run_uuids = Dir.glob(glob_path).map{|t| t.split('/').last.sub("run-","") }
+    run_uuid = run_uuids.last
+
+    general_params = Cpbvt::Payloads::Azure::GeneralParams.new(
+      project_scope: "az-example",
+      run_uuid: run_uuid,
+      region: ENV['AWS_REGION'],
+      user_uuid: ENV['USER_UUID'],
+      azure_client_id: ENV['AZURE_CLIENT_ID'],
+      azure_tenant_id: ENV['AZURE_TENANT_ID'],
+      azure_client_secret: ENV['AZURE_CLIENT_SECRET'],
+      output_path: ENV['OUTPUT_PATH'],
+      aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+      payloads_bucket: ENV['PAYLOADS_BUCKET'],
+      source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
+    )
+
+    specific_params = Azure::SpecificParams.new(
+      storage_account_name: ENV['AZ_STORAGE_ACCOUNT_NAME'],
+      storage_container_name: ENV['AZ_STORAGE_CONTAINER_NAME'],
+      storage_blob_name: ENV['AZ_STORAGE_BLOB_NAME']
+    )
+
+    validations_path =  "/workspace/cloud-project-bootcamp-validation-tool/examples/azure/validations"
+
+    dynamic_params = Azure::DynamicParams.new
+
+    results =
+    Azure::Validator.run(
+      validations_path: validations_path,
+      general_params: general_params,
+      specific_params: specific_params,
+      dynamic_params: dynamic_params,
+      load_order: [
+        :example
+      ]
+    )
+
+    print_results(results)
+  end
+end
+
+namespace :aws do
+  task :permit do
+    puts "gathering permission for: aws_2023 =="
+    general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
+      project_scope: "aws-bootcamp-2023",
+      run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
+      user_uuid: ENV['USER_UUID'],
+      user_region: ENV['USER_AWS_REGION'],
+      output_path: ENV['OUTPUT_PATH'],
+      region: ENV['AWS_REGION'],
+      aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+      payloads_bucket: ENV['PAYLOADS_BUCKET'],
+      target_aws_account_id: ENV['TARGET_AWS_ACCOUNT_ID'],
+      source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
+    )
+
+    specific_params = Aws2023::SpecificParams.new(
+      naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
+      github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
+      cluster_name: ENV['CLUSTER_NAME'],
+      backend_family: ENV['BACKEND_FAMILY'],
+      ecr_repo_name: ENV['ECR_REPO_NAME'],
+      ecs_service_name: ENV['ECS_SERVICE_NAME'],
+      cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
+      apigateway_api_id: ENV['APIGATEWAY_API_ID'],
+      raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME'],
+      cfn_stack_name_machineuser: ENV['CFN_STACK_NAME_MACHINEUSER'],
+      cfn_stack_name_backend: ENV['CFN_STACK_NAME_BACKEND'],
+      cfn_stack_name_sync: ENV['CFN_STACK_NAME_SYNC'],
+      cfn_stack_name_frontend: ENV['CFN_STACK_NAME_FRONTEND'],
+      cfn_stack_name_cicd: ENV['CFN_STACK_NAME_CICD'],
+      cfn_stack_name_db: ENV['CFN_STACK_NAME_DB'],
+      cfn_stack_name_ddb: ENV['CFN_STACK_NAME_DDB'],
+      cfn_stack_name_cluster: ENV['CFN_STACK_NAME_CLUSTER'],
+      cfn_stack_name_networking: ENV['CFN_STACK_NAME_NETWORKING'],
+      cfn_stack_name_cdk: ENV['CFN_STACK_NAME_CDK']
+    )
+
+    Aws2023::Permissioner.run(
+      general_params: general_params,
+      specific_params: specific_params
+    )
+  end
+
+  task :pull do
+    puts "pulling for: aws_2023 =="
+    general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
+      project_scope: "aws-bootcamp-2023",
+      run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
+      user_uuid: ENV['USER_UUID'],
+      user_region: ENV['USER_AWS_REGION'],
+      output_path: ENV['OUTPUT_PATH'],
+      region: ENV['AWS_REGION'],
+      aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+      payloads_bucket: ENV['PAYLOADS_BUCKET'],
+      target_aws_account_id: ENV['TARGET_AWS_ACCOUNT_ID'],
+      source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
+    )
+
+    specific_params = Aws2023::SpecificParams.new(
+      naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
+      github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
+      cluster_name: ENV['CLUSTER_NAME'],
+      backend_family: ENV['BACKEND_FAMILY'],
+      ecr_repo_name: ENV['ECR_REPO_NAME'],
+      ecs_service_name: ENV['ECS_SERVICE_NAME'],
+      cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
+      apigateway_api_id: ENV['APIGATEWAY_API_ID'],
+      raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME'],
+      cfn_stack_name_machineuser: ENV['CFN_STACK_NAME_MACHINEUSER'],
+      cfn_stack_name_backend: ENV['CFN_STACK_NAME_BACKEND'],
+      cfn_stack_name_sync: ENV['CFN_STACK_NAME_SYNC'],
+      cfn_stack_name_frontend: ENV['CFN_STACK_NAME_FRONTEND'],
+      cfn_stack_name_cicd: ENV['CFN_STACK_NAME_CICD'],
+      cfn_stack_name_db: ENV['CFN_STACK_NAME_DB'],
+      cfn_stack_name_ddb: ENV['CFN_STACK_NAME_DDB'],
+      cfn_stack_name_cluster: ENV['CFN_STACK_NAME_CLUSTER'],
+      cfn_stack_name_networking: ENV['CFN_STACK_NAME_NETWORKING'],
+      cfn_stack_name_cdk: ENV['CFN_STACK_NAME_CDK']
+    )
+
+    Aws2023::Puller.run(
+      general_params: general_params,
+      specific_params: specific_params
+    )
+  end
+
+  task :validate do
+    glob_path = File.join(
+      "/workspace",
+      "cloud-project-bootcamp-validation-tool",
+      "examples",
+      "output",
+      "aws-bootcamp-2023",
+      "user-#{ENV['USER_UUID']}",
+      "/*/")
+    run_uuids = Dir.glob(glob_path).map{|t| t.split('/').last.sub("run-","") }
+    run_uuid = run_uuids.last
+
+    general_params = Cpbvt::Payloads::Aws::GeneralParams.new(
+      project_scope: "aws-bootcamp-2023",
+      run_uuid: run_uuid,
+      user_uuid: ENV['USER_UUID'],
+      user_region: ENV['USER_AWS_REGION'],
+      output_path: ENV['OUTPUT_PATH'],
+      region: ENV['AWS_REGION'],
+      aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+      payloads_bucket: ENV['PAYLOADS_BUCKET'],
+      target_aws_account_id: ENV['TARGET_AWS_ACCOUNT_ID'],
+      source_aws_account_id: ENV['SOURCE_AWS_ACCOUNT_ID']
+    )
+
+    puts "validating for: aws_2023 =="
+    puts run_uuid
+
+    dynamic_params = Aws2023::DynamicParams.new
+
+    specific_params = Aws2023::SpecificParams.new(
+      naked_domain_name: ENV['NAKED_DOMAIN_NAME'],
+      github_full_repo_name: ENV['GITHUB_FULL_REPO_NAME'],
+      cluster_name: ENV['CLUSTER_NAME'],
+      backend_family: ENV['BACKEND_FAMILY'],
+      ecr_repo_name: ENV['ECR_REPO_NAME'],
+      ecs_service_name: ENV['ECS_SERVICE_NAME'],
+      cognito_user_pool_name: ENV['COGNITO_USER_POOL_NAME'],
+      apigateway_api_id: ENV['APIGATEWAY_API_ID'],
+      raw_assets_bucket_name: ENV['RAW_ASSETS_BUCKET_NAME'],
+      cfn_stack_name_machineuser: ENV['CFN_STACK_NAME_MACHINEUSER'],
+      cfn_stack_name_backend: ENV['CFN_STACK_NAME_BACKEND'],
+      cfn_stack_name_sync: ENV['CFN_STACK_NAME_SYNC'],
+      cfn_stack_name_frontend: ENV['CFN_STACK_NAME_FRONTEND'],
+      cfn_stack_name_cicd: ENV['CFN_STACK_NAME_CICD'],
+      cfn_stack_name_db: ENV['CFN_STACK_NAME_DB'],
+      cfn_stack_name_ddb: ENV['CFN_STACK_NAME_DDB'],
+      cfn_stack_name_cluster: ENV['CFN_STACK_NAME_CLUSTER'],
+      cfn_stack_name_networking: ENV['CFN_STACK_NAME_NETWORKING'],
+      cfn_stack_name_cdk: ENV['CFN_STACK_NAME_CDK']
+    )
+
+    validations_path =  "/workspace/cloud-project-bootcamp-validation-tool/examples/aws_2023/validations2"
+
+    results =
+    Aws2023::Validator2.run(
+      validations_path: validations_path,
+      dynamic_params: dynamic_params,
+      general_params: general_params,
+      specific_params: specific_params,
+      load_order: [
+        :networking,
+        :cluster,
+        :cicd,
+        :iac,
+        :static_website_hosting,
+        :db,
+        :ddb,
+        :serverless,
+        :authentication
+      ]
+    )
+
+    print_results(results)
+  end #task
+
+end # namespace
+
 #task :chat do 
 #  path = "/workspace/cloud-project-bootcamp-validation-tool/examples/output/aws-bootcamp-2023/user-da124fec-133b-45c5-8423-04b768c886c2/run-1685322793-80559fe1-534d-408c-b1c3-1628e3485d12/ca-central-1/ec2-describe-subnets.json"
 #  data = File.read(path)

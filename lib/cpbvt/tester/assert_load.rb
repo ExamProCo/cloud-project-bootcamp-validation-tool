@@ -6,6 +6,8 @@ class Cpbvt::Tester::AssertLoad
   # at for data
   # eg
   # { "UserPools" => {} }
+
+  # GCP can return data an array or an object.
   def initialize(
     describe_key:,
     spec_key:,
@@ -28,8 +30,10 @@ class Cpbvt::Tester::AssertLoad
       self.fail! kind: 'load_data', message: 'access denied', data: {key: manifest_payload_key}
     end # begin
 
-    if @data_raw.is_a?(Hash)
-      self.pass! kind: 'load_data', message: 'loaded data from manifest', data: { key: manifest_payload_key }
+    if @data_raw.is_a?(Array)
+      self.pass! kind: 'load_data', message: 'loaded array data from manifest', data: { key: manifest_payload_key }
+    elsif @data_raw.is_a?(Hash)
+      self.pass! kind: 'load_data', message: 'loaded object data from manifest', data: { key: manifest_payload_key }
       if key
         if @data_raw.key?(key)
           @data_first_filter = @data_raw[key]

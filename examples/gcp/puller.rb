@@ -24,7 +24,18 @@ class Gcp::Puller
 
     Async do |task|
       self.pull_async task, :gcloud_storage_buckets_list, manifest, general_params
-      self.pull_async task, :gcloud_storage_objects_describe, manifest, general_params, {bucket_name: specific_params.gcp_bucket_name, object_name: 'ships.csv' }
+
+      bucket_name = specific_params.gcp_bucket_name
+      self.pull_async(task,
+        :gcloud_storage_objects_describe, 
+        manifest, 
+        general_params.to_h.merge({
+          filename: "#{:gcloud_storage_objects_describe.to_s.gsub('_','-')}__#{bucket_name}.json",
+        }),
+        {bucket_name: bucket_name, object_name: 'ships.csv' }
+      )
+
+
     end
 
     manifest.write_file!
@@ -47,9 +58,10 @@ class Gcp::Puller
   end
 
   def self.pull(command,manifest,general_params,specific_params={})
+    general_params = general_params.to_h unless general_params.is_a?(Hash)
     result = Cpbvt::Payloads::Gcp::Runner.run(
       command.to_s, 
-      general_params.to_h,
+      general_params,
       specific_params
     )
     manifest.add_payload result[:id], result

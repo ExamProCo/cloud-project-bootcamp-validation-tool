@@ -1,0 +1,2 @@
+class Azure::DynamicParams
+end
