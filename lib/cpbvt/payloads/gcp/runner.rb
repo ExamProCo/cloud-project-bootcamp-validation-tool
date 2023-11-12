@@ -32,12 +32,26 @@ module Cpbvt::Payloads::Gcp::Runner
     stdout_str, stderr_str, status =
     Cpbvt::Payloads::Gcp::Runner.execute(
       general_params.run_uuid,
-      command
+      command,
+      general_params.gcp_key_file
     )
 
-    puts stdout
+    puts stdout_str
 
-    # We need to do error handling here
+    id = general_params.filename.sub(".json","")
+
+    error = false
+    error = stderr_str.strip if stderr_str != ""
+    if error == false && File.size?(output_file).nil?
+      error = "No data returned"
+    end
+
+
+    error = false
+    error = stderr_str.strip if stderr_str != ""
+    if error == false && File.size?(output_file).nil?
+      error = "No data returned"
+    end
 
     ends_at = Time.now.to_f
     return {
@@ -61,7 +75,7 @@ module Cpbvt::Payloads::Gcp::Runner
       project_scope, 
       "user-#{user_uuid}",
       "run-#{run_uuid}",
-      gcp_project_id
+      gcp_project_id,
       filename
     )
 
@@ -74,12 +88,16 @@ module Cpbvt::Payloads::Gcp::Runner
     return value
   end
 
-  def self.execute run_uuid, command
+  def self.execute run_uuid, command, gcp_key_file
     # print the command so we know what is running
     puts "[Executing] #{command}"
     # run the command which will download the json
 
     self.broadcast run_uuid, command
+
+    env_vars = {
+      'GOOGLE_APPLICATION_CREDENTIALS' => gcp_key_file
+    }
 
     # capture3 returns the follwoing ---
     # stdout_str, stderr_str, status

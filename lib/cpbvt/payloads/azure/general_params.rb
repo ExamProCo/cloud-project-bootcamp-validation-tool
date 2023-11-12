@@ -6,7 +6,6 @@ class Cpbvt::Payloads::Azure::GeneralParams
   attr_accessor :project_scope,
                 :user_uuid,
                 :run_uuid,
-                :external_id,
                 :region,
                 :output_path,
                 :aws_access_key_id,
@@ -24,7 +23,6 @@ class Cpbvt::Payloads::Azure::GeneralParams
 
   validates :project_scope, presence: true
   validates :user_uuid , presence: true
-  validates :external_id, presence: true
   validates :run_uuid, presence: true
   validates :region, presence: true
   validates :output_path, presence: true
@@ -42,11 +40,10 @@ class Cpbvt::Payloads::Azure::GeneralParams
     project_scope:,
     user_uuid:,
     run_uuid:,
-    external_id:,
     region:,
-    :azure_client_id,
-    :azure_tenant_id,
-    :azure_client_secret,
+    azure_client_id:,
+    azure_tenant_id:,
+    azure_client_secret:,
     output_path:,
     aws_access_key_id:,
     aws_secret_access_key:,
@@ -54,7 +51,6 @@ class Cpbvt::Payloads::Azure::GeneralParams
     source_aws_account_id:
   )
     @project_scope = project_scope
-    @external_id = external_id
     @run_uuid = run_uuid
     @user_uuid = user_uuid
     @region = region
@@ -72,7 +68,6 @@ class Cpbvt::Payloads::Azure::GeneralParams
   def to_h
     {
       project_scope: @project_scope,
-      external_id: @external_id,
       run_uuid: @run_uuid,
       user_uuid: @user_uuid,
       region: @region,

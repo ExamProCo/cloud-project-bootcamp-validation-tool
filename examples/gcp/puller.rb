@@ -23,8 +23,21 @@ class Gcp::Puller
     creds = Cpbvt::Payloads::Gcp::Command.login general_params.gcp_key_file
 
     Async do |task|
-      self.pull_async task, primary_region, :gcloud_storage_ls, manifest, general_params, {bucket_name: specific_params.bucket_name }
+      self.pull_async task, :gcloud_storage_buckets_list, manifest, general_params
+      self.pull_async task, :gcloud_storage_objects_describe, manifest, general_params, {bucket_name: specific_params.gcp_bucket_name, object_name: 'ships.csv' }
     end
+
+    manifest.write_file!
+    manifest.archive!
+
+    Cpbvt::Uploader.run(
+      file_path: manifest.output_file, 
+      object_key: manifest.object_key,
+      aws_region: general_params.region,
+      aws_access_key_id: general_params.aws_access_key_id,
+      aws_secret_access_key: general_params.aws_secret_access_key,
+      payloads_bucket: general_params.payloads_bucket
+    )
   end
 
   def self.pull_async(task,command,manifest,general_params,specific_params={})
@@ -36,7 +49,7 @@ class Gcp::Puller
   def self.pull(command,manifest,general_params,specific_params={})
     result = Cpbvt::Payloads::Gcp::Runner.run(
       command.to_s, 
-      general_params,
+      general_params.to_h,
       specific_params
     )
     manifest.add_payload result[:id], result

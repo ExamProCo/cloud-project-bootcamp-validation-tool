@@ -20,13 +20,29 @@ class Azure::Puller
       payloads_bucket: general_params.payloads_bucket
     )
 
-    creds = Cpbvt::Payloads::Azure::Command.login general_params.azure_client_id, general_params.azure_client_secret, general_params.azure_tenant_id
+    creds = Cpbvt::Payloads::Azure::Command.login(
+      general_params.azure_client_id, 
+      general_params.azure_client_secret, 
+      general_params.azure_tenant_id
+    )
 
     Async do |task|
       self.pull_async task, :az_storage_account_list, manifest, general_params
       self.pull_async task, :az_storage_container_list, manifest, general_params, {account_name: specific_params.storage_account_name }
       self.pull_async task, :az_storage_blob_exists, manifest, general_params, {account_name: specific_params.storage_account_name, container_name: specific_params.storage_container_name, blob_name: specific_params.storage_blob_name }
     end
+
+    manifest.write_file!
+    manifest.archive!
+
+    Cpbvt::Uploader.run(
+      file_path: manifest.output_file, 
+      object_key: manifest.object_key,
+      aws_region: general_params.region,
+      aws_access_key_id: general_params.aws_access_key_id,
+      aws_secret_access_key: general_params.aws_secret_access_key,
+      payloads_bucket: general_params.payloads_bucket
+    )
   end
 
   def self.pull_async(task,command,manifest,general_params,specific_params={})
@@ -38,7 +54,7 @@ class Azure::Puller
   def self.pull(command,manifest,general_params,specific_params={})
     result = Cpbvt::Payloads::Azure::Runner.run(
       command.to_s, 
-      general_params,
+      general_params.to_h,
       specific_params
     )
     manifest.add_payload result[:id], result

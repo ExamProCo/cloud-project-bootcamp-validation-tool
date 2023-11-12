@@ -1,0 +1,30 @@
+
+[1mFrom:[0m /workspace/cloud-project-bootcamp-validation-tool/examples/gcp/puller.rb:24 Gcp::Puller.run:
+
+     [1;34m4[0m: [32mdef[0m [1;36mself[0m.[1;34mrun[0m([35mgeneral_params[0m:,[35mspecific_params[0m:)
+     [1;34m5[0m:   [32munless[0m general_params.valid?
+     [1;34m6[0m:     puts general_params.errors.full_messages
+     [1;34m7[0m:     raise [31m[1;31m"[0m[31mfailed to pass general params validation[1;31m"[0m[31m[0m
+     [1;34m8[0m:   [32mend[0m
+     [1;34m9[0m: 
+    [1;34m10[0m:   [32munless[0m specific_params.valid?
+    [1;34m11[0m:     puts specific_params.errors.full_messages
+    [1;34m12[0m:     raise [31m[1;31m"[0m[31mfailed to specific params validation[1;31m"[0m[31m[0m
+    [1;34m13[0m:   [32mend[0m
+    [1;34m14[0m: 
+    [1;34m15[0m:   manifest = [1;34;4mCpbvt[0m::[1;34;4mManifest[0m.new(
+    [1;34m16[0m:     [35muser_uuid[0m: general_params.user_uuid, 
+    [1;34m17[0m:     [35mrun_uuid[0m: general_params.run_uuid, 
+    [1;34m18[0m:     [35mproject_scope[0m: general_params.project_scope,
+    [1;34m19[0m:     [35moutput_path[0m: general_params.output_path,
+    [1;34m20[0m:     [35mpayloads_bucket[0m: general_params.payloads_bucket
+    [1;34m21[0m:   )
+    [1;34m22[0m: 
+    [1;34m23[0m:   creds = [1;34;4mCpbvt[0m::[1;34;4mPayloads[0m::[1;34;4mGcp[0m::[1;34;4mCommand[0m.login general_params.gcp_key_file
+ => [1;34m24[0m:   binding.pry
+    [1;34m25[0m: 
+    [1;34m26[0m:   [1;34;4mAsync[0m [32mdo[0m |task|
+    [1;34m27[0m:     [1;36mself[0m.pull_async task, [33m:gcloud_storage_ls[0m, manifest, general_params, {[35mbucket_name[0m: specific_params.gcp_bucket_name }
+    [1;34m28[0m:   [32mend[0m
+    [1;34m29[0m: [32mend[0m
+

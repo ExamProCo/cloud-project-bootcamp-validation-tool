@@ -37,9 +37,15 @@ module Cpbvt::Payloads::Azure::Runner
       command
     )
 
-    puts stdout
+    puts stdout_str
 
-    # We need to do error handling here
+    id = general_params.filename.sub(".json","")
+
+    error = false
+    error = stderr_str.strip if stderr_str != ""
+    if error == false && File.size?(output_file).nil?
+      error = "No data returned"
+    end
 
     ends_at = Time.now.to_f
     return {

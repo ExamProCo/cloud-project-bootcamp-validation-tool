@@ -6,6 +6,20 @@ require 'fileutils'
 #require 'json'
 #require 'openai'
 
+module Azure
+  module Validations
+  end
+end
+require_relative 'azure/puller.rb'
+require_relative 'azure/specific_params.rb'
+
+module Gcp
+  module Validations
+  end
+end
+require_relative 'gcp/puller.rb'
+require_relative 'gcp/specific_params.rb'
+
 module Aws2023
   module Validations
   end
@@ -30,7 +44,9 @@ task :gcp_pull do
   general_params = Cpbvt::Payloads::Gcp::GeneralParams.new(
     project_scope: "gcp-example",
     run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
+    region: ENV['AWS_REGION'],
     user_uuid: ENV['USER_UUID'],
+    gcp_key_file: ENV['GOOGLE_APPLICATION_CREDENTIALS'],
     gcp_project_id: ENV['GCP_PROJECT_ID'],
     output_path: ENV['OUTPUT_PATH'],
     aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
@@ -54,6 +70,7 @@ task :az_pull do
   general_params = Cpbvt::Payloads::Azure::GeneralParams.new(
     project_scope: "az-example",
     run_uuid: "#{Time.now.to_i}-#{SecureRandom.uuid}",
+    region: ENV['AWS_REGION'],
     user_uuid: ENV['USER_UUID'],
     azure_client_id: ENV['AZURE_CLIENT_ID'],
     azure_tenant_id: ENV['AZURE_TENANT_ID'],
@@ -71,7 +88,7 @@ task :az_pull do
     storage_blob_name: ENV['AZ_STORAGE_BLOB_NAME']
   )
 
-  Gcp::Puller.run(
+  Azure::Puller.run(
     general_params: general_params,
     specific_params: specific_params
   )

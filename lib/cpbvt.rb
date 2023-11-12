@@ -3,6 +3,23 @@ require_relative 'cpbvt/version'
 require_relative 'cpbvt/uploader'
 require_relative 'cpbvt/downloader'
 require_relative 'cpbvt/manifest'
+
+# --- require cpbvt/payloads/azure/commands/*
+aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','azure','commands','*.rb')
+Dir.glob(aws_commands_path,&method(:require))
+# ---
+require_relative 'cpbvt/payloads/azure/general_params'
+require_relative 'cpbvt/payloads/azure/runner'
+require_relative 'cpbvt/payloads/azure/command'
+
+# --- require cpbvt/payloads/gcp/commands/*
+aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','gcp','commands','*.rb')
+Dir.glob(aws_commands_path,&method(:require))
+# ---
+require_relative 'cpbvt/payloads/gcp/general_params'
+require_relative 'cpbvt/payloads/gcp/runner'
+require_relative 'cpbvt/payloads/gcp/command'
+
 # --- require cpbvt/payloads/aws/extractors/*
 aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','aws','extractors','*.rb')
 Dir.glob(aws_commands_path,&method(:require))
