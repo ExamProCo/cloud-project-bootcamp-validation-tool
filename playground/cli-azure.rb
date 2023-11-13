@@ -9,6 +9,7 @@ require 'open3'
 # Deploy the Azure Lighthouse ARM template to grant the validator access to resources inside the customer account
 # Access is delegated to a security group in the source tenant with the Reader role on a specified resource group in the customer account
 # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
+# The Azure service principal that is used to run the validator will need to be added to the lighthouse security group in the source tenant
 
 # ARM Files
 # /workspace/cloud-project-bootcamp-validation-tool/lib/cpbvt/payloads/azure/lighthouse-params.json
@@ -17,13 +18,22 @@ require 'open3'
 # Deploy via cli
 
 # az deployment sub create --name <deploymentName> \
-#                          --location <AzureRegion> \
-#                          --template-file <pathToTemplateFile> \
-#                          --verbose
+#                         --location <AzureRegion> \
+#                         --template-uri <templateUri> \
+#                         --parameters <parameterFile> \
+#                         --verbose
+#
+
+# Deploy via PowerShell
+
+# New-AzSubscriptionDeployment -Name <deploymentName> `
+#                  -Location <AzureRegion> `
+#                  -TemplateUri <templateUri> `
+#                  -TemplateParameterUri <parameterUri> `
+#                  -Verbose
 
 # One-click Deployment Button (Markdown)
 # [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/<path to public template url>%26api-version%3D6.0)
-
 
 # These env vars are obtained by registering an application 
 # with Azure Active Directory (Azure AD) know known as Microsoft Entra ID
@@ -49,16 +59,17 @@ require 'open3'
 
 # az storage account list
 
-#
-
 env_vars = {
   "AZURE_CLIENT_ID" => ENV["AZURE_CLIENT_ID"],
   "AZURE_TENANT_ID" => ENV["AZURE_TENANT_ID"],
   "AZURE_CLIENT_SECRET" => ENV["AZURE_CLIENT_SECRET"]
 }
-account_name = 'azvalcheckexp'
-container_name = 'mycontainer'
-blob_name = 'hello.txt'
+
+# user supplied parameters
+account_name = 'examprostorage'
+container_name = 'examprocontainer'
+blob_name = 'examproblob.txt'
+user_subscription_id = 'cf5d6d10-f3fd-442f-ae59-80dae20c8fa4'
 
 login = <<COMMAND
 az login --service-principal \
@@ -85,6 +96,10 @@ COMMAND
 #  }
 #]
 
+# change cli context to the users subscription
+tenant = <<COMMAND
+az account set --subscription #{user_subscription_id}"
+COMMAND
 
 # Check for an storage account in a list
 command_account = <<~COMMAND
@@ -104,7 +119,6 @@ az storage blob exists  \
 --container-name #{container_name} \
 --name #{blob_name}
 COMMAND
-
 
 stdout_str, stderr_str, status = Open3.capture3(env_vars, login)
 puts "\n Login ========"
