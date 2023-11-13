@@ -7,7 +7,7 @@ require 'open3'
 # Permission Setup
 
 # Deploy the Azure Lighthouse ARM template to grant the validator access to resources inside the customer account
-# Access is delegated to a security group in the source tenant with the Reader role on a specified resource group in the customer account
+# Access is delegated to a security group in the source tenant with the Contributor role on a specified resource group in the customer account
 # https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
 # The Azure service principal that is used to run the validator will need to be added to the lighthouse security group in the source tenant
 
@@ -109,7 +109,8 @@ COMMAND
 # Check for a container with an azure storage account
 command_container = <<~COMMAND
 az storage container list \
---account-name #{account_name}
+--account-name #{account_name} \
+--auth-mode login
 COMMAND
 
 # Check for a blob object within a container
@@ -117,6 +118,7 @@ command_blob = <<~COMMAND
 az storage blob exists  \
 --account-name #{account_name} \
 --container-name #{container_name} \
+--auth-mode login \
 --name #{blob_name}
 COMMAND
 

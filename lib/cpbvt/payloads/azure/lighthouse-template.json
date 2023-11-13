@@ -26,12 +26,12 @@
         "authorizations": {
             "type": "array",
             "metadata": {
-                "description": "ExamPro - Cloud Project Validation Tool Security Group - Reader"
+                "description": "ExamPro - Cloud Project Validation Tool Security Group - Contributor"
             },
             "defaultValue": [
                 { 
                     "principalId": "23599e52-e874-4ee9-ae23-427ae0839415",
-                    "roleDefinitionId": "acdd72a7-3385-48ef-bd42-f606fba81ae7",
+                    "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c",
                     "principalIdDisplayName": "ExamPro - Cloud Project Validation Tool"
                 } 
             ]
