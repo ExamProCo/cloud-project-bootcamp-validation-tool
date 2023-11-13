@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "mspOfferName": {
+      "value": "ExamPro - Cloud Project Validation Tool"
+    },
+    "rgName": {
+      "value": "${UserRgName}"
+    },
+    "mspOfferDescription": {
+      "value": "ExamPro - Azure Account Validator"
+    },
+    "managedByTenantId": {
+      "value": "f73244ae-3e74-43eb-8dbf-c66edefbb313"
+    },
+    "authorizations": {
+      "value": [{ 
+        "principalId": "23599e52-e874-4ee9-ae23-427ae0839415",
+        "roleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c",
+        "principalIdDisplayName": "ExamPro - Cloud Project Validation Tool"
+      }]
+    }
+  }
+}

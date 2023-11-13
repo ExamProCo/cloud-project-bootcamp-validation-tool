@@ -4,6 +4,26 @@ require 'ostruct'
 require 'time'
 require 'open3'
 
+# Permission Setup
+
+# Deploy the Azure Lighthouse ARM template to grant the validator access to resources inside the customer account
+# Access is delegated to a security group in the source tenant with the Reader role on a specified resource group in the customer account
+# https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
+
+# ARM Files
+# /workspace/cloud-project-bootcamp-validation-tool/lib/cpbvt/payloads/azure/lighthouse-params.json
+# /workspace/cloud-project-bootcamp-validation-tool/lib/cpbvt/payloads/azure/lighthouse-template.json
+
+# Deploy via cli
+
+# az deployment sub create --name <deploymentName> \
+#                          --location <AzureRegion> \
+#                          --template-file <pathToTemplateFile> \
+#                          --verbose
+
+# One-click Deployment Button (Markdown)
+# [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/<path to public template url>%26api-version%3D6.0)
+
 
 # These env vars are obtained by registering an application 
 # with Azure Active Directory (Azure AD) know known as Microsoft Entra ID
