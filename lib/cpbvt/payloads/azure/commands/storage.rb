@@ -14,6 +14,7 @@ COMMAND
   def az_storage_container_list account_name:
 <<~COMMAND
 az storage container list \
+--auth-mode login \
 --account-name #{account_name}
 COMMAND
   end
@@ -24,6 +25,7 @@ COMMAND
 az storage blob exists  \
 --account-name #{account_name} \
 --container-name #{container_name} \
+--auth-mode login \
 --name #{blob_name}
 COMMAND
   end

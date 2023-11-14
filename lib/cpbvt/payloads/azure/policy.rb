@@ -7,7 +7,7 @@ class Cpbvt::Payloads::Azure::Policy
   def self.generate! general_params
     path = File.join(
       File.dirname(File.expand_path(__FILE__)),
-        "lighthouse-params.json"
+        "lighthouse-template.json"
     )
     arm_template = JSON.load(path)    
     arm_template['parameters']['rgName']['value'] = "#{general_params.user_resource_group}"
@@ -16,7 +16,7 @@ class Cpbvt::Payloads::Azure::Policy
       general_params.output_path,
       general_params.project_scope,
       "user-#{general_params.user_uuid}",
-      "#{general_params.run_uuid}-lighthouse-params.json"
+      "#{general_params.run_uuid}-lighthouse-template.json"
     )
 
     dirpath = File.dirname output_path
