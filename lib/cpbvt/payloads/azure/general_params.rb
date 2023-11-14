@@ -15,12 +15,15 @@ class Cpbvt::Payloads::Azure::GeneralParams
                 :azure_client_secret,
                 :tmp_aws_session_token,
                 :payloads_bucket,
-                :target_aws_account_id,
-                :source_aws_account_id
+                :target_subscription_id,
+                :target_resource_group,
+                :source_aws_account_id,
+                :external_id
 
   # we aren't validating the session_token since
   # will pul it after validation
 
+  validates :external_id, presence: true
   validates :project_scope, presence: true
   validates :user_uuid , presence: true
   validates :run_uuid, presence: true
@@ -29,9 +32,12 @@ class Cpbvt::Payloads::Azure::GeneralParams
   validates :aws_access_key_id, presence: true
   validates :aws_secret_access_key, presence: true
 
- validates :azure_client_id, presence: true
- validates :azure_tenant_id, presence: true
- validates :azure_client_secret, presence: true
+  validates :azure_client_id, presence: true
+  validates :azure_tenant_id, presence: true
+  validates :azure_client_secret, presence: true
+
+  validates :target_subscription_id, presence: true
+  validates :target_resource_group, presence: true
 
   validates :payloads_bucket, presence: true
   validates :source_aws_account_id, presence: true
@@ -48,7 +54,10 @@ class Cpbvt::Payloads::Azure::GeneralParams
     aws_access_key_id:,
     aws_secret_access_key:,
     payloads_bucket:,
-    source_aws_account_id:
+    source_aws_account_id:,
+    target_subscription_id:,
+    target_resource_group:,
+    external_id:
   )
     @project_scope = project_scope
     @run_uuid = run_uuid
@@ -62,6 +71,9 @@ class Cpbvt::Payloads::Azure::GeneralParams
     @aws_secret_access_key = aws_secret_access_key
     @payloads_bucket = payloads_bucket
     @source_aws_account_id = source_aws_account_id
+    @target_subscription_id = target_subscription_id
+    @target_resource_group = target_resource_group
+    @external_id = external_id
   end
 
   # to hash
@@ -79,6 +91,9 @@ class Cpbvt::Payloads::Azure::GeneralParams
       aws_secret_access_key: @aws_secret_access_key,
       payloads_bucket: @payloads_bucket,
       source_aws_account_id: @source_aws_account_id,
+      target_subscription_id: @target_subscription_id,
+      target_resource_group: @target_resource_group,
+      external_id: @external_id
     }
   end
 end
