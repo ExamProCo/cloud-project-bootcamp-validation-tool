@@ -9,8 +9,10 @@ class Cpbvt::Payloads::Azure::Policy
       File.dirname(File.expand_path(__FILE__)),
         "lighthouse-template.json"
     )
-    arm_template = JSON.load(path)    
-    arm_template['parameters']['rgName']['value'] = "#{general_params.user_resource_group}"
+
+    file = File.read(path)
+    arm_template = JSON.parse(file)  
+    arm_template['parameters']['rgName']['defaultValue'] = "#{general_params.target_resource_group}"
 
     output_path = File.join(
       general_params.output_path,
@@ -36,7 +38,7 @@ class Cpbvt::Payloads::Azure::Policy
     Cpbvt::Uploader.run(
       file_path: output_path,
       object_key: object_key,
-      aws_region: general_params.user_region,
+      aws_region: general_params.region,
       aws_access_key_id: general_params.aws_access_key_id,
       aws_secret_access_key: general_params.aws_secret_access_key,
       payloads_bucket: general_params.payloads_bucket

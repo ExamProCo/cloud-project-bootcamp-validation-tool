@@ -37,6 +37,7 @@ aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','aws','p
 Dir.glob(aws_commands_path,&method(:require))
 # ---
 require_relative 'cpbvt/payloads/aws/policy'
+require_relative 'cpbvt/payloads/azure/policy'
 
 require_relative 'cpbvt/tester/report'
 require_relative 'cpbvt/tester/runner'
