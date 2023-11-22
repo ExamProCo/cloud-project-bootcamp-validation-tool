@@ -6,15 +6,15 @@ module Cpbvt::Payloads::Gcp::Commands::Storage
   # https://cloud.google.com/sdk/gcloud/reference/storage/buckets/list
   def gcloud_storage_buckets_list
   <<~COMMAND
-gcloud storage buckets list
+    gcloud storage buckets list
   COMMAND
   end
   
   # https://cloud.google.com/sdk/gcloud/reference/storage/objects/describe
   def gcloud_storage_objects_describe bucket_name:, object_name:
   <<~COMMAND
- gcloud storage objects describe \
- gs://#{bucket_name}/#{object_name}
+    gcloud storage objects describe \
+    gs://#{bucket_name}/#{object_name}
   COMMAND
   end
   # ------
