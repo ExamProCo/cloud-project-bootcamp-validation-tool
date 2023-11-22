@@ -11,7 +11,8 @@ class Cpbvt::Uploader
                aws_region:,
                aws_access_key_id:,
                aws_secret_access_key:,
-               payloads_bucket:)
+               payloads_bucket:,
+               public_read: false)
     Aws.config.update({
       credentials: Aws::Credentials.new(
         aws_access_key_id,
@@ -27,11 +28,18 @@ class Cpbvt::Uploader
 
     begin
       # Upload the JSON file to S3
-      s3_client.put_object({
+      attrs = {
         bucket: payloads_bucket,
         key: object_key,
         body: file_content
-      })
+      }
+      # when working with azure arm templates we need to make them public in S3
+      # the payload bucket also requires a CORS policy to allow portal.azure.com to GET
+      # nothing sensitive is contained inside the ligthhouse template and it is removed after validation is complete
+      if public_read == true
+        attrs[:acl] = 'public-read'
+      end
+      s3_client.put_object attrs
       puts 'File uploaded successfully.'
     rescue Aws::S3::Errors::ServiceError => e
       puts "AWS S3 service error: #{e.message}"
