@@ -41,7 +41,8 @@ class Cpbvt::Payloads::Azure::Policy
       aws_region: general_params.region,
       aws_access_key_id: general_params.aws_access_key_id,
       aws_secret_access_key: general_params.aws_secret_access_key,
-      payloads_bucket: general_params.payloads_bucket
+      payloads_bucket: general_params.payloads_bucket,
+      public_read: true
     )
     File.delete(output_path) if File.exist?(output_path)
 
