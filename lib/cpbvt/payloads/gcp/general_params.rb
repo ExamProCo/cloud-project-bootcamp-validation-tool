@@ -14,7 +14,6 @@ class Cpbvt::Payloads::Gcp::GeneralParams
                 :gcp_project_id,
                 :tmp_aws_session_token,
                 :payloads_bucket,
-                :target_aws_account_id,
                 :source_aws_account_id
 
   # we aren't validating the session_token since

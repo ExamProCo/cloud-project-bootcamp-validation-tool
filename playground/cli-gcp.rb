@@ -22,6 +22,10 @@ gcloud auth activate-service-account \
 --key-file=#{ENV['GOOGLE_APPLICATION_CREDENTIALS']}
 COMMAND
 
+
+## Users can grant cross account role permission using
+# gcloud projects add-iam-policy-binding <USERS PROJECT ID> --member serviceAccount:<VALIDATOR SERVICE ACCOUNT>@<PROJECT>.iam.gserviceaccount.com --role=roles/viewer
+
 list_comamnd = <<COMMAND
 gsutil ls \
 -p #{ENV['GCP_PROJECT_ID']}
