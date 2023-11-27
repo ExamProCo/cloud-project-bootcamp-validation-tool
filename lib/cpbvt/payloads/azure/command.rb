@@ -1,6 +1,7 @@
 require 'open3'
 
 class Cpbvt::Payloads::Azure::Command
+  include Cpbvt::Payloads::Azure::Commands::Network
   include Cpbvt::Payloads::Azure::Commands::Storage
   include Cpbvt::Payloads::Azure::Commands::VirtualMachine
 
