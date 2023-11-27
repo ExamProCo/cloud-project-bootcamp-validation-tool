@@ -2,6 +2,7 @@ require 'open3'
 
 class Cpbvt::Payloads::Azure::Command
   include Cpbvt::Payloads::Azure::Commands::Storage
+  include Cpbvt::Payloads::Azure::Commands::VirtualMachine
 
   def self.login azure_client_id, azure_secret_client, azure_tenant_id, user_subscription_id
     command = <<~COMMAND
