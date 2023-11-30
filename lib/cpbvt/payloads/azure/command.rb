@@ -4,6 +4,8 @@ class Cpbvt::Payloads::Azure::Command
   include Cpbvt::Payloads::Azure::Commands::Network
   include Cpbvt::Payloads::Azure::Commands::Storage
   include Cpbvt::Payloads::Azure::Commands::VirtualMachine
+  include Cpbvt::Payloads::Azure::Commands::FunctionApp
+  include Cpbvt::Payloads::Azure::Commands::Group
 
   def self.login azure_client_id, azure_secret_client, azure_tenant_id, user_subscription_id
     command = <<~COMMAND
