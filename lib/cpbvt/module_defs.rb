@@ -12,6 +12,10 @@ module Cpbvt
       module Commands; end
       module Extractors; end
     end
+    module Terraform
+      module Commands; end
+      module Extractors; end
+    end
     module Aws
       module Commands; end
       module Extractors; end

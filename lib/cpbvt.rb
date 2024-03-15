@@ -5,20 +5,30 @@ require_relative 'cpbvt/downloader'
 require_relative 'cpbvt/manifest'
 
 # --- require cpbvt/payloads/azure/commands/*
-aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','azure','commands','*.rb')
-Dir.glob(aws_commands_path,&method(:require))
+az_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','azure','commands','*.rb')
+Dir.glob(az_commands_path,&method(:require))
 # ---
 require_relative 'cpbvt/payloads/azure/general_params'
 require_relative 'cpbvt/payloads/azure/runner'
 require_relative 'cpbvt/payloads/azure/command'
+require_relative 'cpbvt/payloads/azure/policy'
 
 # --- require cpbvt/payloads/gcp/commands/*
-aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','gcp','commands','*.rb')
-Dir.glob(aws_commands_path,&method(:require))
+gcp_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','gcp','commands','*.rb')
+Dir.glob(gcp_commands_path,&method(:require))
 # ---
 require_relative 'cpbvt/payloads/gcp/general_params'
 require_relative 'cpbvt/payloads/gcp/runner'
 require_relative 'cpbvt/payloads/gcp/command'
+
+# --- require cpbvt/payloads/terraform/commands/*
+tf_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','terraform','commands','*.rb')
+Dir.glob(tf_commands_path,&method(:require))
+# ---
+require_relative 'cpbvt/payloads/terraform/general_params'
+require_relative 'cpbvt/payloads/terraform/runner'
+require_relative 'cpbvt/payloads/terraform/command'
+require_relative 'cpbvt/payloads/terraform/policy'
 
 # --- require cpbvt/payloads/aws/extractors/*
 aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','aws','extractors','*.rb')
@@ -37,7 +47,6 @@ aws_commands_path = File.join(File.dirname(__FILE__),'cpbvt','payloads','aws','p
 Dir.glob(aws_commands_path,&method(:require))
 # ---
 require_relative 'cpbvt/payloads/aws/policy'
-require_relative 'cpbvt/payloads/azure/policy'
 
 require_relative 'cpbvt/tester/report'
 require_relative 'cpbvt/tester/runner'
