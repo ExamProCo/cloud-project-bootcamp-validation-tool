@@ -5,7 +5,7 @@ module Cpbvt::Payloads::Terraform::Commands::State
   
   def terraform_state_pull(terraform_token:, policy_path:)
   <<~COMMAND
-    export TERRAFORM_TOKEN=#{terraform_token} && \
+    export TF_TOKEN_app_terraform_io=#{terraform_token} && \
     cd #{policy_path} && \
     terraform init && \
     terraform state pull

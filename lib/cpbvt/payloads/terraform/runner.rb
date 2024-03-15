@@ -89,7 +89,7 @@ module Cpbvt::Payloads::Terraform::Runner
     self.broadcast run_uuid, "terraform state pull (remote)"
 
     env_vars = {
-      'TERRAFORM_TOKEN' => terraform_token
+      'TF_TOKEN_app_terraform_io' => terraform_token
     }
 
     # capture3 returns the follwoing ---
