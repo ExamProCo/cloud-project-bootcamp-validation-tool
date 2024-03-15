@@ -24,8 +24,8 @@ module Cpbvt::Payloads::Terraform::Runner
     specific_params[:terraform_token] = general_params["terraform_token"]
     command = Cpbvt::Payloads::Terraform::Command.send(command, **specific_params)
     command = command.strip.gsub("\n", " ")
-    command = "#{command} > #{output_file}"
-    
+    command = "#{command} > #{general_params.filename}"
+
     stdout_str, stderr_str, status =
     Cpbvt::Payloads::Terraform::Runner.execute(
       general_params.run_uuid,
@@ -66,8 +66,21 @@ module Cpbvt::Payloads::Terraform::Runner
 
   # create the path to where the json file will be downloaded
   def self.output_file(user_uuid:,run_uuid:,project_scope:,output_path:,filename:)
-    # terraform cli is executing from the export directory already
-    return filename
+    value = File.join(
+      output_path, 
+      project_scope, 
+      "user-#{user_uuid}",
+      "run-#{run_uuid}",
+      filename
+    )
+
+    # create the folder for the downloaded json if it doesn't exist
+    FileUtils.mkdir_p File.dirname(value)
+
+    # print the desination of the outputed json
+    #puts "[Output File] #{value}"
+
+    return value
   end
 
   def self.execute run_uuid, command, terraform_token
