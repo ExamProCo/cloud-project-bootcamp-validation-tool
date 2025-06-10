@@ -2,6 +2,7 @@ require 'open3'
 
 class Cpbvt::Payloads::Gcp::Command
   include Cpbvt::Payloads::Gcp::Commands::Storage
+  include Cpbvt::Payloads::Gcp::Commands::Network
 
   def self.login gcp_key_file
       command = <<~COMMAND
